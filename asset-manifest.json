@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/ranger-glimpass/glimpass-user.git/static/css/main.057e3ae2.css",
+    "main.js": "/ranger-glimpass/glimpass-user.git/static/js/main.96fff027.js",
+    "static/js/787.252292ee.chunk.js": "/ranger-glimpass/glimpass-user.git/static/js/787.252292ee.chunk.js",
+    "index.html": "/ranger-glimpass/glimpass-user.git/index.html",
+    "static/media/navigationArrow.svg": "/ranger-glimpass/glimpass-user.git/static/media/navigationArrow.60415a63d959881e22c52e9d1be134d9.svg",
+    "main.057e3ae2.css.map": "/ranger-glimpass/glimpass-user.git/static/css/main.057e3ae2.css.map",
+    "main.96fff027.js.map": "/ranger-glimpass/glimpass-user.git/static/js/main.96fff027.js.map",
+    "787.252292ee.chunk.js.map": "/ranger-glimpass/glimpass-user.git/static/js/787.252292ee.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.057e3ae2.css",
+    "static/js/main.96fff027.js"
+  ]
+}
