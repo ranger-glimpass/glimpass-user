@@ -1,0 +1,73 @@
+.location-header {
+    position: fixed;
+    top: 10px; /* Adjust for desired vertical spacing from the top */
+    right: 10px; /* Adjust for desired horizontal spacing from the right */
+
+    padding: 5px 10px;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    font-size: 0.8em; /* Makes the text smaller */
+    border-radius: 5px; /* Optional: adds rounded corners */
+}
+
+.shop-container {
+    margin-top: 80px; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.shop-card {
+    width: 80%;
+    margin: 1% 0;
+    padding: 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+    position: relative;
+}
+
+.shop-card:hover {
+    transform: translateY(-5px);
+}
+
+.shop-name {
+    font-weight: bold;
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+.shop-category,
+.shop-discount {
+    font-size: 0.9em;
+    margin-bottom: 10px;
+    color: #757575;
+}
+
+.navigate-btn {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    background-color: #333;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+}
+
+.navigate-btn:hover {
+    background-color: #555;
+}
+
+.shop-description {
+    font-size: 0.8em;
+    color: #757575;
+    margin-bottom: 15px;
+}
+.navigation-arrow {
+    width: 10vw; /* Adjust this value between 5vw to 10vw based on your preference */
+    height: auto;
+}
