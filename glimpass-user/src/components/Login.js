@@ -6,7 +6,7 @@ const Login = () => {
 
     const handleLogin = (e) => {
         e.preventDefault();
-        navigate('/dashboard');
+        navigate('/shops');
     }
 
     return (
@@ -27,5 +27,4 @@ const Login = () => {
         </div>
     );
 }
-
 export default Login;

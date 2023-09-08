@@ -7,6 +7,7 @@ const Navigation = () => {
 
     const locationData = useLocation();
     const shopName = locationData.state?.shopName || 'Unknown Shop';
+    const currentLocation = locationData.state?.location || 'Unknown Location';
 
     // Sample map data
     const mapSteps = [
@@ -21,7 +22,7 @@ const Navigation = () => {
     useEffect(() => {
         const handleOrientation = (event) => {
             const { alpha } = event;
-            setAlpha(parseFloat(alpha));
+            setAlpha(parseInt(alpha));
         };
 
         window.addEventListener('deviceorientation', handleOrientation);
@@ -32,18 +33,20 @@ const Navigation = () => {
     }, []);
 
     return (
-        
         <div>
+            <div className="location-header">
+            <h2>📍 {currentLocation}</h2>
+        </div>
+        
             <div>
             <h2>Navigating to: {shopName}</h2>
-            <h2>Device Orientation: {alpha.toFixed(2)}°</h2>
+            <h2>Device Orientation: {360-alpha}°</h2>
             <img 
     src={navigationArrow} 
     alt="Navigation Arrow" 
     className="navigation-arrow"
-    style={{ transform: `rotate(${alpha}deg)` }}
+    style={{ transform: `rotate(${alpha-45}deg)` }}
 />
-
             <div>
                 <h3>Map Steps:</h3>
                 <ul>

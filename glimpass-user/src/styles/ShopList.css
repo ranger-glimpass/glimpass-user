@@ -1,73 +1,142 @@
-.location-header {
-    position: fixed;
-    top: 10px; /* Adjust for desired vertical spacing from the top */
-    right: 10px; /* Adjust for desired horizontal spacing from the right */
-
-    padding: 5px 10px;
-    z-index: 1000;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    font-size: 0.8em; /* Makes the text smaller */
-    border-radius: 5px; /* Optional: adds rounded corners */
-}
-
-.shop-container {
-    margin-top: 80px; 
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.shop-card {
-    width: 80%;
-    margin: 1% 0;
-    padding: 20px;
-    border: 1px solid #e0e0e0;
-    border-radius: 5px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s;
-    position: relative;
-}
-
-.shop-card:hover {
-    transform: translateY(-5px);
-}
-
-.shop-name {
-    font-weight: bold;
-    font-size: 1.2em;
-    margin-bottom: 10px;
-}
-
-.shop-category,
-.shop-discount {
-    font-size: 0.9em;
-    margin-bottom: 10px;
-    color: #757575;
-}
-
-.navigate-btn {
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    background-color: #333;
-    color: #fff;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-}
-
-.navigate-btn:hover {
-    background-color: #555;
-}
-
-.shop-description {
-    font-size: 0.8em;
-    color: #757575;
-    margin-bottom: 15px;
-}
 .navigation-arrow {
     width: 10vw; /* Adjust this value between 5vw to 10vw based on your preference */
     height: auto;
+} 
+
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f1faee; /* Mint Cream */
+    margin: 0;
+    padding: 0;
+}
+
+button {
+    background-color: #a8dadc; /* Powder Blue */
+    color: #333;
+    border: none;
+    padding: 10px 15px;
+    margin: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #457b9d; /* Steel Blue */
+}
+
+/* .shop-list-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh; /* This will make it take the full height of the viewport */
+ */
+
+.button-container {
+    position: relative;
+    transition: transform 0.5s ease;
+    text-align: center;
+    z-index: 10;
+}
+/* State of the buttons when they move upwards */
+.button-container.move-up {
+    transform: translateY(0); /* Adjust this value as needed */
+}
+
+.button-click {
+    opacity: 1;
+    transform: translateY(50px); 
+    transition: opacity 0.5s ease 0.5s, transform 0.5s ease 0.5s; /* Delayed to wait for the button animation */
+    display: flex; /* Add this */
+    flex-wrap: wrap; /* Add this */
+    justify-content: center; /* Add this */
+}
+/* State of the buttons when they move upwards */
+.button-click.clicked {
+    opacity: 0; /* Adjust this value as needed */
+    transform: translateY(0);
+}
+
+
+
+/* Initial state of the shop container */
+.shop-container {
+    opacity: 0;
+    transform: translateY(50px); /* Starting a bit below */
+    transition: opacity 0.5s ease 0.5s, transform 0.5s ease 0.5s; /* Delayed to wait for the button animation */
+    display: flex; /* Add this */
+    flex-wrap: wrap; /* Add this */
+    justify-content: center; /* Add this */
+}
+
+
+/* State of the shop container when it appears */
+.shop-container.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+
+.shop-card {
+    width: calc(33.33% - 20px);
+    margin: 20px 10px; 
+    background-color: #f4f4f4; /* Light Gray */
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin: 10px;
+    padding: 15px;
+    width: calc(33.33% - 20px); /* Roughly for a 3-column layout */
+    box-sizing: border-box;
+}
+
+.shop-name, .shop-category, .shop-discount, .shop-description {
+    margin: 10px 0;
+}
+
+.navigate-btn {
+    display: block;
+    margin: 20px auto 0;
+}
+
+.location-header {
+    text-align: right;
+    padding: 10px 20px;
+    background-color: #457b9d; /* Steel Blue */
+    color: #f1faee; /* Mint Cream */
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) { /* This is for tablets and mobile devices */
+    
+    .shop-card {
+        width: calc(50% - 20px); /* 2-column layout for tablets */
+        margin: 10px;
+    }
+
+    button {
+        padding: 12px 18px; /* Slightly larger buttons for touch devices */
+    }
+
+    .shop-name, .shop-category, .shop-discount, .shop-description {
+        margin: 8px 0; /* Slightly reduced margins */
+        font-size: 14px; /* Slightly smaller font */
+    }
+}
+
+@media (max-width: 480px) { /* This is for mobile devices */
+    
+    .shop-card {
+        width: 100%; /* 1-column layout for mobile */
+        margin: 10px 0; /* Only vertical margin */
+    }
+
+    .shop-name, .shop-category, .shop-discount, .shop-description {
+        font-size: 12px; /* Even smaller font for mobile */
+    }
 }

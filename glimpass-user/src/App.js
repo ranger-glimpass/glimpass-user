@@ -13,8 +13,8 @@ function App() {
       <Router>
       <div>
 
-
-        <Routes>
+        <Routes>    
+        <Route path="/glimpass-user" element={<Login />} index />
           <Route path="/" element={<Login />} index />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
