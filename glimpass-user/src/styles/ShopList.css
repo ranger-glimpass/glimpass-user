@@ -25,13 +25,6 @@ button:hover {
     background-color: #457b9d; /* Steel Blue */
 }
 
-/* .shop-list-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh; /* This will make it take the full height of the viewport */
- */
 
 .button-container {
     position: relative;
@@ -139,4 +132,14 @@ button:hover {
     .shop-name, .shop-category, .shop-discount, .shop-description {
         font-size: 12px; /* Even smaller font for mobile */
     }
+}
+
+.route-item {
+    display: flex;
+    align-items: center;
+    font-size: 16px;  
+}
+
+.route-item p {
+    margin-left: 10px;
 }
