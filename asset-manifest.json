@@ -1,16 +1,16 @@
 {
   "files": {
     "main.css": "/glimpass-user/static/css/main.729e3763.css",
-    "main.js": "/glimpass-user/static/js/main.14d3cbec.js",
+    "main.js": "/glimpass-user/static/js/main.c915b243.js",
     "static/js/787.252292ee.chunk.js": "/glimpass-user/static/js/787.252292ee.chunk.js",
     "index.html": "/glimpass-user/index.html",
     "static/media/navigationArrow.svg": "/glimpass-user/static/media/navigationArrow.60415a63d959881e22c52e9d1be134d9.svg",
     "main.729e3763.css.map": "/glimpass-user/static/css/main.729e3763.css.map",
-    "main.14d3cbec.js.map": "/glimpass-user/static/js/main.14d3cbec.js.map",
+    "main.c915b243.js.map": "/glimpass-user/static/js/main.c915b243.js.map",
     "787.252292ee.chunk.js.map": "/glimpass-user/static/js/787.252292ee.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.729e3763.css",
-    "static/js/main.14d3cbec.js"
+    "static/js/main.c915b243.js"
   ]
 }
