@@ -5,6 +5,7 @@ import Register from './components/Register';
 import Dashboard from './components/Dashboard';
 import ShopList from './components/ShopList';
 import Navigation from './components/Navigation';
+import ThanksComponent from './components/Thanks';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/shops" element={<ShopList />} />
           <Route path="/navigation" element={<Navigation />} />
+          <Route path="/thanks" element={<ThanksComponent />} />
         </Routes>
       </div>
     </Router>

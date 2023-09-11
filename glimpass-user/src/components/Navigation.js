@@ -4,7 +4,7 @@ import '../styles/ShopList.css';
 // import shops from '../data/shops';
 // import connections from '../data/connections';
 import { readStepDetection, inertialFrame } from './helper';
-
+import ThanksComponent from '../components/Thanks';
 
 
 
@@ -25,6 +25,10 @@ const Navigation = () => {
   const [final_speed, setFinalSpeed] = useState(0);
   const [updatedTotalSteps, setTotalSteps] = useState(0);
   const [updateAdjustedAngle, setAdjustedAngle] = useState(0);
+
+  const [showPopup, setShowPopup] = useState(false);
+  const [showThanks, setShowThanks] = useState(false);
+
     const [alpha, setAlpha] = useState(0);
     const dirRef = useRef({ alpha: 0, beta: 0, gamma: 0 });
     const accRef = useRef();
@@ -237,9 +241,6 @@ const Navigation = () => {
      setZ(parseFloat(lroh_final.current).toFixed(4));
      setdx(parseFloat(sp_x.current).toFixed(4));
      setdy(parseFloat(steps.current));
-    
- 
-     
      
    };
 
@@ -304,7 +305,6 @@ const [adjustedAng, setAdjustedAng] = useState(0);
 
 
 useEffect(() => {
-    // Initial calculation when the component mounts
     const initialTotalSteps = currentRoute.reduce((acc, item) => {
         if (item.connection) {
             return acc + item.connection.steps;
@@ -314,20 +314,49 @@ useEffect(() => {
 
     const initialNextShopAngle = currentRoute[0]?.connection?.angle || 0;
     const initialAdjustedAngle = (alpha + initialNextShopAngle - 45) % 360;
-    
 
     setTotalStep(initialTotalSteps);
     setAdjustedAng(initialAdjustedAngle);
-    
+
 }, [currentRoute, alpha]);
 
-const handleShopClick = (index) => {
-    lastRecordedStep.current = dy;
-    const newRoute = currentRoute.slice(index);
-    setCurrentRoute(newRoute);
 
+const handleShopClick = (index) => {
+    // lastRecordedStep.current = dy;
+    // const newRoute = currentRoute.slice(index);
+    // setCurrentRoute(newRoute);
+
+    setCurrentRoute(prevRoute => prevRoute.slice(1));
+    lastRecordedStep.current = dy;  // Reset the step count
+    setShowPopup(false);
     // The recalculations will be handled by the useEffect above when currentRoute changes
+
+     // Check if the user has reached the last stop
+     if (currentRoute.length === 1) {
+        setShowThanks(true);
+    }
 }
+
+// useEffect(()=> {
+//     if (showThanks) {
+//         return <ThanksComponent route={route} stepsWalked={dy} totalSteps={totalStep} />;
+//     }
+// },[totalStep, dy, route])
+
+
+useEffect(() => {
+    // Check if you've reached the next destination
+    const stepsToNextShop = currentRoute[0]?.connection?.steps || 0;
+
+    if (dy - lastRecordedStep.current >= stepsToNextShop) {
+        setShowPopup(true);
+    }
+}, [dy, currentRoute]);
+
+const handleDropdownChange = (selectedShopName) => {
+    const selectedIndex = route.findIndex(item => item.shop.name === selectedShopName);
+    setCurrentRoute(route.slice(selectedIndex));
+};
 
 
 
@@ -348,8 +377,23 @@ const handleShopClick = (index) => {
     const adjustedAngle = (alpha + nextShopAngle - 45) % 360;
     //setAdjustedAngle(adjustedAngle);
     return (
-        
-        <div>
+        showThanks 
+    ? <ThanksComponent route={route} stepsWalked={dy} totalSteps={totalSteps} />
+    :(<div>
+            <div className="current-location">
+    Currently at: 
+    <select 
+        value={currentRoute[0]?.shop.name} 
+        onChange={(e) => handleDropdownChange(e.target.value)}
+    >
+        {route.map((item, index) => (
+            <option key={index} value={item.shop.name}>
+                {item.shop.name}
+            </option>
+        ))}
+    </select>
+</div>
+
             <h2>Navigation to {route[route.length - 1].shop.name}</h2>
             <div>
                 <img
@@ -370,23 +414,37 @@ const handleShopClick = (index) => {
                 <h3>Route:</h3>
                 {currentRoute.map((item, index) => (
     <div key={index} className="route-item">
-        <input 
-            type="checkbox" 
-            checked={index === 0}  // The first item is always checked as it's the starting point
-            onChange={() => handleShopClick(index)} 
-        />
+        <div>
+            <input 
+                type="checkbox" 
+                checked={index === 0}
+                onChange={() => handleShopClick(index)} 
+            />
+            <h3>{item.shop.name}</h3>
+        </div>
         <p>
             {index !== currentRoute.length - 1 ? 
-                `${item.shop.name} -> ${currentRoute[index + 1].shop.name} (${item.connection.steps} steps)` 
+                <span>👉 Next: {currentRoute[index + 1].shop.name} ({item.connection.steps} steps)</span> 
                 : 
-                `End at ${item.shop.name}`}
+                <span>🎉 You've reached your destination!</span>}
         </p>
     </div>
 ))}
 
+
+{showPopup && (
+    <div className="popup">
+        <p>Did you reach {currentRoute[1]?.shop.name}?</p>
+        <button onClick={handleShopClick}>
+            Yes
+        </button>
+        <button onClick={() => setShowPopup(false)}>No</button>
+    </div>
+)}
+
                 <h4>Total Steps: {totalStep - dy + lastRecordedStep.current}</h4>
             </div>
-        </div>
+        </div>)
     );
 }
 
