@@ -192,3 +192,45 @@ button:hover {
     box-shadow: 0 0 10px rgba(0,0,0,0.2);
     z-index: 1000;
 }
+
+
+.shop-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.shop-list li {
+    padding: 10px;
+    cursor: pointer;
+    border: 1px solid #ddd;
+    margin-bottom: -1px; /* To overlap borders */
+}
+
+.shop-list li:hover {
+    background-color: #f5f5f5;
+}
+
+.active-shop {
+    background-color: #2196F3;
+    color: white;
+}
+.navigation-container {
+    position: relative;
+}
+
+.shop-button {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 10px 20px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.shop-button:hover {
+    background-color: #2980b9;
+}

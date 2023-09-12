@@ -13,7 +13,7 @@ const ShopList = (props) => {
     
     
 
-const [viewMode, setViewMode] = useState(null); // Default view is 'shop'
+const [viewMode, setViewMode] = useState('shop'); // Default view is 'shop'
 
 const [buttonsMoved, setButtonsMoved] = useState(false);
 
@@ -37,9 +37,7 @@ const handleViewChange = (mode) => {
             <button onClick={() => handleViewChange('deals')}>Deals View</button>
         </div>
     
-        <div className={`button-click ${buttonsMoved ? 'clicked' : ''}`}>
-            <h5>Welcome to Ambience Mall</h5>
-        </div>
+      
         <div className={`shop-container ${viewMode ? 'visible' : ''}`}>
             {shops.map((shop, index) => {
                 if (viewMode === 'deals' && !shop.discount) {

@@ -3,14 +3,25 @@ import navigationArrow from '../assets/navigationArrow.svg';
 import '../styles/ShopList.css';
 // import shops from '../data/shops';
 // import connections from '../data/connections';
-import { readStepDetection, inertialFrame } from './helper';
+import {  inertialFrame } from './helper';
 import ThanksComponent from '../components/Thanks';
+import { useNavigate } from 'react-router-dom';
 
+
+    // window.stepError = 0;
+    // window.angleError = 0;
+     window.currentStep = 0;
 
 
 //steps calculation
 
 const Navigation = () => {
+
+    const navigate = useNavigate();
+
+    const navigateToShops = (event) => {
+        navigate('/shops')
+    }
 
     // const location = useLocation();
     // const currentLocation = location.state.currentLocation;
@@ -21,13 +32,12 @@ const Navigation = () => {
   const [dx, setdx] = useState(0);
   const [dy, setdy] = useState(0);
   const [directionData, setDirectionData] = useState({});
-  const [accelerationData, setAccelerationData] = useState({});
   const [final_speed, setFinalSpeed] = useState(0);
-  const [updatedTotalSteps, setTotalSteps] = useState(0);
-  const [updateAdjustedAngle, setAdjustedAngle] = useState(0);
 
   const [showPopup, setShowPopup] = useState(false);
   const [showThanks, setShowThanks] = useState(false);
+
+
 
     const [alpha, setAlpha] = useState(0);
     const dirRef = useRef({ alpha: 0, beta: 0, gamma: 0 });
@@ -35,40 +45,25 @@ const Navigation = () => {
     const totalAccX = useRef(0);
     const totalAccY = useRef(0);
     const overTime = useRef(0);
-    const timeRef = useRef(new Date());
     const distRef = useRef(0);
 
     const lastRecordedStep = useRef(0);
+    
    
     
     
-    //for datapoint 
-    var datapoint = 0;
-    var degree = "Degree";
   //changes for speed
-  const initial_a = useRef(0);
-  const intial_speed = useRef(0); 
   const final_s = useRef(0); 
-  const d = useRef(0); 
   const prev_force = useRef(0);
   const final_force = useRef(0);
-  const final_z = useRef(0);
-  const filterdataX_prev = useRef(0);
   const prev_time = useRef(Date.now());
-  const prev_time_y = useRef(Date.now());
   const sp_x = useRef(0);
-  const sp_y = useRef(0);
-  const dist_x = useRef(0);
-  const dist_y = useRef(0);
   const final = useRef(0);
   const push = useRef(0);
-  const sp_z = useRef(0);
   const steps = useRef(0);
   const push_y = useRef(0);
   const travel = useRef(0);
   const travel_state = useRef(0);
-  const temp_angle = useRef(0);
-  const prev_angle = useRef(0);
   const omega_a = useRef(0);
   const omega_a_p = useRef(0);
   const omega_max_p = useRef(0);
@@ -77,13 +72,7 @@ const Navigation = () => {
   const lrav_now = useRef(0);
   const lrav_push = useRef(0);
   const lrav_final = useRef(0);
-  const lrah_prev = useRef(-1);
-  const lrah_now = useRef(0);
-  const lrah_push = useRef(0);
   const lrah_final = useRef(0);
-  const lrov_prev = useRef(-1);
-  const lrov_now = useRef(0);
-  const lrov_push = useRef(0);
   const lrov_final = useRef(0);
   const lroh_prev = useRef(-1);
   const lroh_now = useRef(0);
@@ -91,11 +80,23 @@ const Navigation = () => {
   const lroh_final = useRef(0);
 
     const conn = [
-        { name: 'Gucci', category: 'Fashion', description: 'An Italian luxury brand of fashion and leather goods.' },
-        { angle: 60, steps: 10 },
-        { name: 'Adidas', category: 'Sportswear', discount: 'Up to 50% off', description: 'A global sportswear brand offering athletic footwear and apparel.' },
-        { angle: 173, steps: 17 },
-        { name: 'Sketchers', category: 'Footwear', discount: 'Flat 30% off', description: 'An American lifestyle and performance footwear company.' }
+        { name: 'Gucci', type: 'shop', category: 'Fashion', description: 'An Italian luxury brand of fashion and leather goods.' },
+        { angle: 60, steps: 6 },
+        { name: 'JAK', type: 'checkpoint',category: 'Sportswear', discount: 'Up to 50% off', description: 'A global sportswear brand offering athletic footwear and apparel.' },
+        { angle: 173, steps: 5 },
+        { name: 'UIA', type: 'checkpoint',category: 'Footwear', discount: 'Flat 30% off', description: 'An American lifestyle and performance footwear company.' },
+        { angle: 13, steps: 7 },
+        { name: 'MKA', type: 'checkpoint',category: 'Footwear', discount: 'Flat 30% off', description: 'An American lifestyle and performance footwear company.' },
+        { angle: 123, steps: 8 },
+        { name: 'VVZ', type: 'checkpoint',category: 'Footwear', discount: 'Flat 30% off', description: 'An American lifestyle and performance footwear company.' },
+        { angle: 173, steps: 4 },
+        { name: 'Spencer', type: 'shop', category: 'Footwear', discount: 'Flat 30% off', description: 'An American lifestyle and performance footwear company.' },
+        { angle: 12, steps: 5 },
+        { name: 'XYZ', type: 'checkpoint',category: 'Footwear', discount: 'Flat 30% off', description: 'An American lifestyle and performance footwear company.' },
+        { angle: 333, steps: 4 },
+        { name: 'ABC', type: 'checkpoint',category: 'Footwear', discount: 'Flat 30% off', description: 'An American lifestyle and performance footwear company.' },
+        { angle: 53, steps: 5 },
+        { name: 'Sketchers', type: 'shop', category: 'Footwear', discount: 'Flat 30% off', description: 'An American lifestyle and performance footwear company.' }
     ];
 
 
@@ -107,28 +108,16 @@ const Navigation = () => {
      totalAccX.current += parseInt(event.acceleration.x);
      totalAccY.current += parseInt(event.acceleration.y);
      overTime.current++;
-     //const currTime = new Date();
-     //milliseconds to second
      const timeInterval = 0
      distRef.current += parseInt(event.acceleration.x) * timeInterval;
-     //setDistance(distRef.current);
-    // Do stuff with the new orientation data
-   //  dirRef.current.alpha = 360-dirRef.current.alpha
     setDirectionData(dirRef.current);
  
-     //LowPass filteredData
-    //  const filteredDataX = filter(accRef.current.x);
-     //const filteredDataY = filter(accRef.current.y);
-     //setLowPassY(parseFloat(filteredDataY).toFixed(2));
      
  
      
      
      const acc_th = 0.1 ;
-     const omega_th = 10;
      const time_th = 0.3 ; 
-     const angle_th = 10 ; 
-     const force_th = 10 ;
      const travel_th = 4 ; 
  
      
@@ -212,7 +201,12 @@ const Navigation = () => {
                      omega_max.current = 0
  
                      if (final_force.current > 0 ) {prev_force.current  = final_force.current }
-                     final_force.current = 0}
+                     final_force.current = 0;
+                    //   window.angleError = Math.atan(Math.sin(sin_a* (Math.PI / 180))/(window.currentStep-Math.cos(sin_a* (Math.PI / 180))));
+                    //   window.stepError = Math.sqrt((window.currentStep - Math.cos(sin_a* (Math.PI / 180))) + Math.sin(sin_a* (Math.PI / 180)));
+                    //   window.stepError = window.currentStep - window.stepError-1;
+                    }
+
  
              if (omega_max.current > 0 ) {omega_max_p.current  = omega_max.current }
              omega_max.current = 0
@@ -227,13 +221,7 @@ const Navigation = () => {
          }
      }
  
- ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
- 
- 
- 
- ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
- 
-     //final_z.current = lr_now.current * lr_prev.current
+
      sp_x.current=Math.sqrt(prev_force.current*omega_a_p.current*omega_max_p.current)
      setFinalSpeed(final_s.current.toFixed(3));
      setX(parseFloat(lrah_final.current).toFixed(4));
@@ -261,42 +249,40 @@ const Navigation = () => {
         };
     }, []);
 
-    let route = [];
-for (let i = 0; i < conn.length - 1; i += 2) {  // Adjusted the loop condition
-    const shop = conn[i];
-    const connection = conn[i + 1];
-    route.push({ shop, connection });
+
+    
+//conn is where we store {node, connection, node , connection ,....}
+let route = [];
+for (let i = 0; i < conn.length; i++) {
+    if (conn[i].type === 'shop' || conn[i].type === 'checkpoint') {
+        const shopOrCheckpoint = conn[i];
+        const connection = conn[i + 1];
+        route.push({ shopOrCheckpoint, connection });
+        i++;  // Increment by one more to skip the connection object
+    }
 }
+
+const getDirection = (targetAngle) => {
+    // Calculate the difference between the current direction and the target direction
+    let angleDifference = targetAngle - alpha;
+    
+    // Normalize the angle difference to the range [-180, 180]
+    angleDifference = (angleDifference + 180) % 360 - 180;
+
+    if (angleDifference > -45 && angleDifference <= 45) return "straight";
+    if (angleDifference > 45 && angleDifference <= 135) return "left";
+    if (angleDifference > -135 && angleDifference <= -45) return "right";
+    return "U-turn";
+}
+
+
+
 
 // If the conn array has an odd length, add the last shop without a connection
-if (conn.length % 2 !== 0) {
+// If the conn array has an odd length and the last element is a connection, add the last shop without a connection
+if (conn.length % 2 !== 0 && conn[conn.length - 1].type !== 'shop') {
     route.push({ shop: conn[conn.length - 1], connection: null });
 }
-
-// const [currentRoute, setCurrentRoute] = useState(route);
-
-// const handleShopClick = (index) => {
-//     const newRoute = currentRoute.slice(index);
-//     setCurrentRoute(newRoute);
-
-//     // Recalculate the total steps and angle
-//     const recalculatedTotalSteps = route.reduce((acc, item) => {
-//         if (item.connection) {
-//             return acc + item.connection.steps;
-//         }
-//         return acc;
-//     }, 0);
-
-//     const recalculatedNextShopAngle = route[0]?.connection?.angle || 0;
-//     const recalculatedAdjustedAngle = (alpha + recalculatedNextShopAngle - 45) % 360;
-
-//     // Update the state or any other necessary variables
-//     // For example:
-//     // setdy(0);
-//     //  setTotalSteps(recalculatedTotalSteps);
-//     //  setAdjustedAngle(recalculatedAdjustedAngle);
-//     return {a: recalculatedNextShopAngle, b: recalculatedAdjustedAngle};
-// };
 
 
 const [currentRoute, setCurrentRoute] = useState(route);
@@ -305,15 +291,20 @@ const [adjustedAng, setAdjustedAng] = useState(0);
 
 
 useEffect(() => {
+    //window.currentStep = currentRoute[0].connection.steps;
+
+
     const initialTotalSteps = currentRoute.reduce((acc, item) => {
         if (item.connection) {
             return acc + item.connection.steps;
         }
-        return acc;
+        return acc ;
     }, 0);
 
+    
     const initialNextShopAngle = currentRoute[0]?.connection?.angle || 0;
     const initialAdjustedAngle = (alpha + initialNextShopAngle - 45) % 360;
+
 
     setTotalStep(initialTotalSteps);
     setAdjustedAng(initialAdjustedAngle);
@@ -325,7 +316,7 @@ const handleShopClick = (index) => {
     // lastRecordedStep.current = dy;
     // const newRoute = currentRoute.slice(index);
     // setCurrentRoute(newRoute);
-
+// if(currentRoute[0]?.shopOrCheckpoint?.name)
     setCurrentRoute(prevRoute => prevRoute.slice(1));
     lastRecordedStep.current = dy;  // Reset the step count
     setShowPopup(false);
@@ -336,12 +327,6 @@ const handleShopClick = (index) => {
         setShowThanks(true);
     }
 }
-
-// useEffect(()=> {
-//     if (showThanks) {
-//         return <ThanksComponent route={route} stepsWalked={dy} totalSteps={totalStep} />;
-//     }
-// },[totalStep, dy, route])
 
 
 useEffect(() => {
@@ -354,7 +339,7 @@ useEffect(() => {
 }, [dy, currentRoute]);
 
 const handleDropdownChange = (selectedShopName) => {
-    const selectedIndex = route.findIndex(item => item.shop.name === selectedShopName);
+    const selectedIndex = route.findIndex(item => item.shopOrCheckpoint.name === selectedShopName);
     setCurrentRoute(route.slice(selectedIndex));
 };
 
@@ -376,25 +361,82 @@ const handleDropdownChange = (selectedShopName) => {
     // -45 is becuase Navigation arrow is initial 45 NE
     const adjustedAngle = (alpha + nextShopAngle - 45) % 360;
     //setAdjustedAngle(adjustedAngle);
+
+
+    const [remainingSteps, setRemainingSteps] = useState(currentRoute[0]?.connection?.steps || 0);
+
+    const dyPrevious = useRef(dy);
+
+    // Handle decrementing of remainingSteps based on dy
+useEffect(() => {
+    // Calculate the difference in steps since the last update
+    const stepsTaken = dy - dyPrevious.current;
+
+    // Update the remaining steps
+    setRemainingSteps(prevSteps => Math.max(0, prevSteps - stepsTaken));
+
+    // Update the previous dy value for the next calculation
+    dyPrevious.current = dy;
+}, [dy]);
+
+// Reset remaining steps when the current route changes
+useEffect(() => {
+    if (currentRoute[0]) {
+        setRemainingSteps(currentRoute[0].connection?.steps || 0);
+    }
+}, [currentRoute]);
+
+    
+
+const directionsAndShops = route.reduce((acc, item, index) => {
+    if (item.shopOrCheckpoint.type === 'shop') {
+        acc.push(item.shopOrCheckpoint);
+    } else if (item.connection) {
+        acc.push({ direction: getDirection(item.connection.angle), steps: item.connection.steps });
+    }
+    return acc;
+}, []);
+
+const totalStepsBetweenShops = directionsAndShops.reduce((acc, item) => {
+    if (item.steps) {
+        return acc + item.steps;
+    }
+    return acc;
+}, 0);
+
+
+
     return (
         showThanks 
-    ? <ThanksComponent route={route} stepsWalked={dy} totalSteps={totalSteps} />
-    :(<div>
-            <div className="current-location">
-    Currently at: 
-    <select 
-        value={currentRoute[0]?.shop.name} 
-        onChange={(e) => handleDropdownChange(e.target.value)}
-    >
-        {route.map((item, index) => (
-            <option key={index} value={item.shop.name}>
-                {item.shop.name}
-            </option>
-        ))}
-    </select>
+    ? <ThanksComponent route={directionsAndShops} stepsWalked={dy} totalSteps={totalSteps} />
+    :(
+        <div>
+    <button className="shop-button" onClick={navigateToShops}>Navigate other shops</button>
+    
+
+    <div className="current-location">
+    <h3>In between</h3>
+<ul className="shop-list">
+    {route
+        .filter(item => item.shopOrCheckpoint.type === 'shop')  // Filter out only shops
+        .map((item, index) => (
+            <li 
+                key={index} 
+                className={currentRoute[0]?.shopOrCheckpoint?.name === item.shopOrCheckpoint?.name ? 'active-shop' : ''}
+                onClick={() => handleDropdownChange(item.shopOrCheckpoint?.name)}
+            >
+                {currentRoute[0]?.shopOrCheckpoint?.name === item.shopOrCheckpoint?.name && "📍 "}
+                {item.shopOrCheckpoint?.name}
+            </li>
+        ))
+    }
+</ul>
+
 </div>
 
-            <h2>Navigation to {route[route.length - 1].shop.name}</h2>
+
+
+            <h2>Navigation to {route[route.length - 1].shopOrCheckpoint.name}</h2>
             <div>
                 <img
                     src={navigationArrow}
@@ -412,29 +454,39 @@ const handleDropdownChange = (selectedShopName) => {
       </div>
             <div>
                 <h3>Route:</h3>
-                {currentRoute.map((item, index) => (
-    <div key={index} className="route-item">
-        <div>
-            <input 
-                type="checkbox" 
-                checked={index === 0}
-                onChange={() => handleShopClick(index)} 
-            />
-            <h3>{item.shop.name}</h3>
+                <div className="route-container">
+    {currentRoute.slice(0, 2).map((item, index) => (
+        <div key={index} className="route-item">
+            <h3>
+                {index === 0 ? 
+                    <span>📍 Now at: {item.shopOrCheckpoint?.name}</span> 
+                    : 
+                    (item.shopOrCheckpoint?.type === 'shop' ? 
+                        <span>👉 Next shop: {item.shopOrCheckpoint?.name}</span> 
+                        : 
+                        <span>Take {getDirection(item.connection?.angle)} in next {remainingSteps} steps</span>
+                    )}
+            </h3>
+            {index === 0 && currentRoute[1] && currentRoute[1].shopOrCheckpoint?.type === 'shop' ? 
+                <p>{remainingSteps} steps to {currentRoute[1].shopOrCheckpoint?.name}</p> 
+                : null}
         </div>
-        <p>
-            {index !== currentRoute.length - 1 ? 
-                <span>👉 Next: {currentRoute[index + 1].shop.name} ({item.connection.steps} steps)</span> 
-                : 
-                <span>🎉 You've reached your destination!</span>}
-        </p>
-    </div>
-))}
+    ))}
+</div>
+
+
+
+
+
 
 
 {showPopup && (
     <div className="popup">
-        <p>Did you reach {currentRoute[1]?.shop.name}?</p>
+        <p>
+            {currentRoute[1]?.shopOrCheckpoint.type === 'checkpoint' 
+                ? `Take a turn ${getDirection(currentRoute[1]?.connection?.angle)}.` 
+                : `Take a turn ${getDirection(currentRoute[1]?.connection?.angle)}.\n Did you reach ${currentRoute[1]?.shopOrCheckpoint.name}?`}
+        </p>
         <button onClick={handleShopClick}>
             Yes
         </button>
@@ -442,7 +494,8 @@ const handleDropdownChange = (selectedShopName) => {
     </div>
 )}
 
-                <h4>Total Steps: {totalStep - dy + lastRecordedStep.current}</h4>
+
+                <h4>Total Steps: {Math.max(0, totalStep - dy + lastRecordedStep.current)}</h4>
             </div>
         </div>)
     );
