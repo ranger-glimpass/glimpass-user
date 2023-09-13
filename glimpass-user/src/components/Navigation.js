@@ -5,7 +5,8 @@ import '../styles/ShopList.css';
 // import connections from '../data/connections';
 import {  inertialFrame } from './helper';
 import ThanksComponent from '../components/Thanks';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import shops from '../data/shops';
 
 
     // window.stepError = 0;
@@ -23,9 +24,52 @@ const Navigation = () => {
         navigate('/shops')
     }
 
-    // const location = useLocation();
-    // const currentLocation = location.state.currentLocation;
-    // const destinationShopId = location.state.destinationShopId;
+    const location = useLocation();
+    const currentLocation = location.state.currentLocation;
+    const destinationShopId = location.state.destinationShopId;
+    // console.log(currentLocation);
+    // console.log(destinationShopId);
+    const [conn, setConn] = useState([]);
+
+
+
+    useEffect(() => {
+        // Ensure both currentLocation and destinationShopId are available
+        if (currentLocation && destinationShopId) {
+            const currDest = JSON.stringify({
+                currentNode: currentLocation,
+                destinationNode: destinationShopId});
+            console.log(currDest);
+            const fetchShortestPath = async () => {
+                const requestOptions = {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: currDest
+                };
+                try {
+                    const response = await fetch("https://app.glimpass.com/graph/get-shortest-path", requestOptions);
+                    const data = await response.json();
+                    console.log(data);
+                    setConn(data);  // Assuming the API returns the data in the desired format
+                } catch (error) {
+                    console.error("Error fetching shortest path:", error);
+                }
+            };
+    
+            fetchShortestPath();
+        }
+    }, [currentLocation, destinationShopId]);
+    
+
+
+
+
+
+
+
+
+
+    
     const [X, setX] = useState(0);
   const [Y, setY] = useState(0);
   const [Z, setZ] = useState(0);
@@ -79,27 +123,25 @@ const Navigation = () => {
   const lroh_push = useRef(0);
   const lroh_final = useRef(0);
 
-    const conn = [
-        { name: 'Gucci', type: 'shop', category: 'Fashion', description: 'An Italian luxury brand of fashion and leather goods.' },
-        { angle: 60, steps: 6 },
-        { name: 'JAK', type: 'checkpoint',category: 'Sportswear', discount: 'Up to 50% off', description: 'A global sportswear brand offering athletic footwear and apparel.' },
-        { angle: 173, steps: 5 },
-        { name: 'UIA', type: 'checkpoint',category: 'Footwear', discount: 'Flat 30% off', description: 'An American lifestyle and performance footwear company.' },
-        { angle: 13, steps: 7 },
-        { name: 'MKA', type: 'checkpoint',category: 'Footwear', discount: 'Flat 30% off', description: 'An American lifestyle and performance footwear company.' },
-        { angle: 123, steps: 8 },
-        { name: 'VVZ', type: 'checkpoint',category: 'Footwear', discount: 'Flat 30% off', description: 'An American lifestyle and performance footwear company.' },
-        { angle: 173, steps: 4 },
-        { name: 'Spencer', type: 'shop', category: 'Footwear', discount: 'Flat 30% off', description: 'An American lifestyle and performance footwear company.' },
-        { angle: 12, steps: 5 },
-        { name: 'XYZ', type: 'checkpoint',category: 'Footwear', discount: 'Flat 30% off', description: 'An American lifestyle and performance footwear company.' },
-        { angle: 333, steps: 4 },
-        { name: 'ABC', type: 'checkpoint',category: 'Footwear', discount: 'Flat 30% off', description: 'An American lifestyle and performance footwear company.' },
-        { angle: 53, steps: 5 },
-        { name: 'Sketchers', type: 'shop', category: 'Footwear', discount: 'Flat 30% off', description: 'An American lifestyle and performance footwear company.' }
-    ];
-
-
+    // const conn = [
+    //     { name: 'Gucci', type: 'shop', floor: 0, category: 'Fashion', description: 'An Italian luxury brand of fashion and leather goods.' },
+    //     { angle: 60, steps: 6 },
+    //     { name: 'JAK', type: 'checkpoint', floor: 0, category: 'Sportswear', discount: 'Up to 50% off', description: 'A global sportswear brand offering athletic footwear and apparel.' },
+    //     { angle: 110, steps: 5 },
+    //     { name: 'Lift', type: 'floor_change', floor:0 , category: 'Footwear', discount: 'Flat 30% off', description: 'An American lifestyle and performance footwear company.' },
+    //     { angle: 42, steps: 7 },
+    //     { name: 'MKA', type: 'checkpoint', floor:2, category: 'Footwear', discount: 'Flat 30% off', description: 'An American lifestyle and performance footwear company.' },
+    //     { angle: 337, steps: 8 },
+    //     { name: 'VVZ', type: 'checkpoint', floor:2,category: 'Footwear', discount: 'Flat 30% off', description: 'An American lifestyle and performance footwear company.' },
+    //     { angle: 55, steps: 4 },
+    //     { name: 'Spencer', type: 'shop',floor:2, category: 'Footwear', discount: 'Flat 30% off', description: 'An American lifestyle and performance footwear company.' },
+    //     { angle: 110, steps: 5 },
+    //     { name: 'XYZ', type: 'checkpoint',floor:2, category: 'Footwear', discount: 'Flat 30% off', description: 'An American lifestyle and performance footwear company.' },
+    //     { angle: 333, steps: 4 },
+    //     { name: 'ABC', type: 'checkpoint',floor:2,category: 'Footwear', discount: 'Flat 30% off', description: 'An American lifestyle and performance footwear company.' },
+    //     { angle: 258, steps: 5 },
+    //     { name: 'Sketchers', type: 'shop', floor:2,category: 'Footwear', discount: 'Flat 30% off', description: 'An American lifestyle and performance footwear company.' }
+    // ];
 
 
     const handleMotion = (event) => {
@@ -254,7 +296,7 @@ const Navigation = () => {
 //conn is where we store {node, connection, node , connection ,....}
 let route = [];
 for (let i = 0; i < conn.length; i++) {
-    if (conn[i].type === 'shop' || conn[i].type === 'checkpoint') {
+    if (conn[i].nodeType === 'shop' || conn[i].nodeType === 'SHOP' || conn[i].nodeType === 'checkpoint') {
         const shopOrCheckpoint = conn[i];
         const connection = conn[i + 1];
         route.push({ shopOrCheckpoint, connection });
@@ -262,27 +304,27 @@ for (let i = 0; i < conn.length; i++) {
     }
 }
 
-const getDirection = (targetAngle) => {
-    // Calculate the difference between the current direction and the target direction
-    let angleDifference = targetAngle - alpha;
-    
-    // Normalize the angle difference to the range [-180, 180]
-    angleDifference = (angleDifference + 180) % 360 - 180;
+const getDirection = (targetAngle, alpha) => {
+    let angleDifference = ((targetAngle - alpha + 180) % 360) - 180;
 
-    if (angleDifference > -45 && angleDifference <= 45) return "straight";
-    if (angleDifference > 45 && angleDifference <= 135) return "left";
-    if (angleDifference > -135 && angleDifference <= -45) return "right";
+    if (angleDifference > 180) angleDifference -= 360;
+    if (angleDifference < -180) angleDifference += 360;
+
+    if (angleDifference >= -10 && angleDifference <= 10) return "straight";
+    if (angleDifference > 10 && angleDifference <= 45) return "slightly right";
+    if (angleDifference > 45 && angleDifference <= 135) return "sharp right";
+    if (angleDifference < -10 && angleDifference >= -45) return "slightly left";
+    if (angleDifference < -45 && angleDifference >= -135) return "sharp left";
     return "U-turn";
-}
-
+};
 
 
 
 // If the conn array has an odd length, add the last shop without a connection
 // If the conn array has an odd length and the last element is a connection, add the last shop without a connection
-if (conn.length % 2 !== 0 && conn[conn.length - 1].type !== 'shop') {
-    route.push({ shop: conn[conn.length - 1], connection: null });
-}
+// if (conn.length % 2 !== 0 && conn[conn.length - 1].type !== 'shop') {
+//     route.push({ shopOrCheckpoint: conn[conn.length - 1], connection: null });
+// }
 
 
 const [currentRoute, setCurrentRoute] = useState(route);
@@ -292,23 +334,16 @@ const [adjustedAng, setAdjustedAng] = useState(0);
 
 useEffect(() => {
     //window.currentStep = currentRoute[0].connection.steps;
-
-
     const initialTotalSteps = currentRoute.reduce((acc, item) => {
         if (item.connection) {
             return acc + item.connection.steps;
         }
         return acc ;
     }, 0);
-
-    
     const initialNextShopAngle = currentRoute[0]?.connection?.angle || 0;
     const initialAdjustedAngle = (alpha + initialNextShopAngle - 45) % 360;
-
-
     setTotalStep(initialTotalSteps);
     setAdjustedAng(initialAdjustedAngle);
-
 }, [currentRoute, alpha]);
 
 
@@ -342,8 +377,6 @@ const handleDropdownChange = (selectedShopName) => {
     const selectedIndex = route.findIndex(item => item.shopOrCheckpoint.name === selectedShopName);
     setCurrentRoute(route.slice(selectedIndex));
 };
-
-
 
 
     // Compute total steps
@@ -386,29 +419,26 @@ useEffect(() => {
     }
 }, [currentRoute]);
 
-    
 
-const directionsAndShops = route.reduce((acc, item, index) => {
-    if (item.shopOrCheckpoint.type === 'shop') {
-        acc.push(item.shopOrCheckpoint);
-    } else if (item.connection) {
-        acc.push({ direction: getDirection(item.connection.angle), steps: item.connection.steps });
-    }
-    return acc;
-}, []);
+// const directionsAndShops = route.reduce((acc, item, index) => {
+//     if (item.shopOrCheckpoint.nodeType === 'shop') {
+//         acc.push(item.shopOrCheckpoint);
+//     } else if (item.connection) {
+//         acc.push({ direction: getDirection(item.connection.angle, dy), steps: item.connection.steps });
+//     }
+//     return acc;
+// }, []);
 
-const totalStepsBetweenShops = directionsAndShops.reduce((acc, item) => {
-    if (item.steps) {
-        return acc + item.steps;
-    }
-    return acc;
-}, 0);
-
-
+// const totalStepsBetweenShops = directionsAndShops.reduce((acc, item) => {
+//     if (item.steps) {
+//         return acc + item.steps;
+//     }
+//     return acc;
+// }, 0);
 
     return (
         showThanks 
-    ? <ThanksComponent route={directionsAndShops} stepsWalked={dy} totalSteps={totalSteps} />
+    ? <ThanksComponent route={route} stepsWalked={dy} totalSteps={totalSteps} />
     :(
         <div>
     <button className="shop-button" onClick={navigateToShops}>Navigate other shops</button>
@@ -418,7 +448,7 @@ const totalStepsBetweenShops = directionsAndShops.reduce((acc, item) => {
     <h3>In between</h3>
 <ul className="shop-list">
     {route
-        .filter(item => item.shopOrCheckpoint.type === 'shop')  // Filter out only shops
+        .filter(item => item.shopOrCheckpoint.nodeType === 'shop')  // Filter out only shops
         .map((item, index) => (
             <li 
                 key={index} 
@@ -433,10 +463,8 @@ const totalStepsBetweenShops = directionsAndShops.reduce((acc, item) => {
 </ul>
 
 </div>
-
-
-
-            <h2>Navigation to {route[route.length - 1].shopOrCheckpoint.name}</h2>
+{/* route[route.length - 1].shopOrCheckpoint.name */}
+            <h2>Navigation to {destinationShopId}</h2>
             <div>
                 <img
                     src={navigationArrow}
@@ -450,7 +478,7 @@ const totalStepsBetweenShops = directionsAndShops.reduce((acc, item) => {
         <div>
           <span>steps : </span>
           {dy}
-        </div>
+        </div> 
       </div>
             <div>
                 <h3>Route:</h3>
@@ -464,10 +492,10 @@ const totalStepsBetweenShops = directionsAndShops.reduce((acc, item) => {
                     (item.shopOrCheckpoint?.type === 'shop' ? 
                         <span>👉 Next shop: {item.shopOrCheckpoint?.name}</span> 
                         : 
-                        <span>Take {getDirection(item.connection?.angle)} in next {remainingSteps} steps</span>
+                        <span>Take {getDirection(item.connection?.angle, dy)} in next {remainingSteps} steps</span>
                     )}
             </h3>
-            {index === 0 && currentRoute[1] && currentRoute[1].shopOrCheckpoint?.type === 'shop' ? 
+            {index === 0 && currentRoute[1] && currentRoute[1].shopOrCheckpoint?.nodeType === 'shop' ? 
                 <p>{remainingSteps} steps to {currentRoute[1].shopOrCheckpoint?.name}</p> 
                 : null}
         </div>
@@ -483,9 +511,11 @@ const totalStepsBetweenShops = directionsAndShops.reduce((acc, item) => {
 {showPopup && (
     <div className="popup">
         <p>
-            {currentRoute[1]?.shopOrCheckpoint.type === 'checkpoint' 
-                ? `Take a turn ${getDirection(currentRoute[1]?.connection?.angle)}.` 
-                : `Take a turn ${getDirection(currentRoute[1]?.connection?.angle)}.\n Did you reach ${currentRoute[1]?.shopOrCheckpoint.name}?`}
+            {currentRoute[0]?.shopOrCheckpoint.nodeType === 'floor_change'
+                ? `Please proceed to the lift and go to floor ${currentRoute[1]?.shopOrCheckpoint.floor}.`
+                : currentRoute[1]?.shopOrCheckpoint.nodeType === 'checkpoint'
+                ? `Take a turn ${getDirection(currentRoute[1]?.connection?.angle, dy)}.`
+                : `Take a turn ${getDirection(currentRoute[1]?.connection?.angle, dy)}.\nDid you reach ${currentRoute[1]?.shopOrCheckpoint.name}?`}
         </p>
         <button onClick={handleShopClick}>
             Yes
@@ -493,6 +523,7 @@ const totalStepsBetweenShops = directionsAndShops.reduce((acc, item) => {
         <button onClick={() => setShowPopup(false)}>No</button>
     </div>
 )}
+
 
 
                 <h4>Total Steps: {Math.max(0, totalStep - dy + lastRecordedStep.current)}</h4>
