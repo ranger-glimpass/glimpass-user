@@ -71,6 +71,7 @@ const Dashboard = () => {
             <div>
                 <h2>Select your current location:</h2>
                 <select onChange={(e) => setCurrentLocation(e.target.value)}>
+                    <option>---Choose Shops---</option>
                     {shops.map(shop => (
                         <option key={shop.nodeId} value={shop.nodeId}>{shop.name}</option>
                     ))}

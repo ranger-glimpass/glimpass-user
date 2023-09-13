@@ -20,16 +20,26 @@ const ThanksComponent = ({ route, stepsWalked, totalSteps }) => {
             <div className="navigation-summary">
                 <h2>Navigation Summary</h2>
                 <ul>
-                    {route.map((item, index) => (
-                        <li key={index}>
-                            {item.direction ? `Take a turn ${item.direction} and walk ${item.steps} steps` : `Reached ${item.name}`}
-                        </li>
-                    ))}
+                    {route.map((item, index) => {
+                        if (item.direction) {
+                            return (
+                                <li key={index}>
+                                    Take a turn {item.direction} and walk {item.steps} steps
+                                </li>
+                            );
+                        } else {
+                            return (
+                                <li key={index}>
+                                    Reached {item.name}
+                                </li>
+                            );
+                        }
+                    })}
                 </ul>
                 <p>Total steps walked: {stepsWalked}</p>
                 <p>Total distance between shops: {totalSteps} steps</p>
             </div>
-
+    
             <h3>Feedback:</h3>
             <form>
                 <textarea placeholder="Share your thoughts..."></textarea>
@@ -37,6 +47,7 @@ const ThanksComponent = ({ route, stepsWalked, totalSteps }) => {
             </form>
         </div>
     );
+    
 }
 
 export default ThanksComponent;

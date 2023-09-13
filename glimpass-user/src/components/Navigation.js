@@ -6,7 +6,7 @@ import '../styles/ShopList.css';
 import {  inertialFrame } from './helper';
 import ThanksComponent from '../components/Thanks';
 import { useNavigate, useLocation } from 'react-router-dom';
-import shops from '../data/shops';
+// import shops from '../data/shops';
 
 
     // window.stepError = 0;
@@ -61,14 +61,6 @@ const Navigation = () => {
     }, [currentLocation, destinationShopId]);
     
 
-
-
-
-
-
-
-
-
     
     const [X, setX] = useState(0);
   const [Y, setY] = useState(0);
@@ -77,6 +69,8 @@ const Navigation = () => {
   const [dy, setdy] = useState(0);
   const [directionData, setDirectionData] = useState({});
   const [final_speed, setFinalSpeed] = useState(0);
+  
+const [destinationName, setDestinationName] = useState(destinationShopId);
 
   const [showPopup, setShowPopup] = useState(false);
   const [showThanks, setShowThanks] = useState(false);
@@ -420,25 +414,25 @@ useEffect(() => {
 }, [currentRoute]);
 
 
-// const directionsAndShops = route.reduce((acc, item, index) => {
-//     if (item.shopOrCheckpoint.nodeType === 'shop') {
-//         acc.push(item.shopOrCheckpoint);
-//     } else if (item.connection) {
-//         acc.push({ direction: getDirection(item.connection.angle, dy), steps: item.connection.steps });
-//     }
-//     return acc;
-// }, []);
+const directionsAndShops = route.reduce((acc, item, index) => {
+    if (item.shopOrCheckpoint.nodeType === 'shop') {
+        acc.push(item.shopOrCheckpoint);
+    } else if (item.connection) {
+        acc.push({ direction: getDirection(item.connection.angle, dy), steps: item.connection.steps });
+    }
+    return acc;
+}, []);
 
-// const totalStepsBetweenShops = directionsAndShops.reduce((acc, item) => {
-//     if (item.steps) {
-//         return acc + item.steps;
-//     }
-//     return acc;
-// }, 0);
+const totalStepsBetweenShops = directionsAndShops.reduce((acc, item) => {
+    if (item.steps) {
+        return acc + item.steps;
+    }
+    return acc;
+}, 0);
 
     return (
         showThanks 
-    ? <ThanksComponent route={route} stepsWalked={dy} totalSteps={totalSteps} />
+    ? <ThanksComponent route={directionsAndShops} stepsWalked={dy} totalSteps={totalSteps} />
     :(
         <div>
     <button className="shop-button" onClick={navigateToShops}>Navigate other shops</button>
@@ -464,7 +458,7 @@ useEffect(() => {
 
 </div>
 {/* route[route.length - 1].shopOrCheckpoint.name */}
-            <h2>Navigation to {destinationShopId}</h2>
+            <h2>Navigation to {destinationName}</h2>
             <div>
                 <img
                     src={navigationArrow}
