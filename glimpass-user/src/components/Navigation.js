@@ -369,7 +369,7 @@ const Navigation = () => {
     //window.currentStep = currentRoute[0].connection.steps;
     const initialTotalSteps = currentRoute.reduce((acc, item) => {
       if (item.connection) {
-        return acc + item.connection.steps;
+        return acc + parseInt(item.connection.steps);
       }
       return acc;
     }, 0);
@@ -415,7 +415,7 @@ const Navigation = () => {
   // Compute total steps
   const totalSteps = route.reduce((acc, item) => {
     if (item.connection) {
-      return acc + item.connection.steps;
+      return acc + parseInt(item.connection.steps);
     }
     return acc;
   }, 0);
@@ -467,7 +467,7 @@ const Navigation = () => {
 
   const totalStepsBetweenShops = directionsAndShops.reduce((acc, item) => {
     if (item.steps) {
-      return acc + item.steps;
+      return acc + parseInt(item.steps);
     }
     return acc;
   }, 0);
