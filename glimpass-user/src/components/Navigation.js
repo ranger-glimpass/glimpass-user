@@ -79,7 +79,7 @@ const Navigation = () => {
   const totalAccY = useRef(0);
   const overTime = useRef(0);
   const distRef = useRef(0);
-  const offset=useRef(0);
+  const offset = useRef(0);
 
   const lastRecordedStep = useRef(0);
 
