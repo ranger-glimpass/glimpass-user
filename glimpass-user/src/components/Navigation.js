@@ -332,7 +332,8 @@ const Navigation = () => {
     if (
       conn[i].nodeType === "shop" ||
       conn[i].nodeType === "SHOP" ||
-      conn[i].nodeType === "checkpoint"
+      conn[i].nodeType === "checkpoint" ||
+      conn[i].nodeType === "floor_change"
     ) {
       const shopOrCheckpoint = conn[i];
       const connection = conn[i + 1];
@@ -488,7 +489,7 @@ const Navigation = () => {
         <h3>In between</h3>
         <ul className="shop-list">
           {route
-            .filter((item) => item.shopOrCheckpoint.nodeType === "shop") // Filter out only shops
+            // .filter((item) => item.shopOrCheckpoint.nodeType === "shop") // Filter out only shops
             .map((item, index) => (
               <li
                 key={index}

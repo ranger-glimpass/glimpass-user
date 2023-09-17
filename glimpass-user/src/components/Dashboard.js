@@ -32,7 +32,7 @@ const Dashboard = () => {
         const fetchShops = async () => {
             const response = await fetch("https://app.glimpass.com/graph/get-all-nodes");
             const data = await response.json();
-            const shopsArray = Object.values(data).filter(item => item.nodeType === "shop"); // Filter only shops
+            const shopsArray = Object.values(data); // Filter only shops
             setShops(shopsArray);
         };
 
