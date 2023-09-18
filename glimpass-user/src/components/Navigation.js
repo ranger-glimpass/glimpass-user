@@ -6,7 +6,11 @@ import "../styles/ShopList.css";
 import { inertialFrame } from "./helper";
 import ThanksComponent from "../components/Thanks";
 import { useNavigate, useLocation } from "react-router-dom";
+import MiniMap from '../components/MiniMap';
+import Path from '../components/Path';
+import NavArrow from '../components/NavArrow';
 // import shops from '../data/shops';
+import CustomProgressBar from '../components/CustomProgressBar'; // Adjust the path accordingly
 
 // window.stepError = 0;
 // window.angleError = 0;
@@ -21,12 +25,17 @@ const Navigation = () => {
     navigate("/shops");
   };
 
+
+
+
+  const pathRef = useRef(null);
   const location = useLocation();
   const currentLocation = location.state.currentLocation;
   const destinationShopId = location.state.destinationShopId;
   // console.log(currentLocation);
   // console.log(destinationShopId);
   const [conn, setConn] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Ensure both currentLocation and destinationShopId are available
@@ -44,15 +53,18 @@ const Navigation = () => {
         };
         try {
           const response = await fetch(
-            "https://app.glimpass.com/graph/get-shortest-path",
-            requestOptions
+              "https://app.glimpass.com/graph/get-shortest-path",
+              requestOptions
           );
           const data = await response.json();
           console.log(data);
           setConn(data); // Assuming the API returns the data in the desired format
-        } catch (error) {
+          setIsLoading(false); // Set loading to false here
+      } catch (error) {
           console.error("Error fetching shortest path:", error);
-        }
+          setIsLoading(false); // Also set loading to false in case of an error
+      }
+      
       };
 
       fetchShortestPath();
@@ -68,6 +80,8 @@ const Navigation = () => {
   const [final_speed, setFinalSpeed] = useState(0);
 
   const [destinationName, setDestinationName] = useState(destinationShopId);
+  const [selectedShopStep, setSelectedShopStep] = useState(0);
+
 
   const [showPopup, setShowPopup] = useState(false);
   const [showThanks, setShowThanks] = useState(false);
@@ -407,11 +421,21 @@ const Navigation = () => {
   }, [dy, currentRoute]);
 
   const handleDropdownChange = (selectedShopName) => {
-    const selectedIndex = route.findIndex(
-      (item) => item.shopOrCheckpoint.name === selectedShopName
-    );
+    const selectedIndex = route.findIndex(item => item.shopOrCheckpoint.name === selectedShopName);
     setCurrentRoute(route.slice(selectedIndex));
-  };
+
+    // Calculate the total steps up to the selected shop/checkpoint
+    let stepsUpToSelectedShop = 0;
+    for (let i = 0; i < selectedIndex; i++) {
+        if (route[i].connection) {
+            stepsUpToSelectedShop += route[i].connection.steps;
+        }
+    }
+
+    // Update the stepsWalked state
+    setSelectedShopStep(stepsUpToSelectedShop);
+};
+
 
   // Compute total steps
   const totalSteps = route.reduce((acc, item) => {
@@ -473,7 +497,30 @@ const Navigation = () => {
     return acc;
   }, 0);
 
-  return showThanks ? (
+  // Prepare the data for the CustomProgressBar
+  const shopsData = route.map((item, index) => {
+    const progressToThisPoint = route
+      .slice(0, index + 1)
+      .reduce((acc, curr) => acc + (curr.connection?.steps || 0), 0);
+    return {
+      name: item.shopOrCheckpoint.name,
+      step: progressToThisPoint,
+    };
+  });
+
+  let flattenedRoute = [];
+route.forEach(item => {
+  flattenedRoute.push(item.shopOrCheckpoint);
+  if (item.connection) {
+    flattenedRoute.push(item.connection);
+  }
+});
+
+
+
+return isLoading ? (
+  <div className="loader">Loading...</div> // Replace with your loader component or style
+) : ( showThanks ? (
     <ThanksComponent
       route={directionsAndShops}
       stepsWalked={dy}
@@ -484,6 +531,17 @@ const Navigation = () => {
       <button className="shop-button" onClick={navigateToShops}>
         Navigate other shops
       </button>
+      {/* <CustomProgressBar 
+    totalSteps={totalSteps} 
+    stepsWalked={dy - selectedShopStep} 
+    shops={shopsData} 
+/> */}
+{/* <MiniMap totalSteps={totalSteps} stepsWalked={selectedShopStep} route={route} /> */}
+<svg width="400" height="400" viewBox="0 0 400 400" style={{border: '1px solid red'}}>
+  <Path route={flattenedRoute} ref={pathRef} />
+  <NavArrow stepsWalked={dy} totalSteps={totalSteps} pathRef={pathRef} />
+</svg>
+
 
       <div className="current-location">
         <h3>In between</h3>
@@ -583,25 +641,7 @@ const Navigation = () => {
         </h4>
       </div>
     </div>
-  );
+  ));
 };
 
 export default Navigation;
-
-// step = x = 6 + 10 = 16
-// total(a+b) = overall - totalcurrentdist
-
-//stepleft = totalcurrentdist - steps
-//stepsLeft = 10-x = 4
-//_x = 17 - (steps-(10-stepLeft))
-//  17 - (16-(10-4))
-
-// stepsLeft = currentMax - (steps-((total - currentMax)-stepLeft))
-//          10 - (6-((35-10)-0)) = 29
-
-//stepleft = totalcurrentdist - steps
-
-//x = (0)
-//total = 25  -8 +7
-
-// a -----------10-------------[b]------------17-----------c-------8------d
