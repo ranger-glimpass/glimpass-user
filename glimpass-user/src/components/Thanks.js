@@ -1,53 +1,65 @@
 import { useNavigate } from "react-router-dom";
-import '../styles/Thanks.css';
+import { Button, Typography, Paper, TextareaAutosize, Container, Box, Divider } from '@mui/material';
+
 const ThanksComponent = ({ route, stepsWalked, totalSteps }) => {
     const navigate = useNavigate();
     
     const handleSubmit = (event) => {
-        event.preventDefault(); // Prevent the default form submission behavior
-
-        // Show the alert
-        window.alert("Thank you for your feedback!");
-
-        // Navigate to the ShopList page
-        navigate('/shops'); // Assuming '/shoplist' is the route for the ShopList page
+        event.preventDefault();
+        window.alert("Feedback received. Thank you!");
+        navigate('/shops');
     };
 
     return (
-        <div className="thanks-container">
-            <h2>Thanks for using our app!</h2>
-            <p>You walked {stepsWalked} steps out of an estimated {totalSteps} steps.</p>
-            <div className="navigation-summary">
-                <h2>Navigation Summary</h2>
-                <ul>
-                    {route.map((item, index) => {
-                        if (item.direction) {
-                            return (
-                                <li key={index}>
-                                    Take a turn {item.direction} and walk {item.steps} steps
-                                </li>
-                            );
-                        } else {
-                            return (
-                                <li key={index}>
-                                    Reached {item.name}
-                                </li>
-                            );
-                        }
-                    })}
-                </ul>
-                <p>Total steps walked: {stepsWalked}</p>
-                <p>Total distance between shops: {totalSteps} steps</p>
-            </div>
-    
-            <h3>Feedback:</h3>
-            <form>
-                <textarea placeholder="Share your thoughts..."></textarea>
-                <button onClick={handleSubmit} type="submit">Submit</button>
-            </form>
-        </div>
+        <Container maxWidth="sm">
+            <Paper elevation={3} style={{ padding: '24px', borderRadius: '15px' }}>
+                <Typography variant="h5" align="center" gutterBottom>
+                    Thank You!
+                </Typography>
+                <Typography variant="subtitle1" align="center" color="textSecondary">
+                    {stepsWalked}/{totalSteps} steps walked.
+                </Typography>
+
+                <Box my={3}>
+                    <Divider />
+                    <Typography variant="h6" align="center" style={{ marginTop: '16px' }}>
+                        Summary
+                    </Typography>
+                    <ul style={{ listStyle: 'none', paddingLeft: 0 }}>
+                        {route.map((item, index) => (
+                            <li key={index}>
+                                <Typography variant="body2" align="center">
+                                    {item.direction ? `Turn ${item.direction}, ${item.steps} steps` : `Reached ${item.name}`}
+                                </Typography>
+                            </li>
+                        ))}
+                    </ul>
+                </Box>
+
+                <Box my={3}>
+                    <Typography variant="h6" align="center">
+                        Feedback
+                    </Typography>
+                    <form>
+                        <TextareaAutosize 
+                            minRows={3} 
+                            style={{ width: '100%', padding: '8px', borderRadius: '8px', marginTop: '8px' }} 
+                            placeholder="Your thoughts..."
+                        />
+                        <Box display="flex" justifyContent="center" mt={2}>
+                            <Button 
+                                variant="contained" 
+                                color="primary" 
+                                onClick={handleSubmit}
+                            >
+                                Send
+                            </Button>
+                        </Box>
+                    </form>
+                </Box>
+            </Paper>
+        </Container>
     );
-    
 }
 
 export default ThanksComponent;

@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
 import navigationArrow from "../assets/navigationArrow.svg";
+
+import { Button, CircularProgress, Typography, List, ListItem, ListItemText, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, SvgIcon } from '@mui/material';
+
 import "../styles/ShopList.css";
 // import shops from '../data/shops';
 // import connections from '../data/connections';
 import { inertialFrame } from "./helper";
 import ThanksComponent from "../components/Thanks";
 import { useNavigate, useLocation } from "react-router-dom";
-import MiniMap from '../components/MiniMap';
 import Path from '../components/Path';
 import NavArrow from '../components/NavArrow';
 // import shops from '../data/shops';
@@ -25,9 +27,6 @@ const Navigation = () => {
     navigate("/shops");
   };
 
-
-
-
   const pathRef = useRef(null);
   const location = useLocation();
   const currentLocation = location.state.currentLocation;
@@ -36,6 +35,7 @@ const Navigation = () => {
   // console.log(destinationShopId);
   const [conn, setConn] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshed, setIsRefreshed] = useState(true);
 
   useEffect(() => {
     // Ensure both currentLocation and destinationShopId are available
@@ -53,19 +53,28 @@ const Navigation = () => {
         };
         try {
           const response = await fetch(
-              "https://app.glimpass.com/graph/get-shortest-path",
-              requestOptions
+            "https://app.glimpass.com/graph/get-shortest-path",
+            requestOptions
           );
           const data = await response.json();
           console.log(data);
           setConn(data); // Assuming the API returns the data in the desired format
+      
+          // Find the first shop and set it as the active shop
+          const firstShop = data.find(item => item.shopOrCheckpoint?.type === "shop");
+          if (firstShop) {
+            setCurrentRoute([firstShop]);
+          }
+          // Open the refershed by default
+    setIsRefreshed(true);
+      
           setIsLoading(false); // Set loading to false here
-      } catch (error) {
+        } catch (error) {
           console.error("Error fetching shortest path:", error);
           setIsLoading(false); // Also set loading to false in case of an error
-      }
-      
+        }
       };
+      
 
       fetchShortestPath();
     }
@@ -393,6 +402,8 @@ const Navigation = () => {
     const initialAdjustedAngle = (alpha + initialNextShopAngle - 45) % 360;
     setTotalStep(initialTotalSteps);
     setAdjustedAng(initialAdjustedAngle);
+    
+    // setCurrentShop(currentRoute[0].shopOrCheckpoint?.name);
   }, [currentRoute, alpha]);
 
   const handleShopClick = (index) => {
@@ -411,14 +422,25 @@ const Navigation = () => {
     }
   };
 
+  const [showReachedPopup, setShowReachedPopup] = useState(false);
+const [currentShop, setCurrentShop] = useState(null);
   useEffect(() => {
     // Check if you've reached the next destination
     const stepsToNextShop = currentRoute[0]?.connection?.steps || 0;
-
     if (dy - lastRecordedStep.current >= stepsToNextShop) {
-      setShowPopup(true);
+        // If it's the last shop in the route
+        if (currentRoute.length === 1) {
+            setShowReachedPopup(true);
+        } else {
+            setCurrentRoute((prevRoute) => prevRoute.slice(1));
+            lastRecordedStep.current = dy; // Reset the step count
+        }
     }
-  }, [dy, currentRoute]);
+    
+    // setCurrentShop(currentRoute[0].shopOrCheckpoint?.name);
+}, [dy, currentRoute]);
+
+
 
   const handleDropdownChange = (selectedShopName) => {
     const selectedIndex = route.findIndex(item => item.shopOrCheckpoint.name === selectedShopName);
@@ -476,6 +498,8 @@ const Navigation = () => {
     if (currentRoute[0]) {
       setRemainingSteps(currentRoute[0].connection?.steps || 0);
     }
+    
+    // setCurrentShop(currentRoute[0].shopOrCheckpoint?.name);
   }, [currentRoute]);
 
   const directionsAndShops = route.reduce((acc, item, index) => {
@@ -516,132 +540,191 @@ route.forEach(item => {
   }
 });
 
+console.log("routeF: ",flattenedRoute)
+const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+const [viewBox, setViewBox] = useState("0 0 500 500");
 
 
-return isLoading ? (
-  <div className="loader">Loading...</div> // Replace with your loader component or style
-) : ( showThanks ? (
-    <ThanksComponent
-      route={directionsAndShops}
-      stepsWalked={dy}
-      totalSteps={totalSteps}
-    />
-  ) : (
-    <div>
-      <button className="shop-button" onClick={navigateToShops}>
-        Navigate other shops
-      </button>
-      {/* <CustomProgressBar 
-    totalSteps={totalSteps} 
-    stepsWalked={dy - selectedShopStep} 
-    shops={shopsData} 
-/> */}
-{/* <MiniMap totalSteps={totalSteps} stepsWalked={selectedShopStep} route={route} /> */}
-<svg width="400" height="400" viewBox="0 0 400 400" style={{border: '1px solid red'}}>
-  <Path route={flattenedRoute} ref={pathRef} />
-  <NavArrow stepsWalked={dy} totalSteps={totalSteps} pathRef={pathRef} />
-</svg>
+
+useEffect(() => {
+  if (isRefreshed && route.length > 0) {
+      handleDropdownChange(route[0].shopOrCheckpoint?.name);
+      setIsRefreshed(false);  // Reset isRefreshed to false after handling
+  }
+  
+  // setCurrentShop(route[0].shopOrCheckpoint?.name);
+}, [isRefreshed, route, handleDropdownChange]);
 
 
-      <div className="current-location">
-        <h3>In between</h3>
-        <ul className="shop-list">
-          {route
-            // .filter((item) => item.shopOrCheckpoint.nodeType === "shop") // Filter out only shops
-            .map((item, index) => (
-              <li
-                key={index}
-                className={
-                  currentRoute[0]?.shopOrCheckpoint?.name ===
-                  item.shopOrCheckpoint?.name
-                    ? "active-shop"
-                    : ""
-                }
-                onClick={() =>
-                  handleDropdownChange(item.shopOrCheckpoint?.name)
-                }
-              >
-                {currentRoute[0]?.shopOrCheckpoint?.name ===
-                  item.shopOrCheckpoint?.name && "📍 "}
-                {item.shopOrCheckpoint?.name}
-              </li>
-            ))}
-        </ul>
-      </div>
-      {/* route[route.length - 1].shopOrCheckpoint.name */}
-      <h2>Navigation to {destinationName}</h2>
-      <div>
-        <img
-          src={navigationArrow}
-          alt="Navigation Arrow"
-          className="navigation-arrow"
-          // Use the adjusted angle for the rotation
-          style={{ transform: `rotate(${adjustedAng}deg)` }}
-        />
-      </div>
-      <div className="device-Y-container">
-        <div>
-          <span>steps : </span>
-          {dy}
-        </div>
-      </div>
-      <div>
-        <h3>Route:</h3>
-        <div className="route-container">
-          {currentRoute.slice(0, 2).map((item, index) => (
-            <div key={index} className="route-item">
-              <h3>
-                {index === 0 ? (
-                  <span>📍 Now at: {item.shopOrCheckpoint?.name}</span>
-                ) : item.shopOrCheckpoint?.type === "shop" ? (
-                  <span>👉 Next shop: {item.shopOrCheckpoint?.name}</span>
-                ) : (
-                  <span>
-                    Take {getDirection(item.connection?.angle, dy)} in next{" "}
-                    {remainingSteps} steps
-                  </span>
-                )}
-              </h3>
-              {index === 0 &&
-              currentRoute[1] &&
-              currentRoute[1].shopOrCheckpoint?.nodeType === "shop" ? (
-                <p>
-                  {remainingSteps} steps to{" "}
-                  {currentRoute[1].shopOrCheckpoint?.name}
-                </p>
-              ) : null}
-            </div>
-          ))}
-        </div>
+const [rotationAngle, setRotationAngle] = useState(0);
 
-        {showPopup && (
-          <div className="popup">
-            <p>
-              {currentRoute[0]?.shopOrCheckpoint.nodeType === "floor_change"
-                ? `Please proceed to the lift and go to floor ${currentRoute[1]?.shopOrCheckpoint.floor}.`
-                : currentRoute[1]?.shopOrCheckpoint.nodeType === "checkpoint"
-                ? `Take a turn ${getDirection(
-                    currentRoute[1]?.connection?.angle,
-                    dy
-                  )}.`
-                : `Take a turn ${getDirection(
-                    currentRoute[1]?.connection?.angle,
-                    dy
-                  )}.\nDid you reach ${
-                    currentRoute[1]?.shopOrCheckpoint.name
-                  }?`}
-            </p>
-            <button onClick={handleShopClick}>Yes</button>
-            <button onClick={() => setShowPopup(false)}>No</button>
-          </div>
-        )}
+let initialAngle = 0;
+let initialRotation = 0;
 
-        <h4>
-          Total Steps: {Math.max(0, totalStep - dy + lastRecordedStep.current)}
-        </h4>
-      </div>
-    </div>
-  ));
+const handleTouchStart = (e) => {
+    if (e.touches.length === 2) {
+        const x1 = e.touches[0].clientX;
+        const y1 = e.touches[0].clientY;
+        const x2 = e.touches[1].clientX;
+        const y2 = e.touches[1].clientY;
+        initialAngle = Math.atan2(y2 - y1, x2 - x1) * (180 / Math.PI);
+        initialRotation = rotationAngle;
+    }
 };
 
+const handleTouchMove = (e) => {
+    if (e.touches.length === 2) {
+        const x1 = e.touches[0].clientX;
+        const y1 = e.touches[0].clientY;
+        const x2 = e.touches[1].clientX;
+        const y2 = e.touches[1].clientY;
+        const currentAngle = Math.atan2(y2 - y1, x2 - x1) * (180 / Math.PI);
+        const rotationChange = currentAngle - initialAngle;
+        setRotationAngle(initialRotation + rotationChange);
+    }
+};
+
+
+
+
+    return isLoading ? (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <CircularProgress />
+      </div>
+    ) : showThanks ? (
+      <ThanksComponent
+        route={directionsAndShops}
+        stepsWalked={dy}
+        totalSteps={totalSteps}
+      />
+    ) : (
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+        {/* Dropdown at top right */}
+        <div style={{ alignSelf: 'flex-end', margin: '10px' }}>
+        <Typography variant="h6" onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
+  📍 {currentRoute[0]?.shopOrCheckpoint?.name || "In between"}
+</Typography>
+
+{/* {isRefreshed &&(
+  handleDropdownChange(currentRoute[0]?.shopOrCheckpoint?.name)
+)} */}
+          {isDropdownOpen && (
+            <List>
+              {route.map((item, index) => (
+                <ListItem
+                  key={index}
+                  button
+                  selected={currentRoute[0]?.shopOrCheckpoint?.name === item.shopOrCheckpoint?.name}
+                  onClick={() => {
+                    handleDropdownChange(item.shopOrCheckpoint?.name);
+                    setIsDropdownOpen(false);
+                  }}
+                >
+                  <ListItemText primary={item.shopOrCheckpoint?.name} />
+                </ListItem>
+              ))}
+            </List>
+          )}
+        </div>
+  
+        {/* SVG Map */}
+        <div onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} style={{ flexGrow: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+    <SvgIcon viewBox="0 0 500 500" style={{ border: '1px solid red', margin: '20px 0' , width: "80%", height: "80%"}}>
+        <Path 
+            route={flattenedRoute} 
+            ref={pathRef} 
+            setViewBox={setViewBox} 
+            stepsWalked={dy} 
+            totalSteps={totalSteps}
+            rotation={rotationAngle}
+            currentShop={currentShop}
+        />
+        {/* <NavArrow stepsWalked={dy} totalSteps={totalSteps} pathRef={pathRef} viewBox={viewBox} /> */}
+    </SvgIcon>
+</div>
+<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}>
+    <img
+        src={navigationArrow}
+        alt="Navigation Arrow"
+        style={{ 
+            transform: `rotate(${adjustedAng}deg)`, 
+            width: '50px',  // Adjust this value as needed
+            height: '50px'  // Adjust this value as needed
+        }}
+    />
+</div>
+
+
+
+        {/* Route Details */}
+        <div style={{ padding: '20px' }}>
+          <Typography variant="h5" gutterBottom>
+            Navigation to {destinationName}
+          </Typography>
+  
+          <Typography variant="body1" style={{ fontSize: '24px', fontWeight: 'bold', margin: '10px 0' }}>
+            Steps: {dy}
+          </Typography>
+  
+          <Typography variant="h6" gutterBottom>
+            Route:
+          </Typography>
+          <div>
+            {currentRoute.slice(0, 2).map((item, index) => (
+              <Typography key={index} variant="body1" gutterBottom>
+                {index === 0 ? (
+                  `📍 Now at: ${item.shopOrCheckpoint?.name}`
+                ) : item.shopOrCheckpoint?.type === "shop" ? (
+                  `👉 Next shop: ${item.shopOrCheckpoint?.name}`
+                ) : (
+                  `Take ${getDirection(item.connection?.angle, dy)} in next ${remainingSteps} steps`
+                )}
+              </Typography>
+            ))}
+          </div>
+  
+          <Typography variant="h6" gutterBottom>
+            Total Steps: {Math.max(0, totalStep - dy + lastRecordedStep.current)}
+          </Typography>
+  
+          {/* Button at the bottom */}
+          <div style={{ marginTop: '20px' }}>
+            <Button variant="contained" color="primary" onClick={navigateToShops}>
+              Navigate other shops
+            </Button>
+          </div>
+        </div>
+
+        {showReachedPopup && (
+    <Dialog
+        open={showReachedPopup}
+        onClose={() => setShowReachedPopup(false)}
+    >
+        <DialogTitle>Confirmation</DialogTitle>
+        <DialogContent>
+            <DialogContentText>
+                Did you reach {currentRoute[0]?.shopOrCheckpoint?.name}?
+            </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+            <Button onClick={() => setShowReachedPopup(false)} color="primary">
+                No
+            </Button>
+            <Button
+                onClick={() => {
+                    setShowReachedPopup(false);
+                    setShowThanks(true);
+                }}
+                color="primary"
+            >
+                Yes
+            </Button>
+        </DialogActions>
+    </Dialog>
+)}
+
+      </div>
+    );
+  }
 export default Navigation;
