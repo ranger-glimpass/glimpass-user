@@ -540,7 +540,7 @@ route.forEach(item => {
   }
 });
 
-console.log("routeF: ",flattenedRoute)
+//console.log("routeF: ",flattenedRoute)
 const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
 const [viewBox, setViewBox] = useState("0 0 500 500");
@@ -636,13 +636,12 @@ const handleTouchMove = (e) => {
         <div onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} style={{ flexGrow: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
     <SvgIcon viewBox="0 0 500 500" style={{ border: '1px solid red', margin: '20px 0' , width: "80%", height: "80%"}}>
         <Path 
-            route={flattenedRoute} 
+            route={flattenedRoute}
             ref={pathRef} 
             setViewBox={setViewBox} 
             stepsWalked={dy} 
             totalSteps={totalSteps}
-            rotation={rotationAngle}
-            currentShop={currentShop}
+            adjustedAng = {adjustedAng}
         />
         {/* <NavArrow stepsWalked={dy} totalSteps={totalSteps} pathRef={pathRef} viewBox={viewBox} /> */}
     </SvgIcon>
@@ -658,8 +657,6 @@ const handleTouchMove = (e) => {
         }}
     />
 </div>
-
-
 
         {/* Route Details */}
         <div style={{ padding: '20px' }}>

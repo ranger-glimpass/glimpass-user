@@ -1,7 +1,7 @@
 import React, {useState, useEffect, useRef, forwardRef } from "react";
 import navigationArrow from "../assets/navigationArrow.svg";
-const Path = forwardRef(({ route,setViewBox, stepsWalked, totalSteps}, ref) => {
-
+const Path = forwardRef(({ route,setViewBox, stepsWalked, totalSteps, adjustedAng}, ref) => {
+    console.log(adjustedAng,"adjeusted")
     // const pathRef = useRef(null);
     const arrowWidth = 20;
     const arrowHeight = 20;
@@ -59,8 +59,8 @@ console.log(ref.current, "pathref");
                 angle = item.angle;
             }
             const steps = item.steps * scaleFactor;
-            const dx = steps * Math.cos((angle * Math.PI) / 180);
-            const dy = steps * Math.sin((angle * Math.PI) / 180);
+            const dx = steps * Math.cos(((angle) * Math.PI) / 180);
+            const dy = steps * Math.sin(((angle) * Math.PI) / 180);
             currentX += dx;
             currentY += dy;
             pathD += ` L ${currentX} ${currentY}`;
@@ -123,6 +123,7 @@ return (
     y={arrowPoint.y - arrowHeight / 2}
     height={arrowHeight}
     width={arrowWidth}
+    transform={`rotate(${adjustedAng%180},${arrowPoint.x},${arrowPoint.y})`}
 />
 
 
