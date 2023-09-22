@@ -1,5 +1,6 @@
 import React, {useState, useEffect, useRef, forwardRef } from "react";
 import navigationArrow from "../assets/navigationArrow.svg";
+import pinPoint from '../assets/pinPoint.svg';
 const Path = forwardRef(({ route,setViewBox, stepsWalked, totalSteps, adjustedAng}, ref) => {
     console.log(adjustedAng,"adjeusted")
     // const pathRef = useRef(null);
@@ -13,6 +14,7 @@ const Path = forwardRef(({ route,setViewBox, stepsWalked, totalSteps, adjustedAn
     //const [currentStep, setCurrentStep] = useState(0);
     const [arrowPoint, setArrowPoint] = useState({ x: svgWidth / 2, y: svgHeight / 2 });
     const [currentShop, setCurrentShop] = useState(null);
+    const [c_angle, setangle] = useState(0);
 
 useEffect(() => {
 console.log(ref.current, "pathref");
@@ -54,6 +56,7 @@ console.log(ref.current, "pathref");
         if (item.relationId) {
             let angle;
             if (index === 0) {
+                let anlge_1 = angle
                 angle = 270;
             } else {
                 angle = item.angle;
@@ -61,6 +64,7 @@ console.log(ref.current, "pathref");
             const steps = item.steps * scaleFactor;
             const dx = steps * Math.cos(((angle) * Math.PI) / 180);
             const dy = steps * Math.sin(((angle) * Math.PI) / 180);
+           // setangle(angle);
             currentX += dx;
             currentY += dy;
             pathD += ` L ${currentX} ${currentY}`;
@@ -118,12 +122,13 @@ return (
             );
         })}
         <image
-    href={navigationArrow}
+    href={pinPoint}
     x={arrowPoint.x - arrowWidth / 2}
     y={arrowPoint.y - arrowHeight / 2}
     height={arrowHeight}
     width={arrowWidth}
-    transform={`rotate(${adjustedAng%180},${arrowPoint.x},${arrowPoint.y})`}
+    //transform={`rotate(${adjustedAng%180},${arrowPoint.x},${arrowPoint.y})`}
+    // transform={`rotate(${angle},${arrowPoint.x},${arrowPoint.y})`}
 />
 
 
