@@ -586,7 +586,11 @@ const handleTouchMove = (e) => {
 };
 
 
-
+// const [xyz, setXyz] = useState(0);
+// const addXYZ = () =>{
+//   setXyz(xyz+1);
+// }
+// console.log(xyz,"xyz");
 
     return isLoading ? (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
@@ -694,6 +698,12 @@ const handleTouchMove = (e) => {
               Navigate other shops
             </Button>
           </div>
+
+          {/* <div style={{ marginTop: '20px' }}>
+            <Button variant="contained" color="primary" onClick={addXYZ}>
+              Add steps mannualy 
+            </Button>
+          </div> */}
         </div>
 
         {showReachedPopup && (

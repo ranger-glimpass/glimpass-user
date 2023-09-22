@@ -2,7 +2,7 @@ import React, {useState, useEffect, useRef, forwardRef } from "react";
 import navigationArrow from "../assets/navigationArrow.svg";
 const Path = forwardRef(({ route,setViewBox, stepsWalked, totalSteps}, ref) => {
 
-    const pathRef = useRef(null);
+    // const pathRef = useRef(null);
     const arrowWidth = 20;
     const arrowHeight = 20;
     
@@ -15,10 +15,11 @@ const Path = forwardRef(({ route,setViewBox, stepsWalked, totalSteps}, ref) => {
     const [currentShop, setCurrentShop] = useState(null);
 
 useEffect(() => {
-    if (pathRef.current && pathRef.current.getTotalLength() > 0) {
-        const pathLength = pathRef.current.getTotalLength();
+console.log(ref.current, "pathref");
+    if (ref.current && ref.current.getTotalLength() > 0) {
+        const pathLength = ref.current.getTotalLength();
         const distance = (stepsWalked / totalSteps) * pathLength;
-        const point = pathRef.current.getPointAtLength(distance);
+        const point = ref.current.getPointAtLength(distance);
         setArrowPoint(point);
 
         let reachedShop = null;
@@ -36,7 +37,6 @@ useEffect(() => {
         }
     }
 }, [stepsWalked, totalSteps, route.length]);
-
 
 
     let currentX = svgWidth / 2;
@@ -82,10 +82,12 @@ useEffect(() => {
     maxY += padding;
 
     // Calculate viewBox to ensure the entire path is visible
-    const viewBox = `${minX} ${minY} ${maxX - minX} ${maxY - minY}`;
+    //const viewBox = `${minX} ${minY} ${maxX - minX} ${maxY - minY}`;
+    //const viewBox = `${currentX} ${currentY} ${currentX - currentX} ${currentY - currentY}`;
 
         // Calculate viewBox to ensure the entire path is visible
         const calculatedViewBox = `${minX} ${minY} ${maxX - minX} ${maxY - minY}`;
+        //const calculatedViewBox = `${0} ${0} ${500} ${500}`;
         setViewBox(calculatedViewBox);
     
 console.log("calculatedViewBox: "+calculatedViewBox);

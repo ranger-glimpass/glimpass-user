@@ -7,6 +7,7 @@ const NavArrow = ({ stepsWalked = 0, totalSteps, pathRef }) => {
     const [point, setPoint] = useState({ x: 0, y: 0 });
 
     useEffect(() => {
+        console.log(pathRef.current);
         if (pathRef.current) {
             // Calculate the distance along the path based on stepsWalked and totalSteps
             const pathLength = pathRef.current.getTotalLength();
