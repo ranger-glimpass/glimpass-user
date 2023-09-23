@@ -1,7 +1,20 @@
 import React, { useState, useEffect, useRef } from "react";
 import navigationArrow from "../assets/navigationArrow.svg";
 
-import { Button, CircularProgress, Typography, List, ListItem, ListItemText, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, SvgIcon } from '@mui/material';
+import {
+  Button,
+  CircularProgress,
+  Typography,
+  List,
+  ListItem,
+  ListItemText,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  SvgIcon,
+} from "@mui/material";
 
 import "../styles/ShopList.css";
 // import shops from '../data/shops';
@@ -9,17 +22,16 @@ import "../styles/ShopList.css";
 import { inertialFrame } from "./helper";
 import ThanksComponent from "../components/Thanks";
 import { useNavigate, useLocation } from "react-router-dom";
-import Path from '../components/Path';
-import NavArrow from '../components/NavArrow';
-// import shops from '../data/shops';
-import CustomProgressBar from '../components/CustomProgressBar'; // Adjust the path accordingly
+import Path from "../components/Path";
 
 // window.stepError = 0;
 // window.angleError = 0;
 window.currentStep = 0;
+window.modifyDy = 1;
 
 //steps calculation
 
+const globalArray = [];
 const Navigation = () => {
   const navigate = useNavigate();
 
@@ -31,11 +43,10 @@ const Navigation = () => {
   const location = useLocation();
   const currentLocation = location.state.currentLocation;
   const destinationShopId = location.state.destinationShopId;
-  // console.log(currentLocation);
-  // console.log(destinationShopId);
   const [conn, setConn] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshed, setIsRefreshed] = useState(true);
+  const [turnAngle, setTurnAngle] = useState(false);
 
   useEffect(() => {
     // Ensure both currentLocation and destinationShopId are available
@@ -59,22 +70,23 @@ const Navigation = () => {
           const data = await response.json();
           console.log(data);
           setConn(data); // Assuming the API returns the data in the desired format
-      
+
           // Find the first shop and set it as the active shop
-          const firstShop = data.find(item => item.shopOrCheckpoint?.type === "shop");
+          const firstShop = data.find(
+            (item) => item.shopOrCheckpoint?.type === "shop"
+          );
           if (firstShop) {
             setCurrentRoute([firstShop]);
           }
           // Open the refershed by default
-    setIsRefreshed(true);
-      
+          setIsRefreshed(true);
+
           setIsLoading(false); // Set loading to false here
         } catch (error) {
           console.error("Error fetching shortest path:", error);
           setIsLoading(false); // Also set loading to false in case of an error
         }
       };
-      
 
       fetchShortestPath();
     }
@@ -85,12 +97,12 @@ const Navigation = () => {
   const [Z, setZ] = useState(0);
   const [dx, setdx] = useState(0);
   const [dy, setdy] = useState(0);
+  const [dyV2, setDyV2] = useState(0);
   const [directionData, setDirectionData] = useState({});
   const [final_speed, setFinalSpeed] = useState(0);
 
   const [destinationName, setDestinationName] = useState(destinationShopId);
   const [selectedShopStep, setSelectedShopStep] = useState(0);
-
 
   const [showPopup, setShowPopup] = useState(false);
   const [showThanks, setShowThanks] = useState(false);
@@ -115,6 +127,7 @@ const Navigation = () => {
   const final = useRef(0);
   const push = useRef(0);
   const steps = useRef(0);
+  const stepsV2 = useRef(0);
   const push_y = useRef(0);
   const travel = useRef(0);
   const travel_state = useRef(0);
@@ -133,25 +146,7 @@ const Navigation = () => {
   const lroh_push = useRef(0);
   const lroh_final = useRef(0);
 
-  // const conn = [
-  //     { name: 'Gucci', type: 'shop', floor: 0, category: 'Fashion', description: 'An Italian luxury brand of fashion and leather goods.' },
-  //     { angle: 60, steps: 6 },
-  //     { name: 'JAK', type: 'checkpoint', floor: 0, category: 'Sportswear', discount: 'Up to 50% off', description: 'A global sportswear brand offering athletic footwear and apparel.' },
-  //     { angle: 110, steps: 5 },
-  //     { name: 'Lift', type: 'floor_change', floor:0 , category: 'Footwear', discount: 'Flat 30% off', description: 'An American lifestyle and performance footwear company.' },
-  //     { angle: 42, steps: 7 },
-  //     { name: 'MKA', type: 'checkpoint', floor:2, category: 'Footwear', discount: 'Flat 30% off', description: 'An American lifestyle and performance footwear company.' },
-  //     { angle: 337, steps: 8 },
-  //     { name: 'VVZ', type: 'checkpoint', floor:2,category: 'Footwear', discount: 'Flat 30% off', description: 'An American lifestyle and performance footwear company.' },
-  //     { angle: 55, steps: 4 },
-  //     { name: 'Spencer', type: 'shop',floor:2, category: 'Footwear', discount: 'Flat 30% off', description: 'An American lifestyle and performance footwear company.' },
-  //     { angle: 110, steps: 5 },
-  //     { name: 'XYZ', type: 'checkpoint',floor:2, category: 'Footwear', discount: 'Flat 30% off', description: 'An American lifestyle and performance footwear company.' },
-  //     { angle: 333, steps: 4 },
-  //     { name: 'ABC', type: 'checkpoint',floor:2,category: 'Footwear', discount: 'Flat 30% off', description: 'An American lifestyle and performance footwear company.' },
-  //     { angle: 258, steps: 5 },
-  //     { name: 'Sketchers', type: 'shop', floor:2,category: 'Footwear', discount: 'Flat 30% off', description: 'An American lifestyle and performance footwear company.' }
-  // ];
+  const reachRef = useRef("here");
 
   const handleMotion = (event) => {
     accRef.current = event.acceleration;
@@ -272,7 +267,8 @@ const Navigation = () => {
           (lroh_final.current == -1 || lrav_final.current == -1)
           //||travel_state.current == 0
         ) {
-          steps.current += 1;
+          steps.current += window.modifyDy;
+          stepsV2.current += 1;
           push.current = 1;
           prev_time.current = Date.now();
           lroh_prev.current = lroh_now.current;
@@ -294,9 +290,6 @@ const Navigation = () => {
             prev_force.current = final_force.current;
           }
           final_force.current = 0;
-          //   window.angleError = Math.atan(Math.sin(sin_a* (Math.PI / 180))/(window.currentStep-Math.cos(sin_a* (Math.PI / 180))));
-          //   window.stepError = Math.sqrt((window.currentStep - Math.cos(sin_a* (Math.PI / 180))) + Math.sin(sin_a* (Math.PI / 180)));
-          //   window.stepError = window.currentStep - window.stepError-1;
         }
 
         if (omega_max.current > 0) {
@@ -323,6 +316,7 @@ const Navigation = () => {
     setZ(parseFloat(lroh_final.current).toFixed(4));
     setdx(parseFloat(sp_x.current).toFixed(4));
     setdy(parseFloat(steps.current));
+    setDyV2(parseFloat(steps.current));
   };
 
   const handleOrientation = (event) => {
@@ -388,9 +382,11 @@ const Navigation = () => {
   const [currentRoute, setCurrentRoute] = useState(route);
   const [totalStep, setTotalStep] = useState(0);
   const [adjustedAng, setAdjustedAng] = useState(0);
+  const [nextNodeAngle, setNextNodeAngle] = useState(0);
+  const [currentWalkAngle, setCurrentWalkAngle] = useState(0);
+  const [showReachedPopup, setShowReachedPopup] = useState(false);
 
   useEffect(() => {
-    //window.currentStep = currentRoute[0].connection.steps;
     const initialTotalSteps = currentRoute.reduce((acc, item) => {
       if (item.connection) {
         return acc + parseInt(item.connection.steps);
@@ -398,66 +394,101 @@ const Navigation = () => {
       return acc;
     }, 0);
 
-    const initialNextShopAngle = currentRoute[0]?.connection?.angle || 0;
-    const initialAdjustedAngle = (alpha + initialNextShopAngle - 45) % 360;
+    const stepsToNextShop = currentRoute[0]?.connection?.steps || 1000000;
+    if (dy - lastRecordedStep.current >= stepsToNextShop) {
+      const initialNextShopAngle = currentRoute[1]?.connection?.angle || 0;
+      const initialAdjustedAngle = (alpha + initialNextShopAngle - 45) % 360;
+
+      setAdjustedAng(initialAdjustedAngle);
+    } else {
+      const initialNextShopAngle = currentRoute[0]?.connection?.angle || 0;
+      const initialAdjustedAngle = (alpha + initialNextShopAngle - 45) % 360;
+
+      setAdjustedAng(initialAdjustedAngle);
+    }
+
     setTotalStep(initialTotalSteps);
-    setAdjustedAng(initialAdjustedAngle);
-    
-    // setCurrentShop(currentRoute[0].shopOrCheckpoint?.name);
+    setCurrentWalkAngle(currentRoute[0]?.connection?.angle || 0);
+    setNextNodeAngle(currentRoute[1]?.connection?.angle || 0);
   }, [currentRoute, alpha]);
 
-  const handleShopClick = (index) => {
-    // lastRecordedStep.current = dy;
-    // const newRoute = currentRoute.slice(index);
-    // setCurrentRoute(newRoute);
-    // if(currentRoute[0]?.shopOrCheckpoint?.name)
-    setCurrentRoute((prevRoute) => prevRoute.slice(1));
-    lastRecordedStep.current = dy; // Reset the step count
-    setShowPopup(false);
-    // The recalculations will be handled by the useEffect above when currentRoute changes
-
-    // Check if the user has reached the last stop
+  useEffect(() => {
     if (currentRoute.length === 1) {
-      setShowThanks(true);
+      setShowReachedPopup(true);
     }
-  };
+    globalArray.push(360 - alpha);
 
-  const [showReachedPopup, setShowReachedPopup] = useState(false);
-const [currentShop, setCurrentShop] = useState(null);
+    const len = globalArray.length;
+    if (len > 3) {
+      const averageAngle =
+        (globalArray[len - 1] + globalArray[len - 2] + globalArray[len - 3]) /
+        3;
+      const percentageError = 15;
+
+      // window.alert(averageAngle);
+
+      if (
+        averageAngle >= currentWalkAngle - percentageError &&
+        averageAngle <= currentWalkAngle + percentageError
+      ) {
+        // true walking in right direction;
+        reachRef.current = "ok walk position";
+      } else if (
+        averageAngle >= nextNodeAngle - percentageError &&
+        averageAngle <= nextNodeAngle + percentageError
+      ) {
+        // turns or not
+        // signal to path.js
+        setTurnAngle(true);
+        reachRef.current = "turmn angle is true";
+      } else {
+        reachRef.current = "inside else condition";
+      }
+    }
+  }, [stepsV2.current]);
+
   useEffect(() => {
     // Check if you've reached the next destination
-    const stepsToNextShop = currentRoute[0]?.connection?.steps || 0;
-    if (dy - lastRecordedStep.current >= stepsToNextShop) {
-        // If it's the last shop in the route
-        if (currentRoute.length === 1) {
-            setShowReachedPopup(true);
-        } else {
-            setCurrentRoute((prevRoute) => prevRoute.slice(1));
-            lastRecordedStep.current = dy; // Reset the step count
-        }
+    const stepsToNextShop = currentRoute[0]?.connection?.steps || 1000000;
+
+    if (dy - lastRecordedStep.current >= stepsToNextShop && turnAngle) {
+      // If it's the last shop in the route
+      window.modifyDy = 1;
+      setTurnAngle(false);
+      setCurrentRoute((prevRoute) => prevRoute.slice(1));
+      lastRecordedStep.current = dy; // Reset the step count
+    } else if (dy - lastRecordedStep.current >= stepsToNextShop) {
+      if (currentRoute.length === 2 || currentRoute.length === 1) {
+        setShowReachedPopup(true);
+      }
+      window.modifyDy = 0;
+      setTurnAngle(false);
+    } else if (turnAngle) {
+      window.modifyDy = stepsToNextShop - (dy - lastRecordedStep.current);
     }
-    
+
     // setCurrentShop(currentRoute[0].shopOrCheckpoint?.name);
-}, [dy, currentRoute]);
+  }, [dy, currentRoute, turnAngle]);
 
-
-
+  console.log("-----------------");
+  console.log(currentRoute);
   const handleDropdownChange = (selectedShopName) => {
-    const selectedIndex = route.findIndex(item => item.shopOrCheckpoint.name === selectedShopName);
+    const selectedIndex = route.findIndex(
+      (item) => item.shopOrCheckpoint.name === selectedShopName
+    );
     setCurrentRoute(route.slice(selectedIndex));
 
     // Calculate the total steps up to the selected shop/checkpoint
     let stepsUpToSelectedShop = 0;
     for (let i = 0; i < selectedIndex; i++) {
-        if (route[i].connection) {
-            stepsUpToSelectedShop += route[i].connection.steps;
-        }
+      if (route[i].connection) {
+        stepsUpToSelectedShop += route[i].connection.steps;
+      }
     }
 
     // Update the stepsWalked state
     setSelectedShopStep(stepsUpToSelectedShop);
-};
-
+  };
 
   // Compute total steps
   const totalSteps = route.reduce((acc, item) => {
@@ -498,7 +529,7 @@ const [currentShop, setCurrentShop] = useState(null);
     if (currentRoute[0]) {
       setRemainingSteps(currentRoute[0].connection?.steps || 0);
     }
-    
+
     // setCurrentShop(currentRoute[0].shopOrCheckpoint?.name);
   }, [currentRoute]);
 
@@ -533,205 +564,255 @@ const [currentShop, setCurrentShop] = useState(null);
   });
 
   let flattenedRoute = [];
-route.forEach(item => {
-  flattenedRoute.push(item.shopOrCheckpoint);
-  if (item.connection) {
-    flattenedRoute.push(item.connection);
-  }
-});
+  route.forEach((item) => {
+    flattenedRoute.push(item.shopOrCheckpoint);
+    if (item.connection) {
+      flattenedRoute.push(item.connection);
+    }
+  });
 
-//console.log("routeF: ",flattenedRoute)
-const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  //console.log("routeF: ",flattenedRoute)
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-const [viewBox, setViewBox] = useState("0 0 500 500");
+  const [viewBox, setViewBox] = useState("0 0 500 500");
 
-
-
-useEffect(() => {
-  if (isRefreshed && route.length > 0) {
+  useEffect(() => {
+    if (isRefreshed && route.length > 0) {
       handleDropdownChange(route[0].shopOrCheckpoint?.name);
-      setIsRefreshed(false);  // Reset isRefreshed to false after handling
-  }
-  
-  // setCurrentShop(route[0].shopOrCheckpoint?.name);
-}, [isRefreshed, route, handleDropdownChange]);
-
-
-const [rotationAngle, setRotationAngle] = useState(0);
-
-let initialAngle = 0;
-let initialRotation = 0;
-
-const handleTouchStart = (e) => {
-    if (e.touches.length === 2) {
-        const x1 = e.touches[0].clientX;
-        const y1 = e.touches[0].clientY;
-        const x2 = e.touches[1].clientX;
-        const y2 = e.touches[1].clientY;
-        initialAngle = Math.atan2(y2 - y1, x2 - x1) * (180 / Math.PI);
-        initialRotation = rotationAngle;
+      setIsRefreshed(false); // Reset isRefreshed to false after handling
     }
-};
 
-const handleTouchMove = (e) => {
+    // setCurrentShop(route[0].shopOrCheckpoint?.name);
+  }, [isRefreshed, route, handleDropdownChange]);
+
+  const [rotationAngle, setRotationAngle] = useState(0);
+
+  let initialAngle = 0;
+  let initialRotation = 0;
+
+  const handleTouchStart = (e) => {
     if (e.touches.length === 2) {
-        const x1 = e.touches[0].clientX;
-        const y1 = e.touches[0].clientY;
-        const x2 = e.touches[1].clientX;
-        const y2 = e.touches[1].clientY;
-        const currentAngle = Math.atan2(y2 - y1, x2 - x1) * (180 / Math.PI);
-        const rotationChange = currentAngle - initialAngle;
-        setRotationAngle(initialRotation + rotationChange);
+      const x1 = e.touches[0].clientX;
+      const y1 = e.touches[0].clientY;
+      const x2 = e.touches[1].clientX;
+      const y2 = e.touches[1].clientY;
+      initialAngle = Math.atan2(y2 - y1, x2 - x1) * (180 / Math.PI);
+      initialRotation = rotationAngle;
     }
-};
+  };
 
+  const handleTouchMove = (e) => {
+    if (e.touches.length === 2) {
+      const x1 = e.touches[0].clientX;
+      const y1 = e.touches[0].clientY;
+      const x2 = e.touches[1].clientX;
+      const y2 = e.touches[1].clientY;
+      const currentAngle = Math.atan2(y2 - y1, x2 - x1) * (180 / Math.PI);
+      const rotationChange = currentAngle - initialAngle;
+      setRotationAngle(initialRotation + rotationChange);
+    }
+  };
 
-// const [xyz, setXyz] = useState(0);
-// const addXYZ = () =>{
-//   setXyz(xyz+1);
-// }
-// console.log(xyz,"xyz");
+  // const [xyz, setXyz] = useState(0);
+  // const addXYZ = () =>{
+  //   setXyz(xyz+1);
+  // }
+  // console.log(xyz,"xyz");
 
-    return isLoading ? (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <CircularProgress />
-      </div>
-    ) : showThanks ? (
-      <ThanksComponent
-        route={directionsAndShops}
-        stepsWalked={dy}
-        totalSteps={totalSteps}
-      />
-    ) : (
-      <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-        {/* Dropdown at top right */}
-        <div style={{ alignSelf: 'flex-end', margin: '10px' }}>
-        <Typography variant="h6" onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
-  📍 {currentRoute[0]?.shopOrCheckpoint?.name || "In between"}
-</Typography>
+  return isLoading ? (
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100vh",
+      }}
+    >
+      <CircularProgress />
+    </div>
+  ) : showThanks ? (
+    <ThanksComponent
+      route={directionsAndShops}
+      stepsWalked={dy}
+      totalSteps={totalSteps}
+    />
+  ) : (
+    <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+      {/* Dropdown at top right */}
+      <div style={{ alignSelf: "flex-end", margin: "10px" }}>
+        <Typography
+          variant="h6"
+          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+        >
+          📍 {currentRoute[0]?.shopOrCheckpoint?.name || "In between"}
+        </Typography>
 
-{/* {isRefreshed &&(
+        {/* {isRefreshed &&(
   handleDropdownChange(currentRoute[0]?.shopOrCheckpoint?.name)
 )} */}
-          {isDropdownOpen && (
-            <List>
-              {route.map((item, index) => (
-                <ListItem
-                  key={index}
-                  button
-                  selected={currentRoute[0]?.shopOrCheckpoint?.name === item.shopOrCheckpoint?.name}
-                  onClick={() => {
-                    handleDropdownChange(item.shopOrCheckpoint?.name);
-                    setIsDropdownOpen(false);
-                  }}
-                >
-                  <ListItemText primary={item.shopOrCheckpoint?.name} />
-                </ListItem>
-              ))}
-            </List>
-          )}
-        </div>
-  
-        {/* SVG Map */}
-        <div onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} style={{ flexGrow: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-    <SvgIcon viewBox="0 0 500 500" style={{ border: '1px solid red', margin: '20px 0' , width: "80%", height: "80%"}}>
-        <Path 
-            route={flattenedRoute}
-            ref={pathRef} 
-            setViewBox={setViewBox} 
-            stepsWalked={dy} 
-            totalSteps={totalSteps}
-            adjustedAng = {adjustedAng}
-        />
-        {/* <NavArrow stepsWalked={dy} totalSteps={totalSteps} pathRef={pathRef} viewBox={viewBox} /> */}
-    </SvgIcon>
-</div>
-<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}>
-    <img
-        src={navigationArrow}
-        alt="Navigation Arrow"
-        style={{ 
-            transform: `rotate(${adjustedAng}deg)`, 
-            width: '50px',  // Adjust this value as needed
-            height: '50px'  // Adjust this value as needed
-        }}
-    />
-</div>
-
-        {/* Route Details */}
-        <div style={{ padding: '20px' }}>
-          <Typography variant="h5" gutterBottom>
-            Navigation to {destinationName}
-          </Typography>
-  
-          <Typography variant="body1" style={{ fontSize: '24px', fontWeight: 'bold', margin: '10px 0' }}>
-            Steps: {dy}
-          </Typography>
-  
-          <Typography variant="h6" gutterBottom>
-            Route:
-          </Typography>
-          <div>
-            {currentRoute.slice(0, 2).map((item, index) => (
-              <Typography key={index} variant="body1" gutterBottom>
-                {index === 0 ? (
-                  `📍 Now at: ${item.shopOrCheckpoint?.name}`
-                ) : item.shopOrCheckpoint?.type === "shop" ? (
-                  `👉 Next shop: ${item.shopOrCheckpoint?.name}`
-                ) : (
-                  `Take ${getDirection(item.connection?.angle, dy)} in next ${remainingSteps} steps`
-                )}
-              </Typography>
+        {isDropdownOpen && (
+          <List>
+            {route.map((item, index) => (
+              <ListItem
+                key={index}
+                button
+                selected={
+                  currentRoute[0]?.shopOrCheckpoint?.name ===
+                  item.shopOrCheckpoint?.name
+                }
+                onClick={() => {
+                  handleDropdownChange(item.shopOrCheckpoint?.name);
+                  setIsDropdownOpen(false);
+                }}
+              >
+                <ListItemText primary={item.shopOrCheckpoint?.name} />
+              </ListItem>
             ))}
-          </div>
-  
-          <Typography variant="h6" gutterBottom>
-            Total Steps: {Math.max(0, totalStep - dy + lastRecordedStep.current)}
-          </Typography>
-  
-          {/* Button at the bottom */}
-          <div style={{ marginTop: '20px' }}>
-            <Button variant="contained" color="primary" onClick={navigateToShops}>
-              Navigate other shops
-            </Button>
-          </div>
+          </List>
+        )}
+      </div>
+      <div style={{ marginTop: "20px" }}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => {
+            steps.current++;
+            stepsV2.current++;
+            setdy(steps.current);
+          }}
+        >
+          Add steps mannualy
+        </Button>
+      </div>
+      <div>
+        {/* {averageAngle && <p>{averageAngle}</p>} */}
+        <p>{turnAngle ? "Trueeee" : "Falseeee"}</p>
+        <p>{reachRef.current}</p>
+        <p>{currentWalkAngle}</p>
+        <p>{nextNodeAngle}</p>
+        <p>{adjustedAng}</p>
+      </div>
 
-          {/* <div style={{ marginTop: '20px' }}>
-            <Button variant="contained" color="primary" onClick={addXYZ}>
-              Add steps mannualy 
-            </Button>
-          </div> */}
+      {/* SVG Map */}
+      <div
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        style={{
+          flexGrow: 1,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <SvgIcon
+          viewBox="0 0 500 500"
+          style={{
+            border: "1px solid red",
+            margin: "20px 0",
+            width: "80%",
+            height: "80%",
+          }}
+        >
+          <Path
+            route={flattenedRoute}
+            ref={pathRef}
+            setViewBox={setViewBox}
+            stepsWalked={dy}
+            totalSteps={totalSteps}
+            adjustedAng={adjustedAng}
+          />
+        </SvgIcon>
+      </div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          padding: "20px",
+        }}
+      >
+        <img
+          src={navigationArrow}
+          alt="Navigation Arrow"
+          style={{
+            transform: `rotate(${adjustedAng}deg)`,
+            width: "50px", // Adjust this value as needed
+            height: "50px", // Adjust this value as needed
+          }}
+        />
+      </div>
+
+      {/* Route Details */}
+      <div style={{ padding: "20px" }}>
+        <Typography variant="h5" gutterBottom>
+          Navigation to {destinationName}
+        </Typography>
+
+        <Typography
+          variant="body1"
+          style={{ fontSize: "24px", fontWeight: "bold", margin: "10px 0" }}
+        >
+          Steps: {dy}
+        </Typography>
+
+        <Typography variant="h6" gutterBottom>
+          Route:
+        </Typography>
+        <div>
+          {currentRoute.slice(0, 2).map((item, index) => (
+            <Typography key={index} variant="body1" gutterBottom>
+              {index === 0
+                ? `📍 Now at: ${item.shopOrCheckpoint?.name}`
+                : item.shopOrCheckpoint?.type === "shop"
+                ? `👉 Next shop: ${item.shopOrCheckpoint?.name}`
+                : `Take ${getDirection(
+                    item.connection?.angle,
+                    dy
+                  )} in next ${remainingSteps} steps`}
+            </Typography>
+          ))}
         </div>
 
-        {showReachedPopup && (
-    <Dialog
-        open={showReachedPopup}
-        onClose={() => setShowReachedPopup(false)}
-    >
-        <DialogTitle>Confirmation</DialogTitle>
-        <DialogContent>
+        <Typography variant="h6" gutterBottom>
+          Total Steps: {Math.max(0, totalStep - dy + lastRecordedStep.current)}
+        </Typography>
+
+        {/* Button at the bottom */}
+        <div style={{ marginTop: "20px" }}>
+          <Button variant="contained" color="primary" onClick={navigateToShops}>
+            Navigate other shops
+          </Button>
+        </div>
+      </div>
+
+      {showReachedPopup && (
+        <Dialog
+          open={showReachedPopup}
+          onClose={() => setShowReachedPopup(false)}
+        >
+          <DialogTitle>Confirmation</DialogTitle>
+          <DialogContent>
             <DialogContentText>
-                Did you reach {currentRoute[0]?.shopOrCheckpoint?.name}?
+              Did you reach {currentRoute[0]?.shopOrCheckpoint?.name}?
             </DialogContentText>
-        </DialogContent>
-        <DialogActions>
+          </DialogContent>
+          <DialogActions>
             <Button onClick={() => setShowReachedPopup(false)} color="primary">
-                No
+              No
             </Button>
             <Button
-                onClick={() => {
-                    setShowReachedPopup(false);
-                    setShowThanks(true);
-                }}
-                color="primary"
+              onClick={() => {
+                setShowReachedPopup(false);
+                setShowThanks(true);
+              }}
+              color="primary"
             >
-                Yes
+              Yes
             </Button>
-        </DialogActions>
-    </Dialog>
-)}
-
-      </div>
-    );
-  }
+          </DialogActions>
+        </Dialog>
+      )}
+    </div>
+  );
+};
 export default Navigation;
