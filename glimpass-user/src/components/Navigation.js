@@ -17,21 +17,17 @@ import {
 } from "@mui/material";
 
 import "../styles/ShopList.css";
-// import shops from '../data/shops';
-// import connections from '../data/connections';
 import { inertialFrame } from "./helper";
 import ThanksComponent from "../components/Thanks";
 import { useNavigate, useLocation } from "react-router-dom";
 import Path from "../components/Path";
-
-// window.stepError = 0;
-// window.angleError = 0;
 window.currentStep = 0;
 window.modifyDy = 1;
 
 //steps calculation
 
 const globalArray = [];
+const globalTimeArray = [];
 const Navigation = () => {
   const navigate = useNavigate();
 
@@ -47,6 +43,8 @@ const Navigation = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshed, setIsRefreshed] = useState(true);
   const [turnAngle, setTurnAngle] = useState(false);
+  const [showFloorChangePopup, setShowFloorChangePopup] = useState(false);
+  const [nextFloor, setNextFloor] = useState(null);
 
   useEffect(() => {
     // Ensure both currentLocation and destinationShopId are available
@@ -68,7 +66,6 @@ const Navigation = () => {
             requestOptions
           );
           const data = await response.json();
-          console.log(data);
           setConn(data); // Assuming the API returns the data in the desired format
 
           // Find the first shop and set it as the active shop
@@ -417,15 +414,17 @@ const Navigation = () => {
       setShowReachedPopup(true);
     }
     globalArray.push(360 - alpha);
+    globalTimeArray.push(new Date().getSeconds());
 
     const len = globalArray.length;
     if (len > 3) {
       const averageAngle =
         (globalArray[len - 1] + globalArray[len - 2] + globalArray[len - 3]) /
         3;
-      const percentageError = 15;
 
-      // window.alert(averageAngle);
+      const timeDiffInterval =
+        (60 + globalTimeArray[len - 3] - globalTimeArray[len - 1]) % 60;
+      const percentageError = 15;
 
       if (
         averageAngle >= currentWalkAngle - percentageError &&
@@ -435,7 +434,8 @@ const Navigation = () => {
         reachRef.current = "ok walk position";
       } else if (
         averageAngle >= nextNodeAngle - percentageError &&
-        averageAngle <= nextNodeAngle + percentageError
+        averageAngle <= nextNodeAngle + percentageError &&
+        timeDiffInterval >= 1
       ) {
         // turns or not
         // signal to path.js
@@ -458,7 +458,9 @@ const Navigation = () => {
       setCurrentRoute((prevRoute) => prevRoute.slice(1));
       lastRecordedStep.current = dy; // Reset the step count
     } else if (dy - lastRecordedStep.current >= stepsToNextShop) {
-      if (currentRoute.length === 2 || currentRoute.length === 1) {
+      if (currentRoute.length === 2) {
+        setCurrentRoute((prevRoute) => prevRoute.slice(1));
+      } else if (currentRoute.length == 1) {
         setShowReachedPopup(true);
       }
       window.modifyDy = 0;
@@ -470,8 +472,6 @@ const Navigation = () => {
     // setCurrentShop(currentRoute[0].shopOrCheckpoint?.name);
   }, [dy, currentRoute, turnAngle]);
 
-  console.log("-----------------");
-  console.log(currentRoute);
   const handleDropdownChange = (selectedShopName) => {
     const selectedIndex = route.findIndex(
       (item) => item.shopOrCheckpoint.name === selectedShopName
@@ -618,6 +618,24 @@ const Navigation = () => {
   //   setXyz(xyz+1);
   // }
   // console.log(xyz,"xyz");
+
+  useEffect(() => {
+    const currentNodeType = currentRoute[0]?.shopOrCheckpoint?.nodeType;
+
+    let nextNode = currentRoute[1]?.shopOrCheckpoint;
+
+    let j = 1;
+    while (j < currentRoute.length && nextNode?.nodeType === "checkpoint") {
+      nextNode = currentRoute[j]?.shopOrCheckpoint;
+      j++;
+    }
+    if (currentNodeType === "floor_change" && nextNode) {
+      setShowFloorChangePopup(true);
+      setNextFloor(nextNode?.floor);
+    } else {
+      setShowFloorChangePopup(false);
+    }
+  }, [currentRoute]);
 
   return isLoading ? (
     <div
@@ -810,6 +828,30 @@ const Navigation = () => {
               Yes
             </Button>
           </DialogActions>
+        </Dialog>
+      )}
+
+      {showFloorChangePopup && (
+        <Dialog
+          open={showFloorChangePopup}
+          onClose={() => setShowFloorChangePopup(false)}
+        >
+          <DialogTitle>Floor Change Required</DialogTitle>{" "}
+          <DialogContent>
+            {" "}
+            <DialogContentText>
+              Proceed to the lift and go to floor {nextFloor}.{" "}
+            </DialogContentText>{" "}
+          </DialogContent>{" "}
+          <DialogActions>
+            {" "}
+            <Button
+              onClick={() => setShowFloorChangePopup(false)}
+              color="primary"
+            >
+              OK{" "}
+            </Button>{" "}
+          </DialogActions>{" "}
         </Dialog>
       )}
     </div>
