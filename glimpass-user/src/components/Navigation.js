@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import navigationArrow from "../assets/navigationArrow.svg";
-
+import CustomProgressBar from '../components/CustomProgressBar';
 import {
   Button,
   CircularProgress,
@@ -45,6 +45,8 @@ const Navigation = () => {
   const [turnAngle, setTurnAngle] = useState(false);
   const [showFloorChangePopup, setShowFloorChangePopup] = useState(false);
   const [nextFloor, setNextFloor] = useState(null);
+  
+  const [destinationName, setDestinationName] = useState(destinationShopId);
 
   useEffect(() => {
     // Ensure both currentLocation and destinationShopId are available
@@ -67,6 +69,11 @@ const Navigation = () => {
           );
           const data = await response.json();
           setConn(data); // Assuming the API returns the data in the desired format
+          console.log(data,"shortest path");
+
+          
+          const lastShop = conn[conn.length-1]?.name;
+          setDestinationName(lastShop);
 
           // Find the first shop and set it as the active shop
           const firstShop = data.find(
@@ -75,6 +82,8 @@ const Navigation = () => {
           if (firstShop) {
             setCurrentRoute([firstShop]);
           }
+
+          // console.log(lastShop, "lastSho");
           // Open the refershed by default
           setIsRefreshed(true);
 
@@ -98,7 +107,6 @@ const Navigation = () => {
   const [directionData, setDirectionData] = useState({});
   const [final_speed, setFinalSpeed] = useState(0);
 
-  const [destinationName, setDestinationName] = useState(destinationShopId);
   const [selectedShopStep, setSelectedShopStep] = useState(0);
 
   const [showPopup, setShowPopup] = useState(false);
@@ -355,7 +363,7 @@ const Navigation = () => {
       i++; // Increment by one more to skip the connection object
     }
   }
-
+console.log(route, "route")
   const getDirection = (targetAngle, alpha) => {
     let angleDifference = ((targetAngle - alpha + 180) % 360) - 180;
 
@@ -556,12 +564,13 @@ const Navigation = () => {
   const shopsData = route.map((item, index) => {
     const progressToThisPoint = route
       .slice(0, index + 1)
-      .reduce((acc, curr) => acc + (curr.connection?.steps || 0), 0);
+      .reduce((acc, curr) => acc + (curr.connection ? parseInt(curr.connection.steps, 10) : 0), 0);
     return {
       name: item.shopOrCheckpoint.name,
       step: progressToThisPoint,
     };
   });
+  
 
   let flattenedRoute = [];
   route.forEach((item) => {
@@ -637,6 +646,8 @@ const Navigation = () => {
     }
   }, [currentRoute]);
 
+  console.log(shopsData, "shopdata")
+
   return isLoading ? (
     <div
       style={{
@@ -702,25 +713,25 @@ const Navigation = () => {
           Add steps mannualy
         </Button>
       </div>
-      <div>
-        {/* {averageAngle && <p>{averageAngle}</p>} */}
+      {/* <div>
+        {/* {averageAngle && <p>{averageAngle}</p>} 
         <p>{turnAngle ? "Trueeee" : "Falseeee"}</p>
         <p>{reachRef.current}</p>
         <p>{currentWalkAngle}</p>
         <p>{nextNodeAngle}</p>
         <p>{adjustedAng}</p>
-      </div>
+      </div> */}
 
       {/* SVG Map */}
       <div
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        style={{
-          flexGrow: 1,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
+        // onTouchStart={handleTouchStart}
+        // onTouchMove={handleTouchMove}
+        // style={{
+        //   flexGrow: 1,
+        //   display: "flex",
+        //   justifyContent: "center",
+        //   alignItems: "center",
+        // }}
       >
         <SvgIcon
           viewBox="0 0 500 500"
@@ -741,6 +752,11 @@ const Navigation = () => {
           />
         </SvgIcon>
       </div>
+
+
+       {/* Use CustomProgressBar, passing the necessary props to it */}
+       <CustomProgressBar shops={shopsData} stepsWalked={dy} totalSteps={totalSteps} />
+
       <div
         style={{
           display: "flex",
@@ -759,6 +775,7 @@ const Navigation = () => {
           }}
         />
       </div>
+      
 
       {/* Route Details */}
       <div style={{ padding: "20px" }}>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Box, Button, Modal, CircularProgress, Select, MenuItem, Typography, Container, TextField } from "@mui/material";
+import { Box, Button, Modal, CircularProgress, Autocomplete, Select, MenuItem, Typography, Container, TextField } from "@mui/material";
 
 const Dashboard = () => {
     const location = useLocation();
@@ -45,7 +45,7 @@ const Dashboard = () => {
             window.addEventListener("deviceorientation", handleOrientation);
             window.addEventListener("devicemotion", handleMotion);
         }
-        navigate('/navigation', { state: { currentLocation, destinationShopId } });
+        navigate('/navigation', { state: { currentLocation: currentLocation?.nodeId, destinationShopId } });
     };
 
     if (isLoading) {
@@ -68,31 +68,17 @@ const Dashboard = () => {
                 </Typography>
 
                 <Box mt={2} width="100%">
-    <TextField
-        fullWidth
-        variant="outlined"
-        placeholder="Search for a shop..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-    />
-    <Select
-        fullWidth
-        variant="outlined"
-        value={currentLocation}
-        onChange={(e) => setCurrentLocation(e.target.value)}
-        displayEmpty
-    >
-        <MenuItem value="" disabled>
-            Select a Shop
-        </MenuItem>
-        {filteredShops.map(shop => (
-            <MenuItem key={shop.nodeId} value={shop.nodeId}>
-                {shop.name}
-            </MenuItem>
-        ))}
-    </Select>
-</Box>
-
+                    <Autocomplete
+                        fullWidth
+                        options={shops}
+                        getOptionLabel={(option) => option.name}
+                        value={currentLocation?.nodeId}
+                        onChange={(event, newValue) => setCurrentLocation(newValue)}
+                        renderInput={(params) => (
+                            <TextField {...params} label="Select a Shop" variant="outlined" />
+                        )}
+                    />
+                </Box>
 
                 <Box mt={2}>
                     <Button variant="contained" color="primary" onClick={() => setOpen(true)}>
@@ -101,30 +87,30 @@ const Dashboard = () => {
                 </Box>
 
                 <Modal open={open} onClose={() => setOpen(false)}>
-    <Box 
-        sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: "95%",
-            bgcolor: "background.paper",
-            border: "2px solid #000",
-            boxShadow: 24,
-            p: 4,
-        }}
-    >
-        <Typography variant="h6" id="modal-title">
-            Calibration Required
-        </Typography>
-        <Typography variant="body2" id="modal-description" gutterBottom>
-            Please align yourself towards the North at {shops.find(shop => shop.nodeId === currentLocation)?.name || 'the selected location'} and then press the calibrate button.
-        </Typography>
-        <Button variant="outlined" onClick={requestPermission}>
-            Calibrate
-        </Button>
-    </Box>
-</Modal>
+                    <Box 
+                        sx={{
+                            position: "absolute",
+                            top: "50%",
+                            left: "50%",
+                            transform: "translate(-50%, -50%)",
+                            width: "95%",
+                            bgcolor: "background.paper",
+                            border: "2px solid #000",
+                            boxShadow: 24,
+                            p: 4,
+                        }}
+                    >
+                        <Typography variant="h6" id="modal-title">
+                            Calibration Required
+                        </Typography>
+                        <Typography variant="body2" id="modal-description" gutterBottom>
+                            Please align yourself towards the North at {currentLocation?.name || 'the selected location'} and then press the calibrate button.
+                        </Typography>
+                        <Button variant="outlined" onClick={requestPermission}>
+                            Calibrate
+                        </Button>
+                    </Box>
+                </Modal>
 
             </Box>
         </Container>
@@ -132,3 +118,4 @@ const Dashboard = () => {
 }
 
 export default Dashboard;
+
