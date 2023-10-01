@@ -124,6 +124,7 @@ const Navigation = () => {
   const overTime = useRef(0);
   const distRef = useRef(0);
   const offset = useRef(0);
+  const straightPath = useRef(false);
 
   const lastRecordedStep = useRef(0);
 
@@ -440,6 +441,11 @@ console.log(route, "route")
         (60 + globalTimeArray[len - 3] - globalTimeArray[len - 1]) % 60;
       const percentageError = 15;
 
+      let angleDiff = Math.abs(currentWalkAngle - nextNodeAngle);
+      let angleDiff2 = Math.abs(180 - angleDiff);
+      angleDiff = Math.min(angleDiff, angleDiff2);
+      straightPath.current = angleDiff <= 15;
+
       if (
         averageAngle >= currentWalkAngle - percentageError &&
         averageAngle <= currentWalkAngle + percentageError
@@ -454,13 +460,32 @@ console.log(route, "route")
         // turns or not
         // signal to path.js
         setTurnAngle(true);
-        reachRef.current = "turmn angle is true";
+        reachRef.current = "turn angle is true";
       } else {
         reachRef.current = "inside else condition";
       }
     }
   }, [stepsV2.current]);
+  // manish
 
+  const floorPopupfn = () => {
+    const currentNodeType = currentRoute[1]?.shopOrCheckpoint?.nodeType;
+
+    let nextNode = currentRoute[2]?.shopOrCheckpoint;
+
+    let j = 2;
+    while (j < currentRoute.length && nextNode?.nodeType === "checkpoint") {
+      nextNode = currentRoute[j]?.shopOrCheckpoint;
+      j++;
+    }
+    if (currentNodeType === "floor_change" && nextNode) {
+      setShowFloorChangePopup(true);
+      window.modifyDy = 0;
+      setNextFloor(nextNode?.floor);
+    } else {
+      setShowFloorChangePopup(false);
+    }
+  };
   useEffect(() => {
     // Check if you've reached the next destination
     const stepsToNextShop = currentRoute[0]?.connection?.steps || 1000000;
@@ -472,13 +497,20 @@ console.log(route, "route")
       setCurrentRoute((prevRoute) => prevRoute.slice(1));
       lastRecordedStep.current = dy; // Reset the step count
     } else if (dy - lastRecordedStep.current >= stepsToNextShop) {
+      floorPopupfn();
       if (currentRoute.length === 2) {
         setCurrentRoute((prevRoute) => prevRoute.slice(1));
       } else if (currentRoute.length == 1) {
         setShowReachedPopup(true);
       }
+
       window.modifyDy = 0;
       setTurnAngle(false);
+      if (straightPath.current) {
+        reachRef.current = "turn angle is true";
+        window.alert("why not worknnnh");
+        setTurnAngle(true);
+      }
     } else if (turnAngle) {
       window.modifyDy = stepsToNextShop - (dy - lastRecordedStep.current);
     }
@@ -1028,7 +1060,10 @@ return isLoading ? (
       {showFloorChangePopup && (
         <Dialog
           open={showFloorChangePopup}
-          onClose={() => setShowFloorChangePopup(false)}
+          onClose={() => {
+            setShowFloorChangePopup(false);
+            window.modifyDy = 1;
+          }}
         >
           <DialogTitle>Floor Change Required</DialogTitle>{" "}
           <DialogContent>
