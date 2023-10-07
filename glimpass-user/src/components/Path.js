@@ -56,7 +56,6 @@ console.log(ref.current, "pathref");
         if (item.relationId) {
             let angle;
             if (index === 0) {
-                let anlge_1 = angle
                 angle = 270;
             } else {
                 angle = item.angle;
@@ -101,7 +100,7 @@ console.log("PathD: "+pathD);
 
 return (
     <svg width={svgWidth} height={svgHeight} viewBox={calculatedViewBox}>
-        <path ref={ref} d={pathD} stroke="red" strokeWidth="3" fill="none" />
+        <path ref={ref} d={pathD} stroke="blue" strokeWidth="3" fill="none" />
         {pathD.split('L').slice(1).map((point, index) => {
             const [x, y] = point.trim().split(' ');
             const shopOrCheckpoint = nodesOnPath[index];
@@ -114,7 +113,7 @@ return (
            }
             return (
                 <g key={index}>
-                    <circle cx={x} cy={y} r="3" fill="blue" />
+                    <circle cx={x} cy={y} r="3" fill="red" />
                     <text x={parseFloat(x) + 5} y={parseFloat(y) + 5} fill="black" fontSize="10">
                         {name}
                     </text>
