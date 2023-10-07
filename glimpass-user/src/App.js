@@ -19,13 +19,13 @@ function App() {
           <div>
           <div style={{ position: 'relative' }}>
     <Link to="/Login" style={{ position: 'fixed', top: '10px', left: '10px', zIndex: 1000 }}>
-        <img src={logo} alt="Logo" style={{ width: '60px', height: 'auto' }}/>
+        {/* <img src={logo} alt="Logo" style={{ width: '60px', height: 'auto' }}/> */}
     </Link>
 </div>
 
             <Routes>
               <Route path="/glimpass-user" element={<Login />} index />
-              <Route path="/" element={<MarketSelection />} index />
+              <Route path="/" element={<Login />} index />
               <Route path="/login" element={<Login />} />
               {/* <Route path="/register" element={<Register />} /> */}
               <Route path="/markets" element={<MarketSelection />} />

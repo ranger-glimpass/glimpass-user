@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/glimpassLogo.png';
+//import Fab from '@mui/material/Fab';
+import RestroomIcon from '@mui/icons-material/Wc'; // Assuming you want to use the WC icon for the restroom
+
 import {
     Card,
     CardContent,
@@ -77,7 +80,7 @@ const ShopList = (props) => {
 
     return (
         <Container>
-            <AppBar position="fixed" color="transparent" elevation={0} sx={{ height: 64 }}>
+            <AppBar position="fixed" elevation={0} sx={{ height: 64 }}>
                 <Toolbar sx={{ justifyContent: 'flex-end', minHeight: '64px', pr: 2 }}>
                     <Autocomplete
                         options={shops}
@@ -167,6 +170,35 @@ const ShopList = (props) => {
                     );
                 })}
             </Box>
+
+            {/* <Button
+    variant="contained"
+    color="primary"
+    sx={{
+        position: 'fixed',
+        bottom: 16,
+        right: 16,
+    }}
+    onClick={() => navigate('/dashboard', { state: { destinationShopId: "nearestWashroom" } })}
+>
+    Nearest Washroom
+</Button> */}
+<img 
+    src="https://iconape.com/wp-content/files/jl/339960/png/restroom-sign-logo.png"
+    alt="Nearest Washroom" 
+    style={{
+        width: '50px', // or whatever size you want
+        height: '50px',
+        borderRadius: '50%', // to ensure it's circular
+        position: 'fixed',
+        bottom: '16px',
+        right: '16px',
+        cursor: 'pointer'
+    }}
+    onClick={() => navigate('/dashboard', { state: { destinationShopId: "nearestWashroom" } })}
+/>
+
+
         </Container>
     );
 }

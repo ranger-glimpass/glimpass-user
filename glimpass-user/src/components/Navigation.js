@@ -72,12 +72,20 @@ const Navigation = () => {
             requestOptions
           );
           const data = await response.json();
+      
+          // Check if the data is empty or not in the desired format
+          if (!data || data.length === 0) {
+            alert("No route found!");
+            navigate('/shops'); // Assuming '/shops' is the route for the shops page
+            return;
+          }
+      
           setConn(data); // Assuming the API returns the data in the desired format
           console.log(data, "shortest path");
-
+      
           const lastShop = conn[conn.length - 1]?.name;
           setDestinationName(lastShop);
-
+      
           // Find the first shop and set it as the active shop
           const firstShop = data.find(
             (item) => item.shopOrCheckpoint?.type === "shop"
@@ -85,17 +93,15 @@ const Navigation = () => {
           if (firstShop) {
             setCurrentRoute([firstShop]);
           }
-
-          // console.log(lastShop, "lastSho");
-          // Open the refershed by default
+      
           setIsRefreshed(true);
-
           setIsLoading(false); // Set loading to false here
         } catch (error) {
           console.error("Error fetching shortest path:", error);
           setIsLoading(false); // Also set loading to false in case of an error
         }
       };
+      
 
       fetchShortestPath();
     }
@@ -339,8 +345,6 @@ const Navigation = () => {
       calibratedAlpha = -1 * calibratedAlpha;
       calibratedAlpha = 360 - calibratedAlpha;
     }
-
-    calibratedAlpha = (calibratedAlpha - calibratedShopAngle + 360) % 360;
     setAlpha(calibratedAlpha);
   };
 
@@ -359,7 +363,7 @@ const Navigation = () => {
   for (let i = 0; i < conn.length; i++) {
     if (
       conn[i].nodeType === "shop" ||
-      conn[i].nodeType === "SHOP" ||
+      conn[i].nodeType === "washroom" ||
       conn[i].nodeType === "checkpoint" ||
       conn[i].nodeType === "floor_change"
     ) {
@@ -612,9 +616,18 @@ const Navigation = () => {
           acc + (curr.connection ? parseInt(curr.connection.steps, 10) : 0),
         0
       );
+
+      const anglesIn = route
+      .slice(0, index + 1)
+      .reduce(
+        (acc, curr) =>
+           (curr.connection ? parseInt(curr.connection.angle, 10) : 0),
+        0
+      );
     return {
       name: item.shopOrCheckpoint.name,
       step: progressToThisPoint,
+      anglesIn: anglesIn
     };
   });
 
@@ -943,9 +956,6 @@ const Navigation = () => {
   ) : (
     <>
       {" "}
-      <br></br>
-      <br></br>
-      <br></br>
       <div
         style={{
           display: "flex",
@@ -1003,8 +1013,8 @@ const Navigation = () => {
           </div>
         </div>
 
-        {/*     
-       <div style={{ marginTop: "20px" }}>
+            
+       {/* <div style={{ marginTop: "20px" }}>
         <Button
           variant="contained"
           color="primary"
@@ -1017,7 +1027,40 @@ const Navigation = () => {
           Add steps mannualy
         </Button>
        </div> */}
+
+<div style={{ marginBottom: "10px", marginTop:"100px"}}>
+            <img
+              src={navigationArrow}
+              alt="Navigation Arrow"
+              style={{
+                transform: `rotate(${adjustedAng}deg)`,
+                width: "250px",
+                height: "250px",
+              }}
+            />
+          </div>
+        
+
+        <CustomProgressBar
+          shops={shopsData}
+          stepsWalked={dy}
+          totalSteps={totalSteps}
+          adjustedAng={adjustedAng}
+        />
+
         <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            padding: "20px",
+            borderTop: "1px solid #ddd",
+          }}
+        >
+          
+
+
+          <div
           style={{
             flexGrow: 1,
             border: "1px solid #ddd",
@@ -1043,34 +1086,6 @@ const Navigation = () => {
             />
           </SvgIcon>
         </div>
-
-        <CustomProgressBar
-          shops={shopsData}
-          stepsWalked={dy}
-          totalSteps={totalSteps}
-          adjustedAng={adjustedAng}
-        />
-
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            padding: "20px",
-            borderTop: "1px solid #ddd",
-          }}
-        >
-          <div style={{ marginBottom: "10px" }}>
-            <img
-              src={navigationArrow}
-              alt="Navigation Arrow"
-              style={{
-                transform: `rotate(${adjustedAng}deg)`,
-                width: "100px",
-                height: "100px",
-              }}
-            />
-          </div>
           {/* <Typography variant="body1" style={{ fontWeight: "bold", marginBottom: '10px' }}>
         Steps: {dy}
       </Typography>
