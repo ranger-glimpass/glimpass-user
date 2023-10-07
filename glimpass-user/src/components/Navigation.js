@@ -72,20 +72,20 @@ const Navigation = () => {
             requestOptions
           );
           const data = await response.json();
-      
+
           // Check if the data is empty or not in the desired format
           if (!data || data.length === 0) {
             alert("No route found!");
-            navigate('/shops'); // Assuming '/shops' is the route for the shops page
+            navigate("/shops"); // Assuming '/shops' is the route for the shops page
             return;
           }
-      
+
           setConn(data); // Assuming the API returns the data in the desired format
           console.log(data, "shortest path");
-      
+
           const lastShop = conn[conn.length - 1]?.name;
           setDestinationName(lastShop);
-      
+
           // Find the first shop and set it as the active shop
           const firstShop = data.find(
             (item) => item.shopOrCheckpoint?.type === "shop"
@@ -93,7 +93,7 @@ const Navigation = () => {
           if (firstShop) {
             setCurrentRoute([firstShop]);
           }
-      
+
           setIsRefreshed(true);
           setIsLoading(false); // Set loading to false here
         } catch (error) {
@@ -101,7 +101,6 @@ const Navigation = () => {
           setIsLoading(false); // Also set loading to false in case of an error
         }
       };
-      
 
       fetchShortestPath();
     }
@@ -345,6 +344,7 @@ const Navigation = () => {
       calibratedAlpha = -1 * calibratedAlpha;
       calibratedAlpha = 360 - calibratedAlpha;
     }
+    calibratedAlpha = (calibratedAlpha - calibratedShopAngle + 360) % 360;
     setAlpha(calibratedAlpha);
   };
 
@@ -517,7 +517,6 @@ const Navigation = () => {
       setTurnAngle(false);
       if (straightPath.current) {
         reachRef.current = "turn angle is true";
-        window.alert("why not worknnnh");
         setTurnAngle(true);
       }
     } else if (turnAngle) {
@@ -617,17 +616,17 @@ const Navigation = () => {
         0
       );
 
-      const anglesIn = route
+    const anglesIn = route
       .slice(0, index + 1)
       .reduce(
         (acc, curr) =>
-           (curr.connection ? parseInt(curr.connection.angle, 10) : 0),
+          curr.connection ? parseInt(curr.connection.angle, 10) : 0,
         0
       );
     return {
       name: item.shopOrCheckpoint.name,
       step: progressToThisPoint,
-      anglesIn: anglesIn
+      anglesIn: anglesIn,
     };
   });
 
@@ -1013,8 +1012,7 @@ const Navigation = () => {
           </div>
         </div>
 
-            
-       {/* <div style={{ marginTop: "20px" }}>
+        {/* <div style={{ marginTop: "20px" }}>
         <Button
           variant="contained"
           color="primary"
@@ -1028,18 +1026,17 @@ const Navigation = () => {
         </Button>
        </div> */}
 
-<div style={{ marginBottom: "10px", marginTop:"100px"}}>
-            <img
-              src={navigationArrow}
-              alt="Navigation Arrow"
-              style={{
-                transform: `rotate(${adjustedAng}deg)`,
-                width: "250px",
-                height: "250px",
-              }}
-            />
-          </div>
-        
+        <div style={{ marginBottom: "10px", marginTop: "100px" }}>
+          <img
+            src={navigationArrow}
+            alt="Navigation Arrow"
+            style={{
+              transform: `rotate(${adjustedAng}deg)`,
+              width: "250px",
+              height: "250px",
+            }}
+          />
+        </div>
 
         <CustomProgressBar
           shops={shopsData}
@@ -1057,35 +1054,32 @@ const Navigation = () => {
             borderTop: "1px solid #ddd",
           }}
         >
-          
-
-
           <div
-          style={{
-            flexGrow: 1,
-            border: "1px solid #ddd",
-            borderRadius: "10px",
-            overflow: "hidden",
-            marginBottom: "20px",
-          }}
-        >
-          <SvgIcon
-            viewBox="0 0 500 400"
             style={{
-              width: "80%",
-              height: "100%",
+              flexGrow: 1,
+              border: "1px solid #ddd",
+              borderRadius: "10px",
+              overflow: "hidden",
+              marginBottom: "20px",
             }}
           >
-            <Path
-              route={flattenedRoute}
-              ref={pathRef}
-              setViewBox={setViewBox}
-              stepsWalked={dy}
-              totalSteps={totalSteps}
-              adjustedAng={adjustedAng}
-            />
-          </SvgIcon>
-        </div>
+            <SvgIcon
+              viewBox="0 0 500 400"
+              style={{
+                width: "80%",
+                height: "100%",
+              }}
+            >
+              <Path
+                route={flattenedRoute}
+                ref={pathRef}
+                setViewBox={setViewBox}
+                stepsWalked={dy}
+                totalSteps={totalSteps}
+                adjustedAng={adjustedAng}
+              />
+            </SvgIcon>
+          </div>
           {/* <Typography variant="body1" style={{ fontWeight: "bold", marginBottom: '10px' }}>
         Steps: {dy}
       </Typography>
