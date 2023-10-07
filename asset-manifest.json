@@ -1,18 +1,20 @@
 {
   "files": {
-    "main.css": "/glimpass-user/static/css/main.9dfceab1.css",
-    "main.js": "/glimpass-user/static/js/main.e059d580.js",
+    "main.css": "/glimpass-user/static/css/main.4007d381.css",
+    "main.js": "/glimpass-user/static/js/main.5ce6c9bb.js",
     "static/js/787.252292ee.chunk.js": "/glimpass-user/static/js/787.252292ee.chunk.js",
+    "static/media/goingToShop.gif": "/glimpass-user/static/media/goingToShop.49aaae9adbf8166afb85.gif",
+    "static/media/facingToShop.gif": "/glimpass-user/static/media/facingToShop.9278de9f602f77bb1242.gif",
     "static/media/glimpassLogo.png": "/glimpass-user/static/media/glimpassLogo.ee6a1179d4bfd8b8ac15.png",
     "static/media/pinPoint.svg": "/glimpass-user/static/media/pinPoint.a05d3fd29bb95003cdca887eeb046790.svg",
     "index.html": "/glimpass-user/index.html",
     "static/media/navigationArrow.svg": "/glimpass-user/static/media/navigationArrow.4d617a72ad56efa3a64706efcaf0106a.svg",
-    "main.9dfceab1.css.map": "/glimpass-user/static/css/main.9dfceab1.css.map",
-    "main.e059d580.js.map": "/glimpass-user/static/js/main.e059d580.js.map",
+    "main.4007d381.css.map": "/glimpass-user/static/css/main.4007d381.css.map",
+    "main.5ce6c9bb.js.map": "/glimpass-user/static/js/main.5ce6c9bb.js.map",
     "787.252292ee.chunk.js.map": "/glimpass-user/static/js/787.252292ee.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.9dfceab1.css",
-    "static/js/main.e059d580.js"
+    "static/css/main.4007d381.css",
+    "static/js/main.5ce6c9bb.js"
   ]
 }
