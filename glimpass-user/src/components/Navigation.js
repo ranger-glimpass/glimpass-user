@@ -989,7 +989,8 @@ const Navigation = () => {
             <Typography variant="h6">
               📍 {currentRoute[0]?.shopOrCheckpoint?.name || "In between"}
             </Typography>
-            {isDropdownOpen && (
+
+            {/* {isDropdownOpen && (
               <List>
                 {route.map((item, index) => (
                   <ListItem
@@ -1008,7 +1009,7 @@ const Navigation = () => {
                   </ListItem>
                 ))}
               </List>
-            )}
+            )} */}
           </div>
         </div>
 
@@ -1025,7 +1026,12 @@ const Navigation = () => {
           Add steps mannualy
         </Button>
        </div> */}
-
+        <CustomProgressBar
+          shops={shopsData}
+          stepsWalked={dy}
+          totalSteps={totalSteps}
+          adjustedAng={adjustedAng}
+        />
         <div style={{ marginBottom: "10px", marginTop: "100px" }}>
           <img
             src={navigationArrow}
@@ -1037,13 +1043,6 @@ const Navigation = () => {
             }}
           />
         </div>
-
-        <CustomProgressBar
-          shops={shopsData}
-          stepsWalked={dy}
-          totalSteps={totalSteps}
-          adjustedAng={adjustedAng}
-        />
 
         <div
           style={{

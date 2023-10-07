@@ -1,6 +1,7 @@
 .App {
   text-align: center;
-  background-color: #f1faee; /* Mint Cream */
+  background-color: #f1faee;
+  /* Mint Cream */
 }
 
 .App-logo {
@@ -15,18 +16,21 @@
 }
 
 .App-header {
-  background-color: white; /* Powder Blue */
+  background-color: white;
+  /* Powder Blue */
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: #333; /* Dark text for better contrast on light background */
+  color: #333;
+  /* Dark text for better contrast on light background */
 }
 
 .App-link {
-  color: #457b9d; /* Steel Blue */
+  color: #457b9d;
+  /* Steel Blue */
   text-decoration: none;
   padding: 5px 10px;
   border-radius: 5px;
@@ -34,7 +38,8 @@
 }
 
 .App-link:hover {
-  background-color: #a8dadc; /* Powder Blue */
+  background-color: #a8dadc;
+  /* Powder Blue */
   color: #333;
 }
 
@@ -42,7 +47,17 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
+}
+
+.custom-progress-bar-container .MuiLinearProgress-root {
+  height: 35px !important;
+  background-color: rgb(202 213 225);
+}
+
+.custom-progress-bar-container .MuiLinearProgress-bar {
+  background-color: #39FF14;
 }
