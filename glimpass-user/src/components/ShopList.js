@@ -1,42 +1,42 @@
-import React, { useState, useEffect, } from 'react';
-import { useNavigate } from 'react-router-dom';
-import logo from '../assets/glimpassLogo.png';
-import atm from '../assets/atm.png';
-import gate from '../assets/gate.png';
-import bathroom from '../assets/bathroom.png';
-import close from '../assets/close.png';
-import nearby from '../assets/nearby.png';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import logo from "../assets/glimpassLogo.png";
+import atm from "../assets/atm.png";
+import gate from "../assets/gate.png";
+import bathroom from "../assets/bathroom.png";
+import close from "../assets/close.png";
+import nearby from "../assets/nearby.png";
 //import Fab from '@mui/material/Fab';
 import RestroomIcon from "@mui/icons-material/Wc"; // Assuming you want to use the WC icon for the restroom
 
 import {
-    Card,
-    CardContent,
-    CardMedia,
-    Button,
-    Typography,
-    Container,
-    Box,
-    CircularProgress,
-    IconButton,
-    CardActionArea,
-    AppBar,
-    Toolbar,
-    Autocomplete,
-    TextField,
-} from '@mui/material';
-import CategoryIcon from '@mui/icons-material/Category';
-import DiscountIcon from '@mui/icons-material/LocalOffer';
-import { Bathroom } from '@mui/icons-material';
+  Card,
+  CardContent,
+  CardMedia,
+  Button,
+  Typography,
+  Container,
+  Box,
+  CircularProgress,
+  IconButton,
+  CardActionArea,
+  AppBar,
+  Toolbar,
+  Autocomplete,
+  TextField,
+} from "@mui/material";
+import CategoryIcon from "@mui/icons-material/Category";
+import DiscountIcon from "@mui/icons-material/LocalOffer";
+import { Bathroom } from "@mui/icons-material";
 
 const ShopList = (props) => {
-    const navigate = useNavigate();
-    const [shops, setShops] = useState([]);
-    const [isLoading, setIsLoading] = useState(true); // State to track loading status
-    const [activeCard, setActiveCard] = useState(null);
-    const [searchTerm, setSearchTerm] = useState("");
-    const [selectedShop, setSelectedShop] = useState(null);  // <-- Add this state variable
-    const [isExpanded, setIsExpanded] = useState(false);
+  const navigate = useNavigate();
+  const [shops, setShops] = useState([]);
+  const [isLoading, setIsLoading] = useState(true); // State to track loading status
+  const [activeCard, setActiveCard] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedShop, setSelectedShop] = useState(null); // <-- Add this state variable
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const handleNavigateClick = (shopId) => {
     setActiveCard(shopId);
@@ -93,6 +93,10 @@ const ShopList = (props) => {
     ? shops.filter((shop) => shop.nodeId === selectedShop.nodeId)
     : shops;
 
+  const handleExpandClick = () => {
+    setIsExpanded((prev) => !prev);
+  };
+
   return (
     <Container>
       <AppBar position="fixed" elevation={0} sx={{ height: 64 }}>
@@ -122,7 +126,11 @@ const ShopList = (props) => {
         </Toolbar>
       </AppBar>
       <br></br>
-      <Box mt={4} px={{ xs: 2, sm: 4 }}>
+      <Box
+        sx={{ opacity: `${isExpanded ? "0.2" : "1"}` }}
+        mt={4}
+        px={{ xs: 2, sm: 4 }}
+      >
         {filteredShops
           .filter((shop) => shop.nodeType === "shop")
           .map((shop, index) => {
@@ -225,7 +233,7 @@ const ShopList = (props) => {
 >
     Nearest Washroom
 </Button> */}
-{/* <img 
+      {/* <img 
     src="https://iconape.com/wp-content/files/jl/339960/png/restroom-sign-logo.png"
     alt="Nearest Washroom" 
     style={{
@@ -239,78 +247,83 @@ const ShopList = (props) => {
     }}
     onClick={() => navigate('/dashboard', { state: { destinationShopId: "nearestWashroom" } })}
 /> */}
-<Box
-    sx={{
-        position: 'fixed',
-        bottom: 16,
-        right: 16,
-        transition: 'all 0.3s',
-        display: 'flex',
-        flexDirection: 'column-reverse',
-        alignItems: 'center',
-    }}
->
-    {isExpanded && (
-        <>
+      <Box
+        sx={{
+          position: "fixed",
+          bottom: 16,
+          right: 16,
+          transition: "all 0.3s",
+          display: "flex",
+          flexDirection: "column-reverse",
+          alignItems: "center",
+        }}
+      >
+        {isExpanded && (
+          <>
             <IconButton
-                onClick={() => navigate('/dashboard', { state: { destinationShopId: "nearestWashroom" } })}
+              onClick={() =>
+                navigate("/dashboard", {
+                  state: { destinationShopId: "nearestWashroom" },
+                })
+              }
             >
-                <img 
-                    src={bathroom} 
-                    alt="Nearest Washroom" 
-                    style={{
-                        width: '60px',
-                        height: '60px',
-                        borderRadius: '0%',
-                    }}
-                />
+              <img
+                src={bathroom}
+                alt="Nearest Washroom"
+                style={{
+                  width: "60px",
+                  height: "60px",
+                  borderRadius: "0%",
+                }}
+              />
             </IconButton>
             <IconButton
-                onClick={() => {/* Handle navigation to main gate */}}
+              onClick={() => {
+                /* Handle navigation to main gate */
+              }}
             >
-                <img 
-                    src={gate}
-                    alt="Main Gate" 
-                    style={{
-                        width: '60px',
-                        height: '60px',
-                        borderRadius: '0%',
-                    }}
-                />
+              <img
+                src={gate}
+                alt="Main Gate"
+                style={{
+                  width: "60px",
+                  height: "60px",
+                  borderRadius: "0%",
+                }}
+              />
             </IconButton>
             <IconButton
-                onClick={() => {/* Handle navigation to ATM */}}
+              onClick={() => {
+                /* Handle navigation to ATM */
+              }}
             >
-                <img 
-                    src={atm} 
-                    alt="ATM" 
-                    style={{
-                        width: '60px',
-                        height: '60px',
-                        borderRadius: '0%',
-                    }}
-                />
+              <img
+                src={atm}
+                alt="ATM"
+                style={{
+                  width: "60px",
+                  height: "60px",
+                  borderRadius: "0%",
+                }}
+              />
             </IconButton>
             {/* Add more buttons as needed */}
-        </>
-    )}
-    <IconButton
-        onClick={handleExpandClick}
-    >
-        <img 
-            src={isExpanded ? close : nearby} 
-            alt={isExpanded ? "Close" : "Expand"} 
+          </>
+        )}
+        <IconButton onClick={handleExpandClick}>
+          <img
+            src={isExpanded ? close : nearby}
+            alt={isExpanded ? "Close" : "Expand"}
             style={{
-                width: '60px',
-                height: '60px',
-                borderRadius: '50%',
+              width: "60px",
+              height: "60px",
+              borderRadius: "50%",
             }}
-        />
-    </IconButton>
-</Box>
-
-        </Container>
-    );
+          />
+        </IconButton>
+      </Box>
+    </Container>
+  );
 };
 
 export default ShopList;
