@@ -13,7 +13,7 @@ const Login = () => {
     const userId = sessionStorage.getItem('_id');
     if (userId) {
       // If it does, redirect to the shops page
-      navigate('/shops');
+      navigate('/markets');
     }
   }, [navigate]);
 
@@ -31,7 +31,7 @@ const Login = () => {
       sessionStorage.setItem('_id', data._id);
       sessionStorage.setItem('email', data.email);
       sessionStorage.setItem('name', data.name);
-      navigate('/shops');
+      navigate('/markets');
     } else {
       setIsEmailSubmitted(true);
     }
@@ -48,7 +48,7 @@ const Login = () => {
     sessionStorage.setItem('_id', data[0].user._id);
     sessionStorage.setItem('email', data[0].user.email);
     sessionStorage.setItem('name', data[0].user.name);
-    navigate('/shops');
+    navigate('/markets');
   };
 
   const handleContinue = () => {

@@ -114,13 +114,17 @@ const CustomProgressBar = ({ totalSteps, stepsWalked, shops }) => {
     if (currentShopIndex === shops.length - 2) {
       direction = "About to reach your destination";
     } else {
-      const directionTurn = getTurnDirection(
-        shops[currentShopIndex].anglesIn,
-        shops[currentShopIndex + 1].anglesIn
-      );
-      direction = "Ready to turn " + directionTurn;
-    }
-  }
+        const directionTurn = getTurnDirection(shops[currentShopIndex].anglesIn, shops[currentShopIndex + 1].anglesIn);
+        if(directionTurn != null)
+          direction = "Ready to turn " + directionTurn;
+        else{
+          direction = "Keep Straight";
+        }
+      }
+}
+
+
+
 
   const [previousDirection, setPreviousDirection] = useState(null);
   useEffect(() => {
