@@ -7,14 +7,67 @@ import ShopList from './components/ShopList';
 import Navigation from './components/Navigation';
 import ThanksComponent from './components/Thanks';
 import MarketSelection from './components/MarketSelection';
+import {useState, useEffect} from 'react';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 
 // 1. Import the logo image
 import logo from './assets/glimpassLogo.png'; // Replace 'path-to-your-logo.png' with the actual path to your logo image
 
 function App() {
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
+        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+      }, function(err) {
+        console.log('ServiceWorker registration failed: ', err);
+      });
+    });
+  }
+
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  useEffect(() => {
+    window.addEventListener('beforeinstallprompt', (e) => {
+      // Prevent Chrome 67 and earlier from automatically showing the prompt
+      e.preventDefault();
+      // Stash the event so it can be triggered later.
+      setDeferredPrompt(e);
+    });
+  }, []);
+  const showAddToHomeScreen = () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('User accepted the A2HS prompt');
+        } else {
+          console.log('User dismissed the A2HS prompt');
+        }
+        setDeferredPrompt(null);
+      });
+    }
+  };
+    
+  
   return (
     <div className="App">
       <header className="App-header">
+      <link rel="manifest" href="/manifest.json"/>
+      
+
+      {/* <!-- Apple Touch Icons (at least one size is required for iOS "Add to Home Screen" feature) --> */}
+<link rel="apple-touch-icon" href={logo}/>
+
+{/* <!-- Specify a startup image for web apps --> */}
+<link rel="apple-touch-startup-image" href={logo}/>
+
+{/* <!-- Display standalone (full-screen) --> */}
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+
+{/* <!-- Set the status bar appearance --> */}
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+
+
         <Router basename='/'>
           <div>
           <div style={{ position: 'relative' }}>
@@ -36,6 +89,22 @@ function App() {
             </Routes>
           </div>
         </Router>
+
+        {deferredPrompt && (
+  <a href="#" onClick={showAddToHomeScreen}>
+    Add to Home Screen
+  </a>
+)}
+{/* {!deferredPrompt && (
+  <div>
+    <p>To add to Home Screen:</p>
+    <ul>
+      <li>Open browser menu</li>
+      <li>Tap 'Add to Home Screen'</li>
+    </ul>
+  </div>
+)} */}
+
       </header>
     </div>
   );

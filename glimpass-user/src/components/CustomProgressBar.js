@@ -112,7 +112,11 @@ if (shops[currentShopIndex + 1] && stepsWalked >= thresholdPoint) {
         direction = "About to reach your destination";
     } else {
         const directionTurn = getTurnDirection(shops[currentShopIndex].anglesIn, shops[currentShopIndex + 1].anglesIn);
-        direction = "Ready to turn " + directionTurn;
+        if(directionTurn != null)
+          direction = "Ready to turn " + directionTurn;
+        else{
+          direction = "Keep Straight";
+        }
       }
 }
 

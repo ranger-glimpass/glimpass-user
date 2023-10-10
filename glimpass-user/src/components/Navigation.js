@@ -517,7 +517,7 @@ const Navigation = () => {
       setTurnAngle(false);
       if (straightPath.current) {
         reachRef.current = "turn angle is true";
-        window.alert("why not worknnnh");
+        //window.alert("why not worknnnh");
         setTurnAngle(true);
       }
     } else if (turnAngle) {
