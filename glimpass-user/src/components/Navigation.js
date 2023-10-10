@@ -172,7 +172,7 @@ const Navigation = () => {
     setDirectionData(dirRef.current);
 
     const acc_th = 0.1;
-    const time_th = 0.3;
+    const time_th = 0.4;
     const travel_th = 4;
 
     let accn_x = parseInt(event.acceleration.x);
