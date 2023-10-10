@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/glimpass-user/static/css/main.4007d381.css",
-    "main.js": "/glimpass-user/static/js/main.16b96ea6.js",
+    "main.css": "/glimpass-user/static/css/main.055eaefd.css",
+    "main.js": "/glimpass-user/static/js/main.4074a2d2.js",
     "static/js/787.252292ee.chunk.js": "/glimpass-user/static/js/787.252292ee.chunk.js",
     "static/media/goingToShop.gif": "/glimpass-user/static/media/goingToShop.49aaae9adbf8166afb85.gif",
     "static/media/facingToShop.gif": "/glimpass-user/static/media/facingToShop.9278de9f602f77bb1242.gif",
@@ -9,15 +9,15 @@
     "static/media/glimpassLogo.png": "/glimpass-user/static/media/glimpassLogo.ee6a1179d4bfd8b8ac15.png",
     "static/media/atm.png": "/glimpass-user/static/media/atm.bb484bbf23d97fea81fc.png",
     "static/media/bathroom.png": "/glimpass-user/static/media/bathroom.c6390f24140f5d4de8f5.png",
-    "static/media/pinPoint.svg": "/glimpass-user/static/media/pinPoint.a05d3fd29bb95003cdca887eeb046790.svg",
+    "static/media/pinPoint.svg": "/glimpass-user/static/media/pinPoint.61ee9d0deddd7573fda192a3733f5c7c.svg",
     "index.html": "/glimpass-user/index.html",
     "static/media/navigationArrow.svg": "/glimpass-user/static/media/navigationArrow.4d617a72ad56efa3a64706efcaf0106a.svg",
-    "main.4007d381.css.map": "/glimpass-user/static/css/main.4007d381.css.map",
-    "main.16b96ea6.js.map": "/glimpass-user/static/js/main.16b96ea6.js.map",
+    "main.055eaefd.css.map": "/glimpass-user/static/css/main.055eaefd.css.map",
+    "main.4074a2d2.js.map": "/glimpass-user/static/js/main.4074a2d2.js.map",
     "787.252292ee.chunk.js.map": "/glimpass-user/static/js/787.252292ee.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.4007d381.css",
-    "static/js/main.16b96ea6.js"
+    "static/css/main.055eaefd.css",
+    "static/js/main.4074a2d2.js"
   ]
 }
