@@ -65,3 +65,13 @@
 .MuiAutocomplete-inputRoot {
   background-color: white;
 }
+
+.show-add-to-screen {
+  position: fixed;
+  bottom: 0;
+  padding: 12px;
+  background-color: #0080ff;
+  width: 90%;
+  color: white;
+  text-decoration: solid;
+}

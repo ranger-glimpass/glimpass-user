@@ -250,7 +250,7 @@ const ShopList = (props) => {
       <Box
         sx={{
           position: "fixed",
-          bottom: 16,
+          bottom: 50,
           right: 16,
           transition: "all 0.3s",
           display: "flex",
