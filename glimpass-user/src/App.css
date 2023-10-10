@@ -61,3 +61,7 @@
 .custom-progress-bar-container .MuiLinearProgress-bar {
   background-color: #39FF14;
 }
+
+.MuiAutocomplete-inputRoot {
+  background-color: white;
+}
