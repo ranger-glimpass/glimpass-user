@@ -145,7 +145,7 @@ const Dashboard = () => {
           <Autocomplete
             fullWidth
             options={shops}
-            getOptionLabel={(option) => option.name}
+            getOptionLabel={(option) => option.name + ", " + option.floor+" floor"}
             value={currentLocation?.nodeId}
             onChange={(event, newValue) => setCurrentLocation(newValue)}
             renderInput={(params) => (
