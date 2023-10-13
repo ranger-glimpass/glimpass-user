@@ -18,36 +18,39 @@ const Login = () => {
   }, [navigate]);
 
   
-  const handleLogin = async () => {
-    const response = await fetch('https://app.glimpass.com/user/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email }),
-    });
-    const data = await response.json();
-    if (data) {
+   const handleLogin = async () => {
+  //   const response = await fetch('https://app.glimpass.com/user/login', {
+  //     method: 'POST',
+  //     headers: { 'Content-Type': 'application/json' },
+  //     body: JSON.stringify({ email }),
+  //   });
+  //   const data = await response.json();
+  //   if (data) {
       
-    console.log(data,"data")
-      sessionStorage.setItem('_id', data._id);
-      sessionStorage.setItem('email', data.email);
-      sessionStorage.setItem('name', data.name);
-      navigate('/markets');
-    } else {
-      setIsEmailSubmitted(true);
-    }
-  };
+  //   console.log(data,"data")
+  //     sessionStorage.setItem('_id', data._id);
+  //     sessionStorage.setItem('email', data.email);
+  //     sessionStorage.setItem('name', data.name);
+  //     navigate('/markets');
+  //   } else {
+       setIsEmailSubmitted(true);
+  //   }
+    };
 
   const handleRegister = async () => {
-    const response = await fetch('https://app.glimpass.com/user/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, name }),
-    });
-    const data = await response.json();
-    console.log(data,"register")
-    sessionStorage.setItem('_id', data[0].user._id);
-    sessionStorage.setItem('email', data[0].user.email);
-    sessionStorage.setItem('name', data[0].user.name);
+    // const response = await fetch('https://app.glimpass.com/user/register', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify({ email, name }),
+    // });
+    // const data = await response.json();
+    // console.log(data,"register")
+    // sessionStorage.setItem('_id', data[0].user._id);
+    // sessionStorage.setItem('email', data[0].user.email);
+    // sessionStorage.setItem('name', data[0].user.name);
+    
+    sessionStorage.setItem('email', email);
+    sessionStorage.setItem('name', name);
     navigate('/markets');
   };
 

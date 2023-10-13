@@ -50,9 +50,16 @@ const Dashboard = () => {
 
   useEffect(() => {
     const fetchShops = async () => {
-      const response = await fetch(
-        "https://app.glimpass.com/graph/get-all-nodes"
-      );
+       const response = await fetch("https://app.glimpass.com/graph/get-all-nodes-by-market", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            market: location.state?.market,
+          })
+          // Add any necessary body data for the POST request
+        });
       const data = await response.json();
       const shopsArray = Object.values(data);
       setShops(shopsArray);
@@ -135,6 +142,22 @@ const Dashboard = () => {
   );
 
   return (
+    <>
+    <Typography
+            variant="h6" // This makes the text bold
+            sx={{ 
+                display: { xs: 'contents', sm: 'block' }, // Hide on smaller screens
+                whiteSpace: 'nowrap', // Prevent wrapping to the next line
+                overflow: 'hidden',
+                textOverflow: 'ellipsis', // Add ellipsis for long names
+                maxWidth: '20%', // Adjust this width as needed
+                pl: '10px',
+                fontSize: '1rem',
+                marginRight: '2px'
+            }}
+        >
+            Hello, {sessionStorage.getItem('name')}!
+        </Typography>
     <Container>
       <Box mt={4} display="flex" flexDirection="column" alignItems="center">
         <Typography variant="h5" gutterBottom>
@@ -142,16 +165,58 @@ const Dashboard = () => {
         </Typography>
 
         <Box mt={2} width="100%">
-          <Autocomplete
-            fullWidth
-            options={shops}
-            getOptionLabel={(option) => option.name + ", " + option.floor+" floor"}
-            value={currentLocation?.nodeId}
-            onChange={(event, newValue) => setCurrentLocation(newValue)}
-            renderInput={(params) => (
-              <TextField {...params} label="Select a Shop" variant="outlined" />
-            )}
-          />
+        <Autocomplete
+    fullWidth
+    options={shops}
+    getOptionLabel={(option) => option.name}
+    value={currentLocation?.nodeId}
+    onChange={(event, newValue) => setCurrentLocation(newValue)}
+    renderInput={(params) => (
+        <TextField {...params} label="Select a Shop" variant="outlined" />
+    )}
+    renderOption={(props, option) => (
+        <Box 
+            component="li" 
+            sx={{ 
+                position: 'relative', 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: 'center', 
+                '& > img': { mr: 2, flexShrink: 0 } 
+            }} 
+            {...props}
+        >
+            {option.name}
+            <Typography 
+                variant="body2" 
+                sx={{ 
+                    position: 'absolute', 
+                    bottom: 0, 
+                    right: 0, 
+                    fontStyle: 'italic', 
+                    fontWeight: 'bold', 
+                    fontSize: '0.6rem' 
+                }}
+            >
+                ({option.floor} floor)
+            </Typography>
+        </Box>
+    )}
+    sx={{
+        '& .MuiAutocomplete-input': {
+            fontSize: '1.2rem', // Increase font size of input
+        },
+        '& .MuiAutocomplete-option': {
+            fontSize: '1.2rem', // Increase font size of dropdown options
+            padding: '10px 15px', // Add padding for elegance
+        },
+        '& .MuiOutlinedInput-root': {
+            borderRadius: '25px', // Rounded corners for elegance
+        },
+    }}
+/>
+
+
         </Box>
 
         <Box mt={2}>
@@ -218,6 +283,7 @@ const Dashboard = () => {
 
       </Box>
     </Container>
+    </>
   );
 };
 

@@ -1,7 +1,11 @@
 import React, {useState, useEffect, useRef, forwardRef } from "react";
+
+import { useNavigate } from "react-router-dom";
 import navigationArrow from "../assets/navigationArrow.svg";
 import pinPoint from '../assets/pinPoint.svg';
 const Path = forwardRef(({ route,setViewBox, stepsWalked, totalSteps, adjustedAng}, ref) => {
+    
+  const navigate = useNavigate();
     console.log(adjustedAng,"adjeusted")
     // const pathRef = useRef(null);
     const arrowWidth = 20;
@@ -18,9 +22,16 @@ const Path = forwardRef(({ route,setViewBox, stepsWalked, totalSteps, adjustedAn
 
 useEffect(() => {
 console.log(ref.current, "pathref");
+
     if (ref.current && ref.current.getTotalLength() > 0) {
         const pathLength = ref.current.getTotalLength();
         const distance = (stepsWalked / totalSteps) * pathLength;
+        // if(!distance){
+        //     window.alert("Not yet mapped, Stay Tuned! ");
+        //     navigate("/markets");
+        //     return;
+        // }
+        console.log(totalSteps,"pointnnnnnnnnn")
         const point = ref.current.getPointAtLength(distance);
         setArrowPoint(point);
 

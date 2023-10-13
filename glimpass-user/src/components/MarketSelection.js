@@ -4,16 +4,20 @@ import { Card, CardActionArea, CardMedia, CardContent, Typography, Grid, Contain
 
 const malls = [
   { id: 1, name: 'Ambience Mall, Gurugram', imageUrl: 'https://imgstaticcontent.lbb.in/lbbnew/wp-content/uploads/sites/1/2016/05/Exterior_of_Ambi_Mall.jpg?w=1200&h=628&fill=blur&fit=fill' },
-  { id: 2, name: 'DLF Promenade, Delhi', imageUrl: 'https://imgmedia.lbb.in/media/2021/03/603c8db2bb3dd9451519351f_1614581170747.jpg' },
+  { id: 2, name: 'New friends colony', imageUrl: 'https://i.ytimg.com/vi/VV-r81_uVs0/maxresdefault.jpg' },
   // ... other malls
 ];
 
 const MarketSelection = () => {
   const navigate = useNavigate();
 
-  const handleCardClick = (mallId) => {
-    navigate(`/shops`);
-  };
+  const handleCardClick = (marketName) => {
+    navigate("/shops", {
+      state: {
+        market: marketName
+      }
+  });
+};
 
   return (
     <Container>
@@ -23,7 +27,7 @@ const MarketSelection = () => {
       <Grid container spacing={2}>
         {malls.map((mall) => (
           <Grid item xs={12} sm={6} md={4} key={mall.id}>
-            <Card onClick={() => handleCardClick(mall.id)} elevation={3} style={{ transition: '0.3s' }} onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'} onMouseOut={(e) => e.currentTarget.style.transform = ''}>
+            <Card onClick={() => handleCardClick(mall.name)} elevation={3} style={{ transition: '0.3s' }} onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'} onMouseOut={(e) => e.currentTarget.style.transform = ''}>
               <CardActionArea>
                 <CardMedia
                   component="img"
