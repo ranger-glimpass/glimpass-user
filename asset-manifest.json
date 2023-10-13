@@ -1,11 +1,14 @@
 {
   "files": {
     "main.css": "/glimpass-user/static/css/main.055eaefd.css",
-    "main.js": "/glimpass-user/static/js/main.5f5432dc.js",
+    "main.js": "/glimpass-user/static/js/main.a3847e76.js",
     "static/js/787.252292ee.chunk.js": "/glimpass-user/static/js/787.252292ee.chunk.js",
     "static/media/goingToShop.gif": "/glimpass-user/static/media/goingToShop.49aaae9adbf8166afb85.gif",
     "static/media/facingToShop.gif": "/glimpass-user/static/media/facingToShop.9278de9f602f77bb1242.gif",
+    "static/media/keepStaright.png": "/glimpass-user/static/media/keepStaright.4daed29b20ee42d99f96.png",
     "static/media/nearby.png": "/glimpass-user/static/media/nearby.4f822d567f30bdbb00e5.png",
+    "static/media/rightTurn.jpg": "/glimpass-user/static/media/rightTurn.ecde39f0ee66e37f467b.jpg",
+    "static/media/leftTurn.jpg": "/glimpass-user/static/media/leftTurn.d836f2d91ac0accbb001.jpg",
     "static/media/glimpassLogo.png": "/glimpass-user/static/media/glimpassLogo.ee6a1179d4bfd8b8ac15.png",
     "static/media/atm.png": "/glimpass-user/static/media/atm.bb484bbf23d97fea81fc.png",
     "static/media/bathroom.png": "/glimpass-user/static/media/bathroom.c6390f24140f5d4de8f5.png",
@@ -13,11 +16,11 @@
     "index.html": "/glimpass-user/index.html",
     "static/media/navigationArrow.svg": "/glimpass-user/static/media/navigationArrow.4d617a72ad56efa3a64706efcaf0106a.svg",
     "main.055eaefd.css.map": "/glimpass-user/static/css/main.055eaefd.css.map",
-    "main.5f5432dc.js.map": "/glimpass-user/static/js/main.5f5432dc.js.map",
+    "main.a3847e76.js.map": "/glimpass-user/static/js/main.a3847e76.js.map",
     "787.252292ee.chunk.js.map": "/glimpass-user/static/js/787.252292ee.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.055eaefd.css",
-    "static/js/main.5f5432dc.js"
+    "static/js/main.a3847e76.js"
   ]
 }
