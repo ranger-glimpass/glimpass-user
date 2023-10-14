@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from "react";
 import LinearProgress from "@mui/material/LinearProgress";
 import { makeStyles } from "@mui/styles";
+import {Box, Typography} from '@mui/material';
+import directionImage  from "../assets/atm.png";
+import leftImage from '../assets/leftTurn.jpg'; // Replace with your image's path and extension
+import rightImage from '../assets/rightTurn.jpg';
+ import straightImage from '../assets/keepStaright.png';
 
 const useStyles = makeStyles({
   root: {
@@ -28,6 +33,26 @@ const useStyles = makeStyles({
     padding: "30px 0 0 0",
     fontWeight: "bolder",
     fontFamily: "sans-serif",
+  },
+
+  directionText: {
+    textAlign: "center",
+    fontSize: "20px",
+    padding: "10px 0",
+    fontWeight: "bolder",
+    fontFamily: "sans-serif",
+    color: "blue", // Change to your desired color
+    animation: "$blink 1s infinite",
+  },
+  directionImage: {
+    width: "30px", // Adjust as needed
+    height: "30px", // Adjust as needed
+    marginRight: "10px",
+  },
+  "@keyframes blink": {
+    "0%": { opacity: 1 },
+    "50%": { opacity: 0.5 },
+    "100%": { opacity: 1 },
   },
 });
 
@@ -136,6 +161,21 @@ const CustomProgressBar = ({ totalSteps, stepsWalked, shops }) => {
     }
   }, [direction]);
 
+
+  const getDirectionImage = (direction) => {
+    switch (direction) {
+      case "Ready to turn Left":
+        return leftImage;
+      case "Ready to turn Right":
+        return rightImage;
+      case "Keep Straight":
+        return straightImage;
+      default:
+        return null; // Default case if no direction matches
+    }
+  };
+  
+
   return (
     <div className="custom-progress-bar-container">
       <div className={classes.root}>
@@ -160,7 +200,13 @@ const CustomProgressBar = ({ totalSteps, stepsWalked, shops }) => {
         </div>
       )}
 
-      {direction && <div className={classes.directionText}>{direction}</div>}
+{direction && (
+  <Box display="flex" alignItems="center" justifyContent="center" className={classes.directionContainer}>
+    <img src={getDirectionImage(direction)} alt="Direction" className={classes.directionImage} />
+    <Typography className={classes.directionText}>{direction}</Typography>
+  </Box>
+)}
+
     </div>
   );
 };

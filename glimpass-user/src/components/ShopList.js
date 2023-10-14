@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import logo from "../assets/glimpassLogo.png";
 import atm from "../assets/atm.png";
 import gate from "../assets/gate.png";
@@ -38,22 +38,35 @@ const ShopList = (props) => {
   const [selectedShop, setSelectedShop] = useState(null); // <-- Add this state variable
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const handleNavigateClick = (shopId) => {
+  const location = useLocation();
+  const handleNavigateClick = async(shopId) => {
     setActiveCard(shopId);
+    const email = sessionStorage.getItem('email');
+    const name = sessionStorage.getItem('name');
+    const response = await fetch('https://app.glimpass.com/user/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify( {email, name} ),
+    });
+    const data = await response.json();
+    sessionStorage.setItem('_id', data[0].user._id);
+    console.log(data,"register");
     setTimeout(() => {
-      navigate("/dashboard", { state: { destinationShopId: shopId } });
+      navigate("/dashboard", { state: { destinationShopId: shopId, market: location.state?.market } });
     }, 300); // Delay for the fade-out effect
   };
 
   const getAllNodes = async () => {
-    const requestOptions = {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    };
-    const response = await fetch(
-      "https://app.glimpass.com/graph/get-all-nodes",
-      requestOptions
-    );
+    const response = await fetch("https://app.glimpass.com/graph/get-all-nodes-by-market", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            market: location.state?.market,
+          })
+          // Add any necessary body data for the POST request
+        });
     const data = await response.json();
     const shopsArray = Object.values(data);
     setShops(shopsArray);
@@ -99,32 +112,50 @@ const ShopList = (props) => {
 
   return (
     <Container>
-      <AppBar position="fixed" elevation={0} sx={{ height: 64 }}>
-        <Toolbar
-          sx={{
-            justifyContent: "flex-end",
+  <AppBar position="fixed" elevation={0} sx={{ height: 64 }}>
+    <Toolbar
+        sx={{
+            justifyContent: "space-between", // Adjust this to space-between
             minHeight: "64px",
-            pr: 1,
-          }}
-        >
-          <Autocomplete
+            pr: 2,
+            pl: 2,
+        }}
+    >
+        <Autocomplete
             options={shops}
             getOptionLabel={(option) => option.name}
             onChange={(event, newValue) => {
-              setSelectedShop(newValue);
+                setSelectedShop(newValue);
             }}
             renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Search for a shop..."
-                variant="outlined"
-                size="small"
-              />
+                <TextField
+                    {...params}
+                    label="Search for a shop..."
+                    variant="outlined"
+                    size="small"
+                />
             )}
-            sx={{ width: "100%" }}
-          />
-        </Toolbar>
-      </AppBar>
+            sx={{ width: "70%", pl: 2 }} // Adjust this width as needed
+        />
+        <Typography
+            variant="h6" // This makes the text bold
+            sx={{ 
+                display: { xs: 'contents', sm: 'block' }, // Hide on smaller screens
+                whiteSpace: 'nowrap', // Prevent wrapping to the next line
+                overflow: 'hidden',
+                textOverflow: 'ellipsis', // Add ellipsis for long names
+                maxWidth: '20%', // Adjust this width as needed
+                pl: '10px',
+                fontSize: '1rem',
+                marginRight: '2px'
+            }}
+        >
+            Hello, {sessionStorage.getItem('name') || 'Guest'}!
+        </Typography>
+    </Toolbar>
+</AppBar>
+
+
       <br></br>
       <Box
         sx={{ opacity: `${isExpanded ? "0.2" : "1"}` }}
@@ -263,7 +294,7 @@ const ShopList = (props) => {
             <IconButton
               onClick={() =>
                 navigate("/dashboard", {
-                  state: { destinationShopId: "nearestWashroom" },
+                  state: { destinationShopId: "nearestWashroom", market: location.state?.market },
                 })
               }
             >

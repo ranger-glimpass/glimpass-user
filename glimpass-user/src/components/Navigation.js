@@ -35,7 +35,7 @@ const Navigation = () => {
   const navigate = useNavigate();
 
   const navigateToShops = (event) => {
-    navigate("/shops");
+    window.location.href = "/markets";
   };
 
   const pathRef = useRef(null);
@@ -52,6 +52,15 @@ const Navigation = () => {
 
   const [destinationName, setDestinationName] = useState(destinationShopId);
 
+  useEffect(() => {
+    // Check if the page was loaded via a refresh
+    if (window.performance && window.performance.navigation.type === window.performance.navigation.TYPE_RELOAD) {
+      // Redirect to the shops page
+      console.log("refreshed!!!!!!!!!!!!!!!!")
+      window.location.href = "/markets";
+    }
+  }, []);
+  
   useEffect(() => {
     // Ensure both currentLocation and destinationShopId are available
     if (currentLocation && destinationShopId) {
@@ -95,6 +104,7 @@ const Navigation = () => {
           }
 
           setIsRefreshed(true);
+          
           setIsLoading(false); // Set loading to false here
         } catch (error) {
           console.error("Error fetching shortest path:", error);
@@ -955,6 +965,11 @@ const Navigation = () => {
   ) : (
     <>
       {" "}
+      {/* <ThanksComponent
+      route={directionsAndShops}
+      stepsWalked={dy}
+      totalSteps={totalSteps}
+    /> */}
       <div
         style={{
           display: "flex",
@@ -1012,8 +1027,8 @@ const Navigation = () => {
             )} */}
           </div>
         </div>
-
-        {/* <div style={{ marginTop: "20px" }}>
+{/* 
+        <div style={{ marginTop: "20px" }}>
         <Button
           variant="contained"
           color="primary"
