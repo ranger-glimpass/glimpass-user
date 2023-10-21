@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import navigationArrow from "../assets/navigationArrow.svg";
 import CustomProgressBar from "../components/CustomProgressBar";
+import NavigationButtons from "./NavigationButtons";
 import {
   Button,
   CircularProgress,
@@ -38,6 +39,10 @@ const Navigation = () => {
     window.location.href = "/markets";
   };
 
+  const svgWidth = 400;
+const svgHeight = 400;
+const scaleFactor = 3;
+
   const pathRef = useRef(null);
   const location = useLocation();
   const currentLocation = location.state.currentLocation;
@@ -49,6 +54,8 @@ const Navigation = () => {
   const [turnAngle, setTurnAngle] = useState(false);
   const [showFloorChangePopup, setShowFloorChangePopup] = useState(false);
   const [nextFloor, setNextFloor] = useState(null);
+  const [selectedShopCoords, setSelectedShopCoords] = useState(null);
+  const [nodeSelected, setNodeSelected] = useState(false);
 
   const [destinationName, setDestinationName] = useState(destinationShopId);
 
@@ -60,7 +67,8 @@ const Navigation = () => {
       window.location.href = "/markets";
     }
   }, []);
-  
+
+
   useEffect(() => {
     // Ensure both currentLocation and destinationShopId are available
     if (currentLocation && destinationShopId) {
@@ -139,7 +147,6 @@ const Navigation = () => {
   const distRef = useRef(0);
   const offset = useRef(0);
   const straightPath = useRef(false);
-
   const lastRecordedStep = useRef(0);
 
   //changes for speed
@@ -542,6 +549,30 @@ const Navigation = () => {
     );
     setCurrentRoute(route.slice(selectedIndex));
 
+    // If the first shop is selected, set the coordinates to (200, 200)
+    if (selectedIndex === 0) {
+        setSelectedShopCoords({ x: 200, y: 200 });
+        setNodeSelected(true);
+        return;
+    }
+
+    // Calculate the coordinates for the selected shop
+    let currentX = 200; // Starting at the center
+    let currentY = 200;
+    for (let i = 0; i < selectedIndex; i++) { // Note: < selectedIndex, not <=
+        if (route[i].connection) {
+            const angle = route[i].connection.angle;
+            const steps = route[i].connection.steps * scaleFactor;
+            const dx = steps * Math.cos(((angle) * Math.PI) / 180);
+            const dy = steps * Math.sin(((angle) * Math.PI) / 180);
+            currentX += dx;
+            currentY += dy;
+        }
+    }
+
+    // Update the selectedShopCoords state
+    setSelectedShopCoords({ x: currentX, y: currentY });
+
     // Calculate the total steps up to the selected shop/checkpoint
     let stepsUpToSelectedShop = 0;
     for (let i = 0; i < selectedIndex; i++) {
@@ -552,7 +583,10 @@ const Navigation = () => {
 
     // Update the stepsWalked state
     setSelectedShopStep(stepsUpToSelectedShop);
-  };
+
+    setNodeSelected(true);
+};
+
 
   // Compute total steps
   const totalSteps = route.reduce((acc, item) => {
@@ -1005,7 +1039,7 @@ const Navigation = () => {
               📍 {currentRoute[0]?.shopOrCheckpoint?.name || "In between"}
             </Typography>
 
-            {/* {isDropdownOpen && (
+            {isDropdownOpen && (
               <List>
                 {route.map((item, index) => (
                   <ListItem
@@ -1024,7 +1058,7 @@ const Navigation = () => {
                   </ListItem>
                 ))}
               </List>
-            )} */}
+            )}
           </div>
         </div>
 {/* 
@@ -1047,6 +1081,14 @@ const Navigation = () => {
           totalSteps={totalSteps}
           adjustedAng={adjustedAng}
         />
+        <div>
+        <NavigationButtons 
+  route={route} 
+  currentRoute={currentRoute} 
+  handleDropdownChange={handleDropdownChange} 
+/>
+
+</div>
         <div style={{ marginBottom: "10px", marginTop: "100px" }}>
           <img
             src={navigationArrow}
@@ -1091,6 +1133,9 @@ const Navigation = () => {
                 stepsWalked={dy}
                 totalSteps={totalSteps}
                 adjustedAng={adjustedAng}
+                selectedShopCoords={selectedShopCoords} 
+                nodeSelected={nodeSelected}
+    setNodeSelected={setNodeSelected}
               />
             </SvgIcon>
           </div>

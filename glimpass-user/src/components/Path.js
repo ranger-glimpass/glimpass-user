@@ -3,7 +3,7 @@ import React, {useState, useEffect, useRef, forwardRef } from "react";
 import { useNavigate } from "react-router-dom";
 import navigationArrow from "../assets/navigationArrow.svg";
 import pinPoint from '../assets/pinPoint.svg';
-const Path = forwardRef(({ route,setViewBox, stepsWalked, totalSteps, adjustedAng}, ref) => {
+const Path = forwardRef(({ route,setViewBox, stepsWalked, totalSteps, adjustedAng, selectedShopCoords, nodeSelected, setNodeSelected}, ref) => {
     
   const navigate = useNavigate();
     console.log(adjustedAng,"adjeusted")
@@ -22,7 +22,13 @@ const Path = forwardRef(({ route,setViewBox, stepsWalked, totalSteps, adjustedAn
 
 useEffect(() => {
 console.log(ref.current, "pathref");
-
+if (nodeSelected) {
+    // if (selectedShopCoords) {
+        setArrowPoint(selectedShopCoords);
+    //   }
+    setNodeSelected(false);  // Reset the state
+}
+else{
     if (ref.current && ref.current.getTotalLength() > 0) {
         const pathLength = ref.current.getTotalLength();
         const distance = (stepsWalked / totalSteps) * pathLength;
@@ -49,7 +55,13 @@ console.log(ref.current, "pathref");
             setArrowPoint({ x: currentShop.x, y: currentShop.y }); // Assuming your shop items have x and y properties.
         }
     }
-}, [stepsWalked, totalSteps, route.length]);
+    if (selectedShopCoords) {
+        setArrowPoint(selectedShopCoords);
+        console.log("selected coords", selectedShopCoords)
+      }
+}
+    }, [stepsWalked, totalSteps, route.length, selectedShopCoords, nodeSelected]);
+  
 
 
     let currentX = svgWidth / 2;

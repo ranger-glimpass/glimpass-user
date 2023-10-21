@@ -8,6 +8,11 @@ import close from "../assets/close.png";
 import nearby from "../assets/nearby.png";
 //import Fab from '@mui/material/Fab';
 import RestroomIcon from "@mui/icons-material/Wc"; // Assuming you want to use the WC icon for the restroom
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
 import {
   Card,
@@ -38,8 +43,12 @@ const ShopList = (props) => {
   const [selectedShop, setSelectedShop] = useState(null); // <-- Add this state variable
   const [isExpanded, setIsExpanded] = useState(false);
 
+  const [openModal, setOpenModal] = useState(false);
+const [selectedShopDetails, setSelectedShopDetails] = useState(null);
+
   const location = useLocation();
   const handleNavigateClick = async(shopId) => {
+
     setActiveCard(shopId);
     const email = sessionStorage.getItem('email');
     const name = sessionStorage.getItem('name');
@@ -73,6 +82,12 @@ const ShopList = (props) => {
     setIsLoading(false); // Set loading to false once data is fetched
   };
 
+
+  const handle = (shopId) => {
+    const selectedShop = shops.find(shop => shop.nodeId === shopId);
+    setSelectedShopDetails(selectedShop);
+    setOpenModal(true);
+  }
   useEffect(() => {
     getAllNodes();
   }, []);
@@ -101,6 +116,7 @@ const ShopList = (props) => {
       alert("Please select a shop first.");
     }
   };
+
 
   const filteredShops = selectedShop
     ? shops.filter((shop) => shop.nodeId === selectedShop.nodeId)
@@ -221,10 +237,12 @@ const ShopList = (props) => {
                   p: 1,
                   mx: { xs: 0, sm: 2 },
                 }}
-                onClick={() => handleNavigateClick(shop.nodeId)}
+               // onClick={() => handleNavigateClick(shop.nodeId)}
               >
                 <CardActionArea
                   sx={{ display: "flex", flexDirection: "row", flexGrow: 1 }}
+    onClick={() => handle(shop.nodeId)}
+
                 >
                   {shop && (
                     <CardMedia
@@ -272,7 +290,7 @@ const ShopList = (props) => {
                     </Typography>
                   </CardContent>
                 </CardActionArea>
-                <Box sx={{ p: 0 }}>
+                {/* <Box sx={{ p: 0 }}>
                   <Button
                     variant="contained"
                     color="primary"
@@ -281,7 +299,7 @@ const ShopList = (props) => {
                   >
                     Navigate
                   </Button>
-                </Box>
+                </Box> */}
               </Card>
             );
           })}
@@ -388,7 +406,55 @@ const ShopList = (props) => {
           />
         </IconButton>
       </Box>
+
+      <Dialog open={openModal} onClose={() => setOpenModal(false)} fullWidth maxWidth="xs">
+    <DialogTitle sx={{ textAlign: 'center', pb: 1 }}>
+        <Typography variant="h6" component="div">
+            {selectedShopDetails?.name}
+        </Typography>
+    </DialogTitle>
+    <DialogContent>
+        <Box display="flex" flexDirection="column" alignItems="center">
+            <CardMedia
+                component="img"
+                image={logo} // Replace with selectedShopDetails?.image or similar
+                alt={selectedShopDetails?.name}
+                sx={{
+                    width: '80%',
+                    height: 'auto',
+                    borderRadius: '15px',
+                    mb: 2
+                }}
+            />
+            <Typography variant="subtitle1" color="textSecondary" gutterBottom>
+                Floor: {selectedShopDetails?.floor}
+            </Typography>
+            <Typography variant="subtitle1" color="textSecondary" gutterBottom>
+                Category: {selectedShopDetails?.category?.join(", ")}
+            </Typography>
+            {/* Add more details as needed */}
+        </Box>
+    </DialogContent>
+    <DialogActions sx={{ justifyContent: 'center', mt: 2 }}>
+        <Button variant="outlined" onClick={() => setOpenModal(false)} color="primary" sx={{ mr: 2 }}>
+            Cancel
+        </Button>
+        <Button 
+            variant="contained"
+            onClick={() => {
+                navigate("/dashboard", { state: { destinationShopId: selectedShopDetails?.nodeId, market: location.state?.market } });
+                setOpenModal(false);
+            }} 
+            color="primary"
+        >
+            Navigate
+        </Button>
+    </DialogActions>
+</Dialog>
+
     </Container>
+
+    
   );
 };
 
