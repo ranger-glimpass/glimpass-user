@@ -40,8 +40,8 @@ const Navigation = () => {
   };
 
   const svgWidth = 400;
-const svgHeight = 400;
-const scaleFactor = 3;
+  const svgHeight = 400;
+  const scaleFactor = 3;
 
   const pathRef = useRef(null);
   const location = useLocation();
@@ -60,16 +60,23 @@ const scaleFactor = 3;
   const [destinationName, setDestinationName] = useState(destinationShopId);
   const [stepsWalked, setStepsWalked] = useState(0);
   const [selectedShopIndex, setSelectedShopIndex] = useState(0);
-  
+
+  const changeSlectedIndexDynamic = (index) => {
+    console.log(index, "manish");
+    setSelectedShopIndex(index);
+  };
   useEffect(() => {
     // Check if the page was loaded via a refresh
-    if (window.performance && window.performance.navigation.type === window.performance.navigation.TYPE_RELOAD) {
+    if (
+      window.performance &&
+      window.performance.navigation.type ===
+        window.performance.navigation.TYPE_RELOAD
+    ) {
       // Redirect to the shops page
-      console.log("refreshed!!!!!!!!!!!!!!!!")
+      console.log("refreshed!!!!!!!!!!!!!!!!");
       window.location.href = "/markets";
     }
   }, []);
-
 
   useEffect(() => {
     // Ensure both currentLocation and destinationShopId are available
@@ -114,7 +121,7 @@ const scaleFactor = 3;
           }
 
           setIsRefreshed(true);
-          
+
           setIsLoading(false); // Set loading to false here
         } catch (error) {
           console.error("Error fetching shortest path:", error);
@@ -553,23 +560,25 @@ const scaleFactor = 3;
 
     // If the first shop is selected, set the coordinates to (200, 200)
     if (selectedIndex === 0) {
-        setSelectedShopCoords({ x: 200, y: 200 });
-        setNodeSelected(true);
-        return;
+      setSelectedShopCoords({ x: 200, y: 200 });
+
+      setNodeSelected(true);
+      return;
     }
 
     // Calculate the coordinates for the selected shop
     let currentX = 200; // Starting at the center
     let currentY = 200;
-    for (let i = 0; i < selectedIndex; i++) { // Note: < selectedIndex, not <=
-        if (route[i].connection) {
-            const angle = route[i].connection.angle;
-            const steps = route[i].connection.steps * scaleFactor;
-            const dx = steps * Math.cos(((angle) * Math.PI) / 180);
-            const dy = steps * Math.sin(((angle) * Math.PI) / 180);
-            currentX += dx;
-            currentY += dy;
-        }
+    for (let i = 0; i < selectedIndex; i++) {
+      // Note: < selectedIndex, not <=
+      if (route[i].connection) {
+        const angle = route[i].connection.angle;
+        const steps = route[i].connection.steps * scaleFactor;
+        const dx = steps * Math.cos((angle * Math.PI) / 180);
+        const dy = steps * Math.sin((angle * Math.PI) / 180);
+        currentX += dx;
+        currentY += dy;
+      }
     }
 
     // Update the selectedShopCoords state
@@ -589,11 +598,12 @@ const scaleFactor = 3;
     setNodeSelected(true);
 
     // Reset stepsWalked and set the selected shop index
-  setStepsWalked(0);
-  const index = route.findIndex(item => item.shopOrCheckpoint.name === selectedShopName);
-  setSelectedShopIndex(index);
-};
-
+    setStepsWalked(0);
+    const index = route.findIndex(
+      (item) => item.shopOrCheckpoint.name === selectedShopName
+    );
+    setSelectedShopIndex(index);
+  };
 
   // Compute total steps
   const totalSteps = route.reduce((acc, item) => {
@@ -680,6 +690,41 @@ const scaleFactor = 3;
       anglesIn: anglesIn,
     };
   });
+  const resetSteps = (index) => {
+    if (index === 0) {
+      steps.current = 0;
+      stepsV2.current = 0;
+      setdy(0);
+      lastRecordedStep.current = 0;
+    } else {
+      const modifySteps = shopsData[index - 1].step;
+      steps.current = modifySteps;
+      stepsV2.current = modifySteps;
+      setdy(modifySteps);
+      lastRecordedStep.current = modifySteps;
+    }
+  };
+
+  useEffect(() => {
+    resetSteps(selectedShopIndex);
+    // Calculate the coordinates for the selected shop
+    let currentX = 200; // Starting at the center
+    let currentY = 200;
+    for (let i = 0; i < selectedShopIndex; i++) {
+      // Note: < selectedIndex, not <=
+      if (route[i].connection) {
+        const angle = route[i].connection.angle;
+        const steps = route[i].connection.steps * scaleFactor;
+        const dx = steps * Math.cos((angle * Math.PI) / 180);
+        const dy = steps * Math.sin((angle * Math.PI) / 180);
+        currentX += dx;
+        currentY += dy;
+      }
+    }
+
+    // Update the selectedShopCoords state
+    setSelectedShopCoords({ x: currentX, y: currentY });
+  }, [selectedShopIndex]);
 
   let flattenedRoute = [];
   route.forEach((item) => {
@@ -702,7 +747,6 @@ const scaleFactor = 3;
 
     // setCurrentShop(route[0].shopOrCheckpoint?.name);
   }, [isRefreshed, route, handleDropdownChange]);
-
 
   // const [xyz, setXyz] = useState(0);
   // const addXYZ = () =>{
@@ -1042,20 +1086,19 @@ const scaleFactor = 3;
           </div>
         </div>
 
-        {/* <div style={{ marginTop: "20px" }}>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => {
-            steps.current++;
-            stepsV2.current++;
-            setdy(steps.current);
-          }}
-        >
-          Add steps mannualy
-        </Button>
-       </div> */}
-
+        <div style={{ marginTop: "20px" }}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => {
+              steps.current++;
+              stepsV2.current++;
+              setdy(steps.current);
+            }}
+          >
+            Add steps mannualy
+          </Button>
+        </div>
 
         <CustomProgressBar
           shops={shopsData}
@@ -1065,13 +1108,13 @@ const scaleFactor = 3;
           selectedShopIndex={selectedShopIndex}
         />
         <div>
-        <NavigationButtons 
-  route={route} 
-  currentRoute={currentRoute} 
-  handleDropdownChange={handleDropdownChange} 
-/>
-
-</div>
+          <NavigationButtons
+            route={route}
+            currentRoute={currentRoute}
+            handleDropdownChange={handleDropdownChange}
+            changeSlectedIndexDynamic={changeSlectedIndexDynamic}
+          />
+        </div>
         <div style={{ marginBottom: "10px", marginTop: "100px" }}>
           <img
             src={navigationArrow}
@@ -1116,9 +1159,9 @@ const scaleFactor = 3;
                 stepsWalked={dy}
                 totalSteps={totalSteps}
                 adjustedAng={adjustedAng}
-                selectedShopCoords={selectedShopCoords} 
+                selectedShopCoords={selectedShopCoords}
                 nodeSelected={nodeSelected}
-    setNodeSelected={setNodeSelected}
+                setNodeSelected={setNodeSelected}
               />
             </SvgIcon>
           </div>
@@ -1165,64 +1208,71 @@ const scaleFactor = 3;
           </Dialog>
         )}
 
-{showFloorChangePopup && (
-  <Dialog
-    open={showFloorChangePopup}
-    onClose={() => {
-      setShowFloorChangePopup(false);
-      setCurrentStep(1); // Reset the step when closing the modal
-      window.modifyDy = 1;
-    }}
-    PaperProps={{
-      style: {
-        borderRadius: 15, // Rounded corners
-        padding: '20px',
-      },
-    }}
-  >
-    <DialogTitle>Floor Change Required</DialogTitle>
-    <DialogContent>
-      {currentStep === 1 ? (
-        <>
-          <img src="path_to_your_gif_1.gif" alt="Lift GIF" style={{ width: '100%', marginBottom: '20px' }} />
-          <DialogContentText>
-            Step 1: Go to the lift/elevator.
-          </DialogContentText>
-        </>
-      ) : (
-        <>
-          <img src="path_to_your_gif_2.gif" alt="Floor GIF" style={{ width: '100%', marginBottom: '20px' }} />
-          <DialogContentText>
-            Step 2: Press continue when reached to floor {nextFloor}.
-          </DialogContentText>
-        </>
-      )}
-    </DialogContent>
-    <DialogActions>
-      {currentStep === 1 ? (
-        <Button
-          onClick={() => setCurrentStep(2)}
-          color="primary"
-          variant="contained"
-        >
-          Next
-        </Button>
-      ) : (
-        <Button
-          onClick={() => {
-            setShowFloorChangePopup(false);
-            setCurrentStep(1); // Reset the step after closing the modal
-          }}
-          color="primary"
-          variant="contained"
-        >
-          Continue
-        </Button>
-      )}
-    </DialogActions>
-  </Dialog>
-)}
-
+        {showFloorChangePopup && (
+          <Dialog
+            open={showFloorChangePopup}
+            onClose={() => {
+              setShowFloorChangePopup(false);
+              setCurrentStep(1); // Reset the step when closing the modal
+              window.modifyDy = 1;
+            }}
+            PaperProps={{
+              style: {
+                borderRadius: 15, // Rounded corners
+                padding: "20px",
+              },
+            }}
+          >
+            <DialogTitle>Floor Change Required</DialogTitle>
+            <DialogContent>
+              {currentStep === 1 ? (
+                <>
+                  <img
+                    src="path_to_your_gif_1.gif"
+                    alt="Lift GIF"
+                    style={{ width: "100%", marginBottom: "20px" }}
+                  />
+                  <DialogContentText>
+                    Step 1: Go to the lift/elevator.
+                  </DialogContentText>
+                </>
+              ) : (
+                <>
+                  <img
+                    src="path_to_your_gif_2.gif"
+                    alt="Floor GIF"
+                    style={{ width: "100%", marginBottom: "20px" }}
+                  />
+                  <DialogContentText>
+                    Step 2: Press continue when reached to floor {nextFloor}.
+                  </DialogContentText>
+                </>
+              )}
+            </DialogContent>
+            <DialogActions>
+              {currentStep === 1 ? (
+                <Button
+                  onClick={() => setCurrentStep(2)}
+                  color="primary"
+                  variant="contained"
+                >
+                  Next
+                </Button>
+              ) : (
+                <Button
+                  onClick={() => {
+                    setShowFloorChangePopup(false);
+                    setCurrentStep(1); // Reset the step after closing the modal
+                  }}
+                  color="primary"
+                  variant="contained"
+                >
+                  Continue
+                </Button>
+              )}
+            </DialogActions>
+          </Dialog>
+        )}
       </div>
     </>
   );

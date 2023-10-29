@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import LinearProgress from "@mui/material/LinearProgress";
 import { makeStyles } from "@mui/styles";
-import {Box, Typography} from '@mui/material';
-import directionImage  from "../assets/atm.png";
-import leftImage from '../assets/leftTurn.jpg'; // Replace with your image's path and extension
-import rightImage from '../assets/rightTurn.jpg';
- import straightImage from '../assets/keepStaright.png';
+import { Box, Typography } from "@mui/material";
+import directionImage from "../assets/atm.png";
+import leftImage from "../assets/leftTurn.jpg"; // Replace with your image's path and extension
+import rightImage from "../assets/rightTurn.jpg";
+import straightImage from "../assets/keepStaright.png";
 
 const useStyles = makeStyles({
   root: {
@@ -56,32 +56,42 @@ const useStyles = makeStyles({
   },
 });
 
-const CustomProgressBar = ({ totalSteps, stepsWalked, shops, selectedShopIndex }) => {
+const CustomProgressBar = ({
+  totalSteps,
+  stepsWalked,
+  shops,
+  selectedShopIndex,
+}) => {
+  console.log("----------------");
+  console.log(totalSteps, "totalSteps");
+  console.log(stepsWalked, "stepsWalked");
+  console.log(shops, "shops");
+  console.log(selectedShopIndex, "selectedSHopIndex");
+  console.log("----------------");
   const classes = useStyles();
   //const [selectedShopIndex, setselectedShopIndex] = useState(0);
   const [stepsBetweenShops, setStepsBetweenShops] = useState(0);
-  console.log(selectedShopIndex,"seleShop");
+  console.log(selectedShopIndex, "seleShop");
   useEffect(() => {
     // Determine the next shop based on stepsWalked
     let nextShopIndex = selectedShopIndex;
     for (let i = selectedShopIndex; i < shops.length; i++) {
-        if (stepsWalked < Number(shops[i].step)) {
-            nextShopIndex = i;
-            break;
-        }
+      if (stepsWalked < Number(shops[i].step)) {
+        nextShopIndex = i;
+        break;
+      }
     }
 
     // Update the steps between the current shop and the next shop
     if (nextShopIndex === 0) {
-        setStepsBetweenShops(parseInt(shops[0].step, 10));
+      setStepsBetweenShops(parseInt(shops[0].step, 10));
     } else {
-        setStepsBetweenShops(
-            parseInt(shops[nextShopIndex].step, 10) -
-            parseInt(shops[nextShopIndex - 1].step, 10)
-        );
+      setStepsBetweenShops(
+        parseInt(shops[nextShopIndex].step, 10) -
+          parseInt(shops[nextShopIndex - 1].step, 10)
+      );
     }
-}, [stepsWalked, shops, selectedShopIndex]);
-
+  }, [stepsWalked, shops, selectedShopIndex]);
 
   useEffect(() => {
     console.log(shops[selectedShopIndex + 1], "here");
@@ -104,11 +114,18 @@ const CustomProgressBar = ({ totalSteps, stepsWalked, shops, selectedShopIndex }
     }
   }, [selectedShopIndex, shops, totalSteps]);
 
-  const currentShopStep = selectedShopIndex === 0 ? 0 : parseInt(shops[selectedShopIndex - 1].step, 10);
+  const currentShopStep =
+    selectedShopIndex === 0
+      ? 0
+      : parseInt(shops[selectedShopIndex - 1].step, 10);
 
   const nextShopStep = parseInt(shops[selectedShopIndex].step, 10);
- const clampedStepsWalked = Math.max(currentShopStep, Math.min(stepsWalked, parseInt(shops[selectedShopIndex].step, 10)));
-const progressPercentage = ((clampedStepsWalked - currentShopStep) / stepsBetweenShops) * 100;
+  const clampedStepsWalked = Math.max(
+    currentShopStep,
+    Math.min(stepsWalked, parseInt(shops[selectedShopIndex].step, 10))
+  );
+  const progressPercentage =
+    ((clampedStepsWalked - currentShopStep) / stepsBetweenShops) * 100;
 
   const thresholdPoint = currentShopStep + 0.75 * stepsBetweenShops;
 
@@ -138,17 +155,16 @@ const progressPercentage = ((clampedStepsWalked - currentShopStep) / stepsBetwee
     if (selectedShopIndex === shops.length - 2) {
       direction = "About to reach your destination";
     } else {
-        const directionTurn = getTurnDirection(shops[selectedShopIndex].anglesIn, shops[selectedShopIndex + 1].anglesIn);
-        if(directionTurn != null)
-          direction = "Ready to turn " + directionTurn;
-        else{
-          direction = "Keep Straight";
-        }
+      const directionTurn = getTurnDirection(
+        shops[selectedShopIndex].anglesIn,
+        shops[selectedShopIndex + 1].anglesIn
+      );
+      if (directionTurn != null) direction = "Ready to turn " + directionTurn;
+      else {
+        direction = "Keep Straight";
       }
-}
-
-
-
+    }
+  }
 
   const [previousDirection, setPreviousDirection] = useState(null);
   useEffect(() => {
@@ -159,7 +175,6 @@ const progressPercentage = ((clampedStepsWalked - currentShopStep) / stepsBetwee
       setPreviousDirection(direction);
     }
   }, [direction]);
-
 
   const getDirectionImage = (direction) => {
     switch (direction) {
@@ -173,7 +188,6 @@ const progressPercentage = ((clampedStepsWalked - currentShopStep) / stepsBetwee
         return null; // Default case if no direction matches
     }
   };
-  
 
   return (
     <div className="custom-progress-bar-container">
@@ -199,13 +213,21 @@ const progressPercentage = ((clampedStepsWalked - currentShopStep) / stepsBetwee
         </div>
       )}
 
-{direction && (
-  <Box display="flex" alignItems="center" justifyContent="center" className={classes.directionContainer}>
-    <img src={getDirectionImage(direction)} alt="Direction" className={classes.directionImage} />
-    <Typography className={classes.directionText}>{direction}</Typography>
-  </Box>
-)}
-
+      {direction && (
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          className={classes.directionContainer}
+        >
+          <img
+            src={getDirectionImage(direction)}
+            alt="Direction"
+            className={classes.directionImage}
+          />
+          <Typography className={classes.directionText}>{direction}</Typography>
+        </Box>
+      )}
     </div>
   );
 };
