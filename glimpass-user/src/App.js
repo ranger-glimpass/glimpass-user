@@ -103,7 +103,7 @@ function App() {
         {deferredPrompt && (
           <a
             className="show-add-to-screen"
-            href="#"
+            href=""
             onClick={showAddToHomeScreen}
           >
             Add to Home Screen

@@ -17,7 +17,7 @@ import "react-responsive-carousel/lib/styles/carousel.min.css"; // Import carous
 
 import facingToShop from '../assets/facingToShop.gif';
 import goingToShop from '../assets/goingToShop.gif';
-
+import SearchBox from './SearchBox';
 
 const Dashboard = () => {
   const location = useLocation();
@@ -69,7 +69,6 @@ const Dashboard = () => {
     fetchShops();
   }, []);
 
-
   const [updatedDestinationShopId, setUpdatedDestinationShopId] = useState(destinationShopId);
 
   useEffect(() => {
@@ -115,15 +114,20 @@ const Dashboard = () => {
       window.addEventListener("deviceorientation", handleOrientation);
       window.addEventListener("devicemotion", handleMotion);
     }
+
+    const currentLocationId = currentLocation?.nodeId;
+              if(currentLocation?.nearby){
+                currentLocationId = currentLocation?.nearby;
+              }
     navigate("/navigation", {
       state: {
-        currentLocation: currentLocation?.nodeId,
+        currentLocation: currentLocationId,
         destinationShopId: updatedDestinationShopId,
         calibratedShopAngle: currentLocation?.shop_angle || 0,
       },
     });
   };
-  console.log(currentLocation, "manish");
+  console.log(currentLocation, "currentLocation");
   if (isLoading) {
     return (
       <Box
@@ -165,7 +169,7 @@ const Dashboard = () => {
         </Typography>
 
         <Box mt={2} width="100%">
-        <Autocomplete
+        {/* <Autocomplete
     fullWidth
     options={shops}
     getOptionLabel={(option) => option.name}
@@ -214,10 +218,18 @@ const Dashboard = () => {
             borderRadius: '25px', // Rounded corners for elegance
         },
     }}
-/>
+/> */}
+    <SearchBox
+        data={shops}
+        value={currentLocation} // Pass the current selected shop
+        onChange={setCurrentLocation} // Handle when the shop changes
+        onShopSelected={(selectedShop) => {
+            console.log(selectedShop,"selected on dashboard");
+            setCurrentLocation(selectedShop); 
+        }}
+    />
+</Box>
 
-
-        </Box>
 
         <Box mt={2}>
           <Button

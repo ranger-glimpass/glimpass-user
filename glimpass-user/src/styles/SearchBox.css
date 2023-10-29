@@ -1,0 +1,56 @@
+/* For the searchbox container and input */
+.navbar-searchbox-container {
+  width: 100%; /* If you want it to occupy the entire width of the parent */
+  position: relative;
+}
+
+.navbar-searchbox-input {
+  padding: 10px 15px;
+  font-size: 1.2rem;
+  border: 1px solid #ccc;
+  border-radius: 25px;
+  width: 100%;
+  box-sizing: border-box;
+  background: #fff;
+}
+
+/* For the dropdown list and individual list items */
+.navbar-searchbox-dropdown {
+  border: 1px solid #ddd;
+  max-height: 150px;
+  overflow-y: auto;
+  width: 100%; 
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin: 5px 0 0;
+  padding: 0;
+  background: #0080ff;
+  list-style-type: none;
+  z-index: 10;
+}
+
+.navbar-searchbox-dropdown li {
+  position: relative;
+  padding: 10px 15px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar-searchbox-dropdown li:hover,
+.navbar-searchbox-dropdown li.active {
+  background-color: #a9d5ff;
+}
+
+/* For the floor label inside the dropdown list items */
+.navbar-searchbox-dropdown .align-right {
+  font-style: italic;
+  font-weight: bold;
+  font-size: 0.6rem;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}

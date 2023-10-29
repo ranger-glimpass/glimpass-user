@@ -56,60 +56,59 @@ const useStyles = makeStyles({
   },
 });
 
-const CustomProgressBar = ({ totalSteps, stepsWalked, shops }) => {
+const CustomProgressBar = ({ totalSteps, stepsWalked, shops, selectedShopIndex }) => {
   const classes = useStyles();
-  const [currentShopIndex, setCurrentShopIndex] = useState(0);
+  //const [selectedShopIndex, setselectedShopIndex] = useState(0);
   const [stepsBetweenShops, setStepsBetweenShops] = useState(0);
-
+  console.log(selectedShopIndex,"seleShop");
   useEffect(() => {
-    let nextShopIndex = currentShopIndex; // Start with the current index
-
-    for (let i = currentShopIndex; i < shops.length; i++) {
-      if (stepsWalked < Number(shops[i].step)) {
-        nextShopIndex = i;
-        break;
-      }
+    // Determine the next shop based on stepsWalked
+    let nextShopIndex = selectedShopIndex;
+    for (let i = selectedShopIndex; i < shops.length; i++) {
+        if (stepsWalked < Number(shops[i].step)) {
+            nextShopIndex = i;
+            break;
+        }
     }
 
-    // Only update if the nextShopIndex has changed and it's not the last shop
-    if (
-      nextShopIndex !== currentShopIndex &&
-      nextShopIndex < shops.length - 1
-    ) {
-      setCurrentShopIndex(nextShopIndex);
-    }
-  }, [stepsWalked, shops, currentShopIndex]);
-
-  useEffect(() => {
-    console.log(shops[currentShopIndex + 1], "here");
-  }, [currentShopIndex, shops]);
-
-  useEffect(() => {
-    if (currentShopIndex === 0) {
-      setStepsBetweenShops(parseInt(shops[currentShopIndex].step, 10));
+    // Update the steps between the current shop and the next shop
+    if (nextShopIndex === 0) {
+        setStepsBetweenShops(parseInt(shops[0].step, 10));
     } else {
-      if (shops[currentShopIndex]) {
         setStepsBetweenShops(
-          parseInt(shops[currentShopIndex].step, 10) -
-            parseInt(shops[currentShopIndex - 1].step, 10)
+            parseInt(shops[nextShopIndex].step, 10) -
+            parseInt(shops[nextShopIndex - 1].step, 10)
+        );
+    }
+}, [stepsWalked, shops, selectedShopIndex]);
+
+
+  useEffect(() => {
+    console.log(shops[selectedShopIndex + 1], "here");
+  }, [selectedShopIndex, shops]);
+
+  useEffect(() => {
+    if (selectedShopIndex === 0) {
+      setStepsBetweenShops(parseInt(shops[selectedShopIndex].step, 10));
+    } else {
+      if (shops[selectedShopIndex]) {
+        setStepsBetweenShops(
+          parseInt(shops[selectedShopIndex].step, 10) -
+            parseInt(shops[selectedShopIndex - 1].step, 10)
         );
       } else {
         setStepsBetweenShops(
-          totalSteps - parseInt(shops[currentShopIndex].step, 10)
+          totalSteps - parseInt(shops[selectedShopIndex].step, 10)
         );
       }
     }
-  }, [currentShopIndex, shops, totalSteps]);
+  }, [selectedShopIndex, shops, totalSteps]);
 
-  const currentShopStep =
-    currentShopIndex === 0 ? 0 : parseInt(shops[currentShopIndex - 1].step, 10);
-  const nextShopStep = parseInt(shops[currentShopIndex].step, 10);
-  const clampedStepsWalked = Math.max(
-    currentShopStep,
-    Math.min(stepsWalked, nextShopStep)
-  );
-  const progressPercentage =
-    ((clampedStepsWalked - currentShopStep) / stepsBetweenShops) * 100;
+  const currentShopStep = selectedShopIndex === 0 ? 0 : parseInt(shops[selectedShopIndex - 1].step, 10);
+
+  const nextShopStep = parseInt(shops[selectedShopIndex].step, 10);
+ const clampedStepsWalked = Math.max(currentShopStep, Math.min(stepsWalked, parseInt(shops[selectedShopIndex].step, 10)));
+const progressPercentage = ((clampedStepsWalked - currentShopStep) / stepsBetweenShops) * 100;
 
   const thresholdPoint = currentShopStep + 0.75 * stepsBetweenShops;
 
@@ -135,11 +134,11 @@ const CustomProgressBar = ({ totalSteps, stepsWalked, shops }) => {
   };
 
   let direction;
-  if (shops[currentShopIndex + 1] && stepsWalked >= thresholdPoint) {
-    if (currentShopIndex === shops.length - 2) {
+  if (shops[selectedShopIndex + 1] && stepsWalked >= thresholdPoint) {
+    if (selectedShopIndex === shops.length - 2) {
       direction = "About to reach your destination";
     } else {
-        const directionTurn = getTurnDirection(shops[currentShopIndex].anglesIn, shops[currentShopIndex + 1].anglesIn);
+        const directionTurn = getTurnDirection(shops[selectedShopIndex].anglesIn, shops[selectedShopIndex + 1].anglesIn);
         if(directionTurn != null)
           direction = "Ready to turn " + directionTurn;
         else{
@@ -189,14 +188,14 @@ const CustomProgressBar = ({ totalSteps, stepsWalked, shops }) => {
             key={index}
             className={classes.dot}
             style={{
-              left: `${((parseInt(shop.step, 10) - parseInt(shops[currentShopIndex].step, 10)) / stepsBetweenShops) * 100}%`
+              left: `${((parseInt(shop.step, 10) - parseInt(shops[selectedShopIndex].step, 10)) / stepsBetweenShops) * 100}%`
             }}
           ></div>
         ))} */}
       </div>
-      {shops[currentShopIndex + 1] && (
+      {shops[selectedShopIndex + 1] && (
         <div className={classes.nextShop}>
-          Next Shop: {shops[currentShopIndex + 1].name}
+          Next Shop: {shops[selectedShopIndex + 1].name}
         </div>
       )}
 

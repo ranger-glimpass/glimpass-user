@@ -13,6 +13,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import SearchBox from './SearchBox'
 
 import {
   Card,
@@ -137,7 +138,7 @@ const [selectedShopDetails, setSelectedShopDetails] = useState(null);
             pl: 2,
         }}
     >
-         <Autocomplete
+         {/* <Autocomplete
     fullWidth
     options={shops}
     getOptionLabel={(option) => option.name}
@@ -187,6 +188,12 @@ const [selectedShopDetails, setSelectedShopDetails] = useState(null);
             borderRadius: '25px', // Rounded corners for elegance
         },
     }}
+/> */}
+<SearchBox
+data={shops}
+onShopSelected={(selectedShop) => {
+  handle(selectedShop); // set the details for the selected shop
+  }}
 />
         <Typography
             variant="h6" // This makes the text bold
@@ -205,7 +212,12 @@ const [selectedShopDetails, setSelectedShopDetails] = useState(null);
         </Typography>
     </Toolbar>
 </AppBar>
-
+<div>
+<SearchBox
+data={shops}
+/>
+  
+</div>
 
       <br></br>
       <Box
@@ -442,8 +454,12 @@ const [selectedShopDetails, setSelectedShopDetails] = useState(null);
         <Button 
             variant="contained"
             onClick={() => {
-                navigate("/dashboard", { state: { destinationShopId: selectedShopDetails?.nodeId, market: location.state?.market } });
-                setOpenModal(false);
+              const destinationNodeId = selectedShopDetails?.nodeId;
+              if(selectedShopDetails?.nearby){
+                destinationNodeId = selectedShopDetails?.nearby;
+              }
+              navigate("/dashboard", { state: { destinationShopId: destinationNodeId, market: location.state?.market } });
+              setOpenModal(false);
             }} 
             color="primary"
         >

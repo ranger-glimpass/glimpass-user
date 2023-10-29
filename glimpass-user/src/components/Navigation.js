@@ -58,7 +58,9 @@ const scaleFactor = 3;
   const [nodeSelected, setNodeSelected] = useState(false);
 
   const [destinationName, setDestinationName] = useState(destinationShopId);
-
+  const [stepsWalked, setStepsWalked] = useState(0);
+  const [selectedShopIndex, setSelectedShopIndex] = useState(0);
+  
   useEffect(() => {
     // Check if the page was loaded via a refresh
     if (window.performance && window.performance.navigation.type === window.performance.navigation.TYPE_RELOAD) {
@@ -585,6 +587,11 @@ const scaleFactor = 3;
     setSelectedShopStep(stepsUpToSelectedShop);
 
     setNodeSelected(true);
+
+    // Reset stepsWalked and set the selected shop index
+  setStepsWalked(0);
+  const index = route.findIndex(item => item.shopOrCheckpoint.name === selectedShopName);
+  setSelectedShopIndex(index);
 };
 
 
@@ -696,33 +703,6 @@ const scaleFactor = 3;
     // setCurrentShop(route[0].shopOrCheckpoint?.name);
   }, [isRefreshed, route, handleDropdownChange]);
 
-  const [rotationAngle, setRotationAngle] = useState(0);
-
-  let initialAngle = 0;
-  let initialRotation = 0;
-
-  const handleTouchStart = (e) => {
-    if (e.touches.length === 2) {
-      const x1 = e.touches[0].clientX;
-      const y1 = e.touches[0].clientY;
-      const x2 = e.touches[1].clientX;
-      const y2 = e.touches[1].clientY;
-      initialAngle = Math.atan2(y2 - y1, x2 - x1) * (180 / Math.PI);
-      initialRotation = rotationAngle;
-    }
-  };
-
-  const handleTouchMove = (e) => {
-    if (e.touches.length === 2) {
-      const x1 = e.touches[0].clientX;
-      const y1 = e.touches[0].clientY;
-      const x2 = e.touches[1].clientX;
-      const y2 = e.touches[1].clientY;
-      const currentAngle = Math.atan2(y2 - y1, x2 - x1) * (180 / Math.PI);
-      const rotationChange = currentAngle - initialAngle;
-      setRotationAngle(initialRotation + rotationChange);
-    }
-  };
 
   // const [xyz, setXyz] = useState(0);
   // const addXYZ = () =>{
@@ -730,23 +710,22 @@ const scaleFactor = 3;
   // }
   // console.log(xyz,"xyz");
 
-  useEffect(() => {
-    const currentNodeType = currentRoute[0]?.shopOrCheckpoint?.nodeType;
-
-    let nextNode = currentRoute[1]?.shopOrCheckpoint;
-
-    let j = 1;
-    while (j < currentRoute.length && nextNode?.nodeType === "checkpoint") {
-      nextNode = currentRoute[j]?.shopOrCheckpoint;
-      j++;
-    }
-    if (currentNodeType === "floor_change" && nextNode) {
-      setShowFloorChangePopup(true);
-      setNextFloor(nextNode?.floor);
-    } else {
-      setShowFloorChangePopup(false);
-    }
-  }, [currentRoute]);
+  //Devashish's floor_change popup function
+  // useEffect(() => {
+  //   const currentNodeType = currentRoute[0]?.shopOrCheckpoint?.nodeType;
+  //   let nextNode = currentRoute[1]?.shopOrCheckpoint;
+  //   let j = 1;
+  //   while (j < currentRoute.length && nextNode?.nodeType === "checkpoint") {
+  //     nextNode = currentRoute[j]?.shopOrCheckpoint;
+  //     j++;
+  //   }
+  //   if (currentNodeType === "floor_change" && nextNode) {
+  //     setShowFloorChangePopup(true);
+  //     setNextFloor(nextNode?.floor);
+  //   } else {
+  //     setShowFloorChangePopup(false);
+  //   }
+  // }, [currentRoute]);
 
   console.log(shopsData, "shopdata");
 
@@ -979,6 +958,7 @@ const scaleFactor = 3;
   //   );
   // };
 
+  const [currentStep, setCurrentStep] = useState(1);
   return isLoading ? (
     <div
       style={{
@@ -1039,7 +1019,7 @@ const scaleFactor = 3;
               📍 {currentRoute[0]?.shopOrCheckpoint?.name || "In between"}
             </Typography>
 
-            {isDropdownOpen && (
+            {/* {isDropdownOpen && (
               <List>
                 {route.map((item, index) => (
                   <ListItem
@@ -1058,11 +1038,11 @@ const scaleFactor = 3;
                   </ListItem>
                 ))}
               </List>
-            )}
+            )} */}
           </div>
         </div>
-{/* 
-        <div style={{ marginTop: "20px" }}>
+
+        {/* <div style={{ marginTop: "20px" }}>
         <Button
           variant="contained"
           color="primary"
@@ -1075,11 +1055,14 @@ const scaleFactor = 3;
           Add steps mannualy
         </Button>
        </div> */}
+
+
         <CustomProgressBar
           shops={shopsData}
           stepsWalked={dy}
           totalSteps={totalSteps}
           adjustedAng={adjustedAng}
+          selectedShopIndex={selectedShopIndex}
         />
         <div>
         <NavigationButtons 
@@ -1182,32 +1165,64 @@ const scaleFactor = 3;
           </Dialog>
         )}
 
-        {showFloorChangePopup && (
-          <Dialog
-            open={showFloorChangePopup}
-            onClose={() => {
-              setShowFloorChangePopup(false);
-              window.modifyDy = 1;
-            }}
-          >
-            <DialogTitle>Floor Change Required</DialogTitle>{" "}
-            <DialogContent>
-              {" "}
-              <DialogContentText>
-                Proceed to the lift and go to floor {nextFloor}.{" "}
-              </DialogContentText>{" "}
-            </DialogContent>{" "}
-            <DialogActions>
-              {" "}
-              <Button
-                onClick={() => setShowFloorChangePopup(false)}
-                color="primary"
-              >
-                OK{" "}
-              </Button>{" "}
-            </DialogActions>{" "}
-          </Dialog>
-        )}
+{showFloorChangePopup && (
+  <Dialog
+    open={showFloorChangePopup}
+    onClose={() => {
+      setShowFloorChangePopup(false);
+      setCurrentStep(1); // Reset the step when closing the modal
+      window.modifyDy = 1;
+    }}
+    PaperProps={{
+      style: {
+        borderRadius: 15, // Rounded corners
+        padding: '20px',
+      },
+    }}
+  >
+    <DialogTitle>Floor Change Required</DialogTitle>
+    <DialogContent>
+      {currentStep === 1 ? (
+        <>
+          <img src="path_to_your_gif_1.gif" alt="Lift GIF" style={{ width: '100%', marginBottom: '20px' }} />
+          <DialogContentText>
+            Step 1: Go to the lift/elevator.
+          </DialogContentText>
+        </>
+      ) : (
+        <>
+          <img src="path_to_your_gif_2.gif" alt="Floor GIF" style={{ width: '100%', marginBottom: '20px' }} />
+          <DialogContentText>
+            Step 2: Press continue when reached to floor {nextFloor}.
+          </DialogContentText>
+        </>
+      )}
+    </DialogContent>
+    <DialogActions>
+      {currentStep === 1 ? (
+        <Button
+          onClick={() => setCurrentStep(2)}
+          color="primary"
+          variant="contained"
+        >
+          Next
+        </Button>
+      ) : (
+        <Button
+          onClick={() => {
+            setShowFloorChangePopup(false);
+            setCurrentStep(1); // Reset the step after closing the modal
+          }}
+          color="primary"
+          variant="contained"
+        >
+          Continue
+        </Button>
+      )}
+    </DialogActions>
+  </Dialog>
+)}
+
       </div>
     </>
   );
