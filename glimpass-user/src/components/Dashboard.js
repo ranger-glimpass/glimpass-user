@@ -17,7 +17,7 @@ import "react-responsive-carousel/lib/styles/carousel.min.css"; // Import carous
 
 import facingToShop from "../assets/facingToShop.gif";
 import goingToShop from "../assets/goingToShop.gif";
-import CountdownButton from "./CountdownButton";
+import CountdownButton from "./CountdownButton";import SearchBox from './SearchBox';
 
 const Dashboard = () => {
   const location = useLocation();
@@ -119,15 +119,20 @@ const Dashboard = () => {
       window.addEventListener("deviceorientation", handleOrientation);
       window.addEventListener("devicemotion", handleMotion);
     }
+
+    const currentLocationId = currentLocation?.nodeId;
+              if(currentLocation?.nearby){
+                currentLocationId = currentLocation?.nearby;
+              }
     navigate("/navigation", {
       state: {
-        currentLocation: currentLocation?.nodeId,
+        currentLocation: currentLocationId,
         destinationShopId: updatedDestinationShopId,
         calibratedShopAngle: currentLocation?.shop_angle || 0,
       },
     });
   };
-  console.log(currentLocation, "manish");
+  console.log(currentLocation, "currentLocation");
   if (isLoading) {
     return (
       <Box
@@ -168,62 +173,68 @@ const Dashboard = () => {
             Where are you at?
           </Typography>
 
-          <Box mt={2} width="100%">
-            <Autocomplete
-              fullWidth
-              options={shops}
-              getOptionLabel={(option) => option.name}
-              value={currentLocation?.nodeId}
-              onChange={(event, newValue) => setCurrentLocation(newValue)}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Select a Shop"
-                  variant="outlined"
-                />
-              )}
-              renderOption={(props, option) => (
-                <Box
-                  component="li"
-                  sx={{
-                    position: "relative",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    "& > img": { mr: 2, flexShrink: 0 },
-                  }}
-                  {...props}
-                >
-                  {option.name}
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      position: "absolute",
-                      bottom: 0,
-                      right: 0,
-                      fontStyle: "italic",
-                      fontWeight: "bold",
-                      fontSize: "0.6rem",
-                    }}
-                  >
-                    ({option.floor} floor)
-                  </Typography>
-                </Box>
-              )}
-              sx={{
-                "& .MuiAutocomplete-input": {
-                  fontSize: "1.2rem", // Increase font size of input
-                },
-                "& .MuiAutocomplete-option": {
-                  fontSize: "1.2rem", // Increase font size of dropdown options
-                  padding: "10px 15px", // Add padding for elegance
-                },
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: "25px", // Rounded corners for elegance
-                },
-              }}
-            />
-          </Box>
+        <Box mt={2} width="100%">
+        {/* <Autocomplete
+    fullWidth
+    options={shops}
+    getOptionLabel={(option) => option.name}
+    value={currentLocation?.nodeId}
+    onChange={(event, newValue) => setCurrentLocation(newValue)}
+    renderInput={(params) => (
+        <TextField {...params} label="Select a Shop" variant="outlined" />
+    )}
+    renderOption={(props, option) => (
+        <Box 
+            component="li" 
+            sx={{ 
+                position: 'relative', 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: 'center', 
+                '& > img': { mr: 2, flexShrink: 0 } 
+            }} 
+            {...props}
+        >
+            {option.name}
+            <Typography 
+                variant="body2" 
+                sx={{ 
+                    position: 'absolute', 
+                    bottom: 0, 
+                    right: 0, 
+                    fontStyle: 'italic', 
+                    fontWeight: 'bold', 
+                    fontSize: '0.6rem' 
+                }}
+            >
+                ({option.floor} floor)
+            </Typography>
+        </Box>
+    )}
+    sx={{
+        '& .MuiAutocomplete-input': {
+            fontSize: '1.2rem', // Increase font size of input
+        },
+        '& .MuiAutocomplete-option': {
+            fontSize: '1.2rem', // Increase font size of dropdown options
+            padding: '10px 15px', // Add padding for elegance
+        },
+        '& .MuiOutlinedInput-root': {
+            borderRadius: '25px', // Rounded corners for elegance
+        },
+    }}
+/> */}
+    <SearchBox
+        data={shops}
+        value={currentLocation} // Pass the current selected shop
+        onChange={setCurrentLocation} // Handle when the shop changes
+        onShopSelected={(selectedShop) => {
+            console.log(selectedShop,"selected on dashboard");
+            setCurrentLocation(selectedShop); 
+        }}
+    />
+</Box>
+
 
           <Box mt={2}>
             <Button

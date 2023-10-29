@@ -31,7 +31,7 @@ const ThanksComponent = ({ route, stepsWalked, totalSteps }) => {
 
             if (response.ok) {
                 window.alert("Feedback received. Thank you!");
-                navigate('/markets');
+                window.location.href = "/markets";
             } else {
                 window.alert("Error submitting feedback. Please try again.");
             }}
@@ -79,7 +79,7 @@ const ThanksComponent = ({ route, stepsWalked, totalSteps }) => {
                             <Button 
                                 variant="contained" 
                                 color="primary" 
-                                onClick={() => navigate('/markets')}
+                                onClick={() =>  window.location.href = "/markets"}
                             >
                                 Explore Other Shops
                             </Button>
