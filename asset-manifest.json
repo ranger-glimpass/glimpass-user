@@ -1,8 +1,9 @@
 {
   "files": {
-    "main.css": "/glimpass-user/static/css/main.c32057fe.css",
-    "main.js": "/glimpass-user/static/js/main.ecfe743e.js",
+    "main.css": "/glimpass-user/static/css/main.ad2872a7.css",
+    "main.js": "/glimpass-user/static/js/main.174e108e.js",
     "static/js/787.252292ee.chunk.js": "/glimpass-user/static/js/787.252292ee.chunk.js",
+    "static/media/logoGif.gif": "/glimpass-user/static/media/logoGif.38c37036108896eb2d09.gif",
     "static/media/goingToShop.gif": "/glimpass-user/static/media/goingToShop.49aaae9adbf8166afb85.gif",
     "static/media/OutsideLift.png": "/glimpass-user/static/media/OutsideLift.2418fe09e04eab6fd62b.png",
     "static/media/facingToShop.gif": "/glimpass-user/static/media/facingToShop.9278de9f602f77bb1242.gif",
@@ -11,19 +12,19 @@
     "static/media/nearby.png": "/glimpass-user/static/media/nearby.4f822d567f30bdbb00e5.png",
     "static/media/rightTurn.jpg": "/glimpass-user/static/media/rightTurn.ecde39f0ee66e37f467b.jpg",
     "static/media/leftTurn.jpg": "/glimpass-user/static/media/leftTurn.d836f2d91ac0accbb001.jpg",
-    "static/media/glimpassLogo.png": "/glimpass-user/static/media/glimpassLogo.ee6a1179d4bfd8b8ac15.png",
+    "static/media/glimpassLogo.png": "/glimpass-user/static/media/glimpassLogo.9b4369c522f8b382f3fa.png",
     "static/media/reached.png": "/glimpass-user/static/media/reached.a068422f5cccd692947f.png",
     "static/media/atm.png": "/glimpass-user/static/media/atm.bb484bbf23d97fea81fc.png",
     "static/media/bathroom.png": "/glimpass-user/static/media/bathroom.c6390f24140f5d4de8f5.png",
     "index.html": "/glimpass-user/index.html",
     "static/media/pinPoint.svg": "/glimpass-user/static/media/pinPoint.61ee9d0deddd7573fda192a3733f5c7c.svg",
     "static/media/navigationArrow.svg": "/glimpass-user/static/media/navigationArrow.4d617a72ad56efa3a64706efcaf0106a.svg",
-    "main.c32057fe.css.map": "/glimpass-user/static/css/main.c32057fe.css.map",
-    "main.ecfe743e.js.map": "/glimpass-user/static/js/main.ecfe743e.js.map",
+    "main.ad2872a7.css.map": "/glimpass-user/static/css/main.ad2872a7.css.map",
+    "main.174e108e.js.map": "/glimpass-user/static/js/main.174e108e.js.map",
     "787.252292ee.chunk.js.map": "/glimpass-user/static/js/787.252292ee.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.c32057fe.css",
-    "static/js/main.ecfe743e.js"
+    "static/css/main.ad2872a7.css",
+    "static/js/main.174e108e.js"
   ]
 }
