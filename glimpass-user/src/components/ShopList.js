@@ -14,6 +14,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import SearchBox from './SearchBox'
+import LoadingSpinner from './LoadingSpinner'
 
 import {
   Card,
@@ -46,10 +47,12 @@ const ShopList = (props) => {
 
   const [openModal, setOpenModal] = useState(false);
 const [selectedShopDetails, setSelectedShopDetails] = useState(null);
-
+  const [frequencyMap, setFrequencyMap] = useState(null);
+  
   const location = useLocation();
-  const handleNavigateClick = async(shopId) => {
 
+
+  const handleNavigateClick = async(shopId) => {
     setActiveCard(shopId);
     const email = sessionStorage.getItem('email');
     const name = sessionStorage.getItem('name');
@@ -61,6 +64,7 @@ const [selectedShopDetails, setSelectedShopDetails] = useState(null);
     const data = await response.json();
     sessionStorage.setItem('_id', data[0].user._id);
     console.log(data,"register");
+    const endNodeName = null;
     setTimeout(() => {
       navigate("/dashboard", { state: { destinationShopId: shopId, market: location.state?.market } });
     }, 300); // Delay for the fade-out effect
@@ -80,9 +84,19 @@ const [selectedShopDetails, setSelectedShopDetails] = useState(null);
     const data = await response.json();
     const shopsArray = Object.values(data);
     setShops(shopsArray);
+    console.log(shops, "shops fetched!")
+    const shopFrequency = {};
+  shopsArray.forEach(shop => {
+    if (shopFrequency[shop.name]) {
+      shopFrequency[shop.name] += 1; // Increment if already exists
+    } else {
+      shopFrequency[shop.name] = 1; // Initialize with 1
+    }
+  });
+  setFrequencyMap(shopFrequency);
+  console.log(shopFrequency); // Here you have your hashmap with shop frequencies
     setIsLoading(false); // Set loading to false once data is fetched
   };
-
 
   const handle = (shopId) => {
     const selectedShop = shops.find(shop => shop.nodeId === shopId);
@@ -98,17 +112,21 @@ const [selectedShopDetails, setSelectedShopDetails] = useState(null);
   if (isLoading) {
     return (
       <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        height="100vh"
-      >
-        <CircularProgress style={{ transform: "rotate(-45deg)" }} />{" "}
-        {/* Compass needle effect */}
-        Shops near you!
-      </Box>
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      height="100vh"
+      flexDirection="column"
+    >
+      {/* Replace CircularProgress with your custom spinner */}
+      <div><LoadingSpinner /></div>
+      <h3>Hang On!</h3>
+      <h4>Getting shops in the market...</h4>
+    </Box>
     );
   }
+
+  
 
   const handleNavigateButtonClick = () => {
     if (selectedShop) {
@@ -118,6 +136,7 @@ const [selectedShopDetails, setSelectedShopDetails] = useState(null);
     }
   };
 
+  
 
   const filteredShops = selectedShop
     ? shops.filter((shop) => shop.nodeId === selectedShop.nodeId)
@@ -138,57 +157,7 @@ const [selectedShopDetails, setSelectedShopDetails] = useState(null);
             pl: 2,
         }}
     >
-         {/* <Autocomplete
-    fullWidth
-    options={shops}
-    getOptionLabel={(option) => option.name}
-    onChange={(event, newValue) => {
-      setSelectedShop(newValue);
-  }}
-  renderInput={(params) => (
-        <TextField {...params} label="Select a Shop" variant="outlined" />
-    )}
-    renderOption={(props, option) => (
-        <Box 
-            component="li" 
-            sx={{ 
-                position: 'relative', 
-                display: 'flex', 
-                justifyContent: 'space-between', 
-                alignItems: 'center', 
-                '& > img': { mr: 2, flexShrink: 0 } 
-            }} 
-            {...props}
-        >
-            {option.name}
-            <Typography 
-                variant="body2" 
-                sx={{ 
-                    position: 'absolute', 
-                    bottom: 0, 
-                    right: 0, 
-                    fontStyle: 'italic', 
-                    fontWeight: 'bold', 
-                    fontSize: '0.6rem' 
-                }}
-            >
-                ({option.floor} floor)
-            </Typography>
-        </Box>
-    )}
-    sx={{
-        '& .MuiAutocomplete-input': {
-            fontSize: '1.2rem', // Increase font size of input
-        },
-        '& .MuiAutocomplete-option': {
-            fontSize: '1.2rem', // Increase font size of dropdown options
-            padding: '10px 15px', // Add padding for elegance
-        },
-        '& .MuiOutlinedInput-root': {
-            borderRadius: '25px', // Rounded corners for elegance
-        },
-    }}
-/> */}
+
 <SearchBox
 data={shops}
 onShopSelected={(selectedShop) => {
@@ -359,7 +328,7 @@ data={shops}
             <IconButton
               onClick={() =>
                 navigate("/dashboard", {
-                  state: { destinationShopId: "nearestWashroom", market: location.state?.market },
+                  state: {endNodeName: null, destinationShopId: "nearestWashroom", market: location.state?.market },
                 })
               }
             >
@@ -458,7 +427,12 @@ data={shops}
               if(selectedShopDetails?.nearby){
                 destinationNodeId = selectedShopDetails?.nearby;
               }
-              navigate("/dashboard", { state: { destinationShopId: destinationNodeId, market: location.state?.market } });
+              const selectedShop = shops.find(shop => shop.nodeId === destinationNodeId);
+              let endNodeName = null;
+              if(frequencyMap[selectedShop.name] > 1){
+                endNodeName = selectedShop.name;
+              }
+              navigate("/dashboard", { state: {endNodeName: endNodeName, destinationShopId: destinationNodeId, market: location.state?.market } });
               setOpenModal(false);
             }} 
             color="primary"

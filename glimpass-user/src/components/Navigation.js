@@ -23,8 +23,12 @@ import { inertialFrame } from "./helper";
 import ThanksComponent from "../components/Thanks";
 import { useNavigate, useLocation } from "react-router-dom";
 import Path from "../components/Path";
-
+import LiftStairs from "../assets/LiftStairs.png";
+import OutsideLift from "../assets/OutsideLift.png";
+import CountdownButton from "./CountdownButton";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import LoadingSpinner from "./LoadingSpinner";
+
 window.currentStep = 0;
 window.modifyDy = 1;
 
@@ -48,6 +52,7 @@ const Navigation = () => {
   const currentLocation = location.state.currentLocation;
   const calibratedShopAngle = location.state?.calibratedShopAngle || 0;
   const destinationShopId = location.state.destinationShopId;
+  const endNodeName = location.state.endNodeName;
   const [conn, setConn] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshed, setIsRefreshed] = useState(true);
@@ -65,18 +70,18 @@ const Navigation = () => {
     console.log(index, "manish");
     setSelectedShopIndex(index);
   };
-  useEffect(() => {
-    // Check if the page was loaded via a refresh
-    if (
-      window.performance &&
-      window.performance.navigation.type ===
-        window.performance.navigation.TYPE_RELOAD
-    ) {
-      // Redirect to the shops page
-      console.log("refreshed!!!!!!!!!!!!!!!!");
-      window.location.href = "/markets";
-    }
-  }, []);
+  // useEffect(() => {
+  //   // Check if the page was loaded via a refresh
+  //   if (
+  //     window.performance &&
+  //     window.performance.navigation.type ===
+  //       window.performance.navigation.TYPE_RELOAD
+  //   ) {
+  //     // Redirect to the shops page
+  //     console.log("refreshed!!!!!!!!!!!!!!!!");
+  //     window.location.href = "/markets";
+  //   }
+  // }, []);
 
   useEffect(() => {
     // Ensure both currentLocation and destinationShopId are available
@@ -84,8 +89,9 @@ const Navigation = () => {
       const currDest = JSON.stringify({
         currentNode: currentLocation,
         destinationNode: destinationShopId,
+        endNodeName: endNodeName
       });
-      console.log(currDest);
+      console.log(currDest, "currDest");
       const fetchShortestPath = async () => {
         const requestOptions = {
           method: "POST",
@@ -686,6 +692,7 @@ const Navigation = () => {
       );
     return {
       name: item.shopOrCheckpoint.name,
+      nodeType: item.shopOrCheckpoint.nodeType,
       step: progressToThisPoint,
       anglesIn: anglesIn,
     };
@@ -1005,14 +1012,16 @@ const Navigation = () => {
   const [currentStep, setCurrentStep] = useState(1);
   return isLoading ? (
     <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100vh",
-      }}
-    >
-      <CircularProgress />
+    display="flex"
+    justifyContent="center"
+    alignItems="center"
+    height="100vh"
+    flexDirection="column"
+  >
+    {/* Replace CircularProgress with your custom spinner */}
+    <div><LoadingSpinner /></div>
+    <h3>Hang On!</h3>
+    <h4>Finding shortest path...</h4>
     </div>
   ) : showThanks ? (
     <ThanksComponent
@@ -1055,7 +1064,7 @@ const Navigation = () => {
             </Typography>
           </div>
           <br></br>
-          <div
+          {/* <div
             style={{ cursor: "pointer" }}
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           >
@@ -1082,11 +1091,11 @@ const Navigation = () => {
                   </ListItem>
                 ))}
               </List>
-            )} */}
-          </div>
-        </div>
+            )} 
+          </div>*/}
+        </div> 
 
-        <div style={{ marginTop: "20px" }}>
+        {/* <div style={{ marginTop: "20px" }}>
           <Button
             variant="contained"
             color="primary"
@@ -1098,7 +1107,7 @@ const Navigation = () => {
           >
             Add steps mannualy
           </Button>
-        </div>
+        </div> */}
 
         <CustomProgressBar
           shops={shopsData}
@@ -1115,7 +1124,7 @@ const Navigation = () => {
             changeSlectedIndexDynamic={changeSlectedIndexDynamic}
           />
         </div>
-        <div style={{ marginBottom: "10px", marginTop: "100px" }}>
+        <div style={{ marginBottom: "10px", marginTop: "30px" }}>
           <img
             src={navigationArrow}
             alt="Navigation Arrow"
@@ -1208,71 +1217,58 @@ const Navigation = () => {
           </Dialog>
         )}
 
-        {showFloorChangePopup && (
-          <Dialog
-            open={showFloorChangePopup}
-            onClose={() => {
-              setShowFloorChangePopup(false);
-              setCurrentStep(1); // Reset the step when closing the modal
-              window.modifyDy = 1;
-            }}
-            PaperProps={{
-              style: {
-                borderRadius: 15, // Rounded corners
+{showFloorChangePopup && (
+    <Dialog
+        open={showFloorChangePopup}
+        onClose={() => {
+            setShowFloorChangePopup(false);
+            setCurrentStep(1);
+            window.modifyDy = 1;
+        }}
+        PaperProps={{
+            style: {
+                borderRadius: 15,
                 padding: "20px",
-              },
-            }}
-          >
-            <DialogTitle>Floor Change Required</DialogTitle>
-            <DialogContent>
-              {currentStep === 1 ? (
+            },
+        }}
+    >
+        <DialogTitle>Floor Change Required</DialogTitle>
+        <DialogContent>
+            {currentStep === 1 ? (
                 <>
-                  <img
-                    src="path_to_your_gif_1.gif"
-                    alt="Lift GIF"
-                    style={{ width: "100%", marginBottom: "20px" }}
-                  />
-                  <DialogContentText>
-                    Step 1: Go to the lift/elevator.
-                  </DialogContentText>
+                    <img src={LiftStairs} alt="Lift GIF" style={{ width: "100%", marginBottom: "20px" }} />
+                    <DialogContentText style={{ fontSize: '18px', fontWeight: 'bold', lineHeight: '1.5' }}>
+                        Step 1: Go to the lift/elevator.
+                    </DialogContentText>
                 </>
-              ) : (
+            ) : (
                 <>
-                  <img
-                    src="path_to_your_gif_2.gif"
-                    alt="Floor GIF"
-                    style={{ width: "100%", marginBottom: "20px" }}
-                  />
-                  <DialogContentText>
-                    Step 2: Press continue when reached to floor {nextFloor}.
-                  </DialogContentText>
+                    <img src={OutsideLift} alt="Floor GIF" style={{ width: "100%", marginBottom: "20px" }} />
+                    <DialogContentText style={{ fontSize: '18px', fontWeight: 'bold', lineHeight: '1.5' }}>
+                        Step 2: Press continue when reached to floor {nextFloor}.
+                    </DialogContentText>
                 </>
-              )}
-            </DialogContent>
-            <DialogActions>
-              {currentStep === 1 ? (
-                <Button
-                  onClick={() => setCurrentStep(2)}
-                  color="primary"
-                  variant="contained"
-                >
-                  Next
-                </Button>
-              ) : (
-                <Button
-                  onClick={() => {
-                    setShowFloorChangePopup(false);
-                    setCurrentStep(1); // Reset the step after closing the modal
-                  }}
-                  color="primary"
-                  variant="contained"
-                >
-                  Continue
-                </Button>
-              )}
-            </DialogActions>
-          </Dialog>
-        )}
+            )}
+        </DialogContent>
+        <DialogActions>
+            {currentStep === 1 ? (
+                <CountdownButton
+                    handlePrevious={() => setCurrentStep(2)}
+                    buttonText="Next"
+                />
+            ) : (
+                <CountdownButton
+                    handlePrevious={() => {
+                        setShowFloorChangePopup(false);
+                        setCurrentStep(1);
+                    }}
+                    buttonText="Continue"
+                />
+            )}
+        </DialogActions>
+    </Dialog>
+)}
+
       </div>
     </>
   );

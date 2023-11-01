@@ -42,6 +42,14 @@ const NavigationButtons = ({
 
   const nodesToDisplay = route.slice(start, end + 1);
 
+  const checkpointOrStop=(node)=>{
+    if(node.shopOrCheckpoint?.nodeType === "checkpoint"){
+      return 'Just a Turn'
+    }
+    else{
+      return node.shopOrCheckpoint?.name;
+    }
+  }
   return (
     <div>
       {nodesToDisplay.map((node, index) => (
@@ -58,9 +66,9 @@ const NavigationButtons = ({
         >
           {node.shopOrCheckpoint.name ===
           currentRoute[0]?.shopOrCheckpoint?.name ? (
-            <>📍 {node.shopOrCheckpoint?.name}</>
+            <>📍 {checkpointOrStop(node)}</>
           ) : (
-            node.shopOrCheckpoint?.name
+            checkpointOrStop(node)
           )}
         </Button>
       ))}

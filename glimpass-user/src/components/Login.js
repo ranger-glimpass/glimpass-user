@@ -1,12 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { Button, TextField, Typography, Container, Box, Paper } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-
+import glimpassLogo from "../assets/glimpassLogo.png"
+import logoGif from "../assets/logoGif.gif"
 const Login = () => {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [isEmailSubmitted, setIsEmailSubmitted] = useState(false);
   const navigate = useNavigate();
+
+  const [showGif, setShowGif] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowGif(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     // Check if session storage exists
@@ -62,9 +73,18 @@ const Login = () => {
     }
   };
   return (
+    <>
+    {showGif ? (
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+          <img src={logoGif} alt="Loading..." />
+        </div>
+      ) : (
     <Container component="main" maxWidth="xs">
       <Paper elevation={3} style={{ padding: '20px', borderRadius: '15px' }}>
         <Box display="flex" flexDirection="column" alignItems="center">
+
+        <img src={glimpassLogo} alt="Logo" style={{ maxWidth: '170px', height: 'auto', marginBottom: '20px' }} />
+         
           <Typography component="h1" variant="h5">
             Login
           </Typography>
@@ -112,6 +132,8 @@ const Login = () => {
         </Box>
       </Paper>
     </Container>
+    )}
+    </>
   );
 };
 

@@ -101,14 +101,15 @@ function App() {
         </Router>
 
         {deferredPrompt && (
-          <a
-            className="show-add-to-screen"
-            href=""
-            onClick={showAddToHomeScreen}
-          >
-            Add to Home Screen
-          </a>
-        )}
+  <div className="show-add-to-screen">
+    <span onClick={showAddToHomeScreen}>Install Glimpass!</span>
+    <span 
+      className="close-add-to-screen-icon"
+      onClick={() => setDeferredPrompt(null)}
+    >X</span>
+  </div>
+)}
+
         {/* {!deferredPrompt && (
   <div>
     <p>To add to Home Screen:</p>
