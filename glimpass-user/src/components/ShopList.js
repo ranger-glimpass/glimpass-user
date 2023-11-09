@@ -14,8 +14,9 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import SearchBox from './SearchBox'
-import LoadingSpinner from './LoadingSpinner'
-
+import LoadingSpinner from './LoadingSpinner';
+import searchIcon from "../assets/searchIcon.png"
+import ambienceShops from '../data/ambienceWithCategory.js';
 import {
   Card,
   CardContent,
@@ -31,11 +32,12 @@ import {
   Toolbar,
   Autocomplete,
   TextField,
+  Avatar,
+  Menu, MenuItem
 } from "@mui/material";
 import CategoryIcon from "@mui/icons-material/Category";
 import DiscountIcon from "@mui/icons-material/LocalOffer";
-import { Bathroom } from "@mui/icons-material";
-
+import { Bathroom, Margin, NoAccounts } from "@mui/icons-material";
 const ShopList = (props) => {
   const navigate = useNavigate();
   const [shops, setShops] = useState([]);
@@ -49,6 +51,10 @@ const ShopList = (props) => {
 const [selectedShopDetails, setSelectedShopDetails] = useState(null);
   const [frequencyMap, setFrequencyMap] = useState(null);
   
+
+  
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [showSearch, setShowSearch] = React.useState(false);
   const location = useLocation();
 
 
@@ -83,18 +89,30 @@ const [selectedShopDetails, setSelectedShopDetails] = useState(null);
         });
     const data = await response.json();
     const shopsArray = Object.values(data);
-    setShops(shopsArray);
+
+const amb = Object.values(ambienceShops);
+    console.log(amb, "ambeinceshop")
+    //setShops(shopsArray);
     console.log(shops, "shops fetched!")
     const shopFrequency = {};
-  shopsArray.forEach(shop => {
-    if (shopFrequency[shop.name]) {
-      shopFrequency[shop.name] += 1; // Increment if already exists
-    } else {
-      shopFrequency[shop.name] = 1; // Initialize with 1
-    }
-  });
-  setFrequencyMap(shopFrequency);
+    shopsArray.forEach(shop => {
+      if (shopFrequency[shop.name]) {
+        shopFrequency[shop.name][1] += 1; // Increment if already exists
+        shopFrequency[shop.name][2].push(shop.nodeId);
+      } else {
+        shopFrequency[shop.name] = [shop, 1,[shop.nodeId]]; // Initialize with [shop, 1]
+      }
+    });
+  setFrequencyMap(shopFrequency, "shopFrquency with shop object");
   console.log(shopFrequency); // Here you have your hashmap with shop frequencies
+
+  let newShopsArray = [];
+Object.values(shopFrequency).forEach(([shop, frequency]) => {
+    newShopsArray.push(shop);
+});
+console.log(newShopsArray,"newShopsArray");
+setShops(newShopsArray);
+
     setIsLoading(false); // Set loading to false once data is fetched
   };
 
@@ -126,7 +144,6 @@ const [selectedShopDetails, setSelectedShopDetails] = useState(null);
     );
   }
 
-  
 
   const handleNavigateButtonClick = () => {
     if (selectedShop) {
@@ -146,9 +163,28 @@ const [selectedShopDetails, setSelectedShopDetails] = useState(null);
     setIsExpanded((prev) => !prev);
   };
 
+
+  const handleMenu = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleLogout = () => {
+    sessionStorage.clear();
+    // Navigate to login page here.
+    navigate("/login");
+    handleClose();
+  };
+
+  const toggleSearch = () => {
+    setShowSearch(!showSearch);
+  };
   return (
     <Container>
-  <AppBar position="fixed" elevation={0} sx={{ height: 64 }}>
+  {/* <AppBar position="fixed" elevation={0} sx={{ height: 64 }}>
     <Toolbar
         sx={{
             justifyContent: "space-between", // Adjust this to space-between
@@ -180,7 +216,44 @@ onShopSelected={(selectedShop) => {
             Hello, {sessionStorage.getItem('name') || 'Guest'}!
         </Typography>
     </Toolbar>
-</AppBar>
+</AppBar> */}
+<AppBar position="fixed">
+        <Toolbar>
+          
+          <IconButton
+            edge="start"
+            color="inherit"
+            aria-label="menu"
+            // onClick={handleMenu}
+          >
+             <img src={logo} width='53px' height='60px'/>
+            {/* Replace with your logo if this isn't a menu */}
+          </IconButton>
+          <div style={{ flexGrow: 1 }}></div>
+          <IconButton color="inherit" onClick={toggleSearch}>
+            <img src={searchIcon} width='25px' height='25px' styles="margin-right: 2px"/> {/* Replace with your searchIcon if necessary */}
+          </IconButton>
+          <Typography onClick={handleMenu} style={{ cursor: 'pointer' }}>
+            Hello, {sessionStorage.getItem('name') || 'Guest'}! 🠻
+          </Typography>
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleClose}
+          >
+            <MenuItem onClick={handleLogout}>Logout</MenuItem>
+          </Menu>
+        </Toolbar>
+        {showSearch &&(
+          <SearchBox
+          data={shops}
+          onShopSelected={(selectedShop) => {
+            handle(selectedShop); // set the details for the selected shop
+            }}
+          />
+        )}
+      </AppBar>
+
 <div>
 <SearchBox
 data={shops}
@@ -271,47 +344,11 @@ data={shops}
                     </Typography>
                   </CardContent>
                 </CardActionArea>
-                {/* <Box sx={{ p: 0 }}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    fullWidth
-                    onClick={() => handleNavigateClick(shop.nodeId)}
-                  >
-                    Navigate
-                  </Button>
-                </Box> */}
               </Card>
             );
           })}
       </Box>
 
-      {/* <Button
-    variant="contained"
-    color="primary"
-    sx={{
-        position: 'fixed',
-        bottom: 16,
-        right: 16,
-    }}
-    onClick={() => navigate('/dashboard', { state: { destinationShopId: "nearestWashroom" } })}
->
-    Nearest Washroom
-</Button> */}
-      {/* <img 
-    src="https://iconape.com/wp-content/files/jl/339960/png/restroom-sign-logo.png"
-    alt="Nearest Washroom" 
-    style={{
-        width: '80px', // or whatever size you want
-        height: '80px',
-        borderRadius: '50%', // to ensure it's circular
-        position: 'fixed',
-        bottom: '16px',
-        right: '16px',
-        cursor: 'pointer'
-    }}
-    onClick={() => navigate('/dashboard', { state: { destinationShopId: "nearestWashroom" } })}
-/> */}
       <Box
         sx={{
           position: "fixed",
@@ -328,7 +365,7 @@ data={shops}
             <IconButton
               onClick={() =>
                 navigate("/dashboard", {
-                  state: {endNodeName: null, destinationShopId: "nearestWashroom", market: location.state?.market },
+                  state: {endNodesList: [], destinationShopId: "nearestWashroom", market: location.state?.market },
                 })
               }
             >
@@ -345,6 +382,7 @@ data={shops}
             <IconButton
               onClick={() => {
                 /* Handle navigation to main gate */
+                window.alert("No Gate mapped till now!\nWe will map it soon :) \nStay tuned!")
               }}
             >
               <img
@@ -360,6 +398,7 @@ data={shops}
             <IconButton
               onClick={() => {
                 /* Handle navigation to ATM */
+                window.alert("No nearby ATM mapped till now!\nWe will map it soon :) \nstay tuned!")
               }}
             >
               <img
@@ -428,11 +467,8 @@ data={shops}
                 destinationNodeId = selectedShopDetails?.nearby;
               }
               const selectedShop = shops.find(shop => shop.nodeId === destinationNodeId);
-              let endNodeName = null;
-              if(frequencyMap[selectedShop.name] > 1){
-                endNodeName = selectedShop.name;
-              }
-              navigate("/dashboard", { state: {endNodeName: endNodeName, destinationShopId: destinationNodeId, market: location.state?.market } });
+              const endNodesList = frequencyMap[selectedShop.name][2];
+              navigate("/dashboard", { state: {endNodesList: endNodesList, destinationShopId: destinationNodeId, market: location.state?.market } });
               setOpenModal(false);
             }} 
             color="primary"

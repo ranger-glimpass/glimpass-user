@@ -23,7 +23,7 @@ import LoadingSpinner from "./LoadingSpinner";
 import glimpassLogo from "../assets/glimpassLogo.png"
 
 const themeStyles = {
-  primary: '#5E4FDB', // Primary color
+  primary: '#1976d2', // Primary color
   secondary: '#8F8F8F', // Secondary color
   background: '#FFFFFF', // Background color
   textPrimary: '#000000', // Primary text color
@@ -32,7 +32,7 @@ const themeStyles = {
 const Dashboard = () => {
   const location = useLocation();
   const destinationShopId = location.state.destinationShopId;
-  const endNodeName = location.state.endNodeName;
+  const endNodesList = location.state.endNodesList;
   const [open, setOpen] = useState(false);
   const [shops, setShops] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -40,7 +40,7 @@ const Dashboard = () => {
   const [searchTerm, setSearchTerm] = useState(""); // <-- Add this state for search term
 
   const navigate = useNavigate();
-console.log(endNodeName)
+console.log(endNodesList, "endNodesList")
   const handleMotion = () => {};
   const handleOrientation = () => {};
 
@@ -147,7 +147,7 @@ console.log(endNodeName)
       state: {
         currentLocation: currentLocationId,
         destinationShopId: updatedDestinationShopId,
-        endNodeName: endNodeName,
+        endNodesList: endNodesList,
         calibratedShopAngle: currentLocation?.shop_angle || 0,
       },
     });

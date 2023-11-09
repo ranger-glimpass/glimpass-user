@@ -2,12 +2,9 @@
 import React from 'react';
 import "../styles/LoadingSpinner.css";
 const LoadingSpinner = () => (
-  <div className="loadingio-spinner-chunk-q2udb4u95cj">
-    <div className="ldio-mhuen7d07t">
-      <div><div><div></div><div></div><div></div><div></div></div></div>
-    </div>
-    
-  </div>
+  <div class="loadingio-spinner-chunk-n50nznzxwvi"><div class="ldio-s1x8ftelnh">
+<div><div><div></div><div></div><div></div><div></div></div></div>
+</div></div>
 );
 
 export default LoadingSpinner;

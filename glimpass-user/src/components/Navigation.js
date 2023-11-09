@@ -28,7 +28,7 @@ import OutsideLift from "../assets/OutsideLift.png";
 import CountdownButton from "./CountdownButton";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import LoadingSpinner from "./LoadingSpinner";
-
+import arrowTorch from "../assets/arrowTorch.png"
 window.currentStep = 0;
 window.modifyDy = 1;
 
@@ -52,7 +52,7 @@ const Navigation = () => {
   const currentLocation = location.state.currentLocation;
   const calibratedShopAngle = location.state?.calibratedShopAngle || 0;
   const destinationShopId = location.state.destinationShopId;
-  const endNodeName = location.state.endNodeName;
+  const endNodesList = location.state.endNodesList;
   const [conn, setConn] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshed, setIsRefreshed] = useState(true);
@@ -66,6 +66,7 @@ const Navigation = () => {
   const [stepsWalked, setStepsWalked] = useState(0);
   const [selectedShopIndex, setSelectedShopIndex] = useState(0);
 
+  const [showMap, setShowMap] = useState(false);
   const changeSlectedIndexDynamic = (index) => {
     console.log(index, "manish");
     setSelectedShopIndex(index);
@@ -89,7 +90,7 @@ const Navigation = () => {
       const currDest = JSON.stringify({
         currentNode: currentLocation,
         destinationNode: destinationShopId,
-        endNodeName: endNodeName
+        endNodesList: endNodesList
       });
       console.log(currDest, "currDest");
       const fetchShortestPath = async () => {
@@ -1010,18 +1011,28 @@ const Navigation = () => {
   // };
 
   const [currentStep, setCurrentStep] = useState(1);
+
+
+  // Function to toggle the map view
+  const toggleShowMap = () => {
+    setShowMap(!showMap);
+  };
+
+  // Button label based on the showMap state
+  const showMapButton = showMap ? "Hide Map" : "Show Map";
+
   return isLoading ? (
     <div
-    display="flex"
-    justifyContent="center"
-    alignItems="center"
-    height="100vh"
-    flexDirection="column"
-  >
-    {/* Replace CircularProgress with your custom spinner */}
-    <div><LoadingSpinner /></div>
-    <h3>Hang On!</h3>
-    <h4>Finding shortest path...</h4>
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      height="100vh"
+      flexDirection="column"
+    >
+      {/* Replace CircularProgress with your custom spinner */}
+      <div><LoadingSpinner /></div>
+      <h3>Hang On!</h3>
+      <h4>Finding shortest path...</h4>
     </div>
   ) : showThanks ? (
     <ThanksComponent
@@ -1093,7 +1104,7 @@ const Navigation = () => {
               </List>
             )} 
           </div>*/}
-        </div> 
+        </div>
 
         {/* <div style={{ marginTop: "20px" }}>
           <Button
@@ -1126,15 +1137,18 @@ const Navigation = () => {
         </div>
         <div style={{ marginBottom: "10px", marginTop: "30px" }}>
           <img
-            src={navigationArrow}
+            src={arrowTorch} //{navigationArrow}
             alt="Navigation Arrow"
             style={{
               transform: `rotate(${adjustedAng}deg)`,
-              width: "250px",
-              height: "250px",
+              width: "151px",
+              height: "193px",
+              margin: "10px"
             }}
           />
         </div>
+
+
 
         <div
           style={{
@@ -1145,35 +1159,43 @@ const Navigation = () => {
             borderTop: "1px solid #ddd",
           }}
         >
-          <div
-            style={{
-              flexGrow: 1,
-              border: "1px solid #ddd",
-              borderRadius: "10px",
-              overflow: "hidden",
-              marginBottom: "20px",
-            }}
-          >
-            <SvgIcon
-              viewBox="0 0 500 400"
-              style={{
-                width: "80%",
-                height: "100%",
-              }}
-            >
-              <Path
-                route={flattenedRoute}
-                ref={pathRef}
-                setViewBox={setViewBox}
-                stepsWalked={dy}
-                totalSteps={totalSteps}
-                adjustedAng={adjustedAng}
-                selectedShopCoords={selectedShopCoords}
-                nodeSelected={nodeSelected}
-                setNodeSelected={setNodeSelected}
-              />
-            </SvgIcon>
+          <button onClick={toggleShowMap}>{showMapButton}</button>
+          <div style={{ transition: 'opacity 2s ease', opacity: showMap ? 1 : 0, height: showMap ? 'auto' : 0, overflow: 'hidden' }}>
+
+
+            {showMap && (
+              <div
+                style={{
+                  flexGrow: 1,
+                  border: "1px solid #ddd",
+                  borderRadius: "10px",
+                  overflow: "hidden",
+                  marginBottom: "20px",
+                }}
+              >
+                <SvgIcon
+                  viewBox="0 0 500 400"
+                  style={{
+                    width: "80%",
+                    height: "100%",
+                  }}
+                >
+                  <Path
+                    route={flattenedRoute}
+                    ref={pathRef}
+                    setViewBox={setViewBox}
+                    stepsWalked={dy}
+                    totalSteps={totalSteps}
+                    adjustedAng={adjustedAng}
+                    selectedShopCoords={selectedShopCoords}
+                    nodeSelected={nodeSelected}
+                    setNodeSelected={setNodeSelected}
+                  />
+                </SvgIcon>
+              </div>
+            )}
           </div>
+
           {/* <Typography variant="body1" style={{ fontWeight: "bold", marginBottom: '10px' }}>
         Steps: {dy}
       </Typography>
@@ -1184,6 +1206,7 @@ const Navigation = () => {
             Navigate other shops
           </Button>
         </div>
+
 
         {/* ... your Dialog components */}
         {showReachedPopup && (
@@ -1217,57 +1240,57 @@ const Navigation = () => {
           </Dialog>
         )}
 
-{showFloorChangePopup && (
-    <Dialog
-        open={showFloorChangePopup}
-        onClose={() => {
-            setShowFloorChangePopup(false);
-            setCurrentStep(1);
-            window.modifyDy = 1;
-        }}
-        PaperProps={{
-            style: {
+        {showFloorChangePopup && (
+          <Dialog
+            open={showFloorChangePopup}
+            onClose={() => {
+              setShowFloorChangePopup(false);
+              setCurrentStep(1);
+              window.modifyDy = 1;
+            }}
+            PaperProps={{
+              style: {
                 borderRadius: 15,
                 padding: "20px",
-            },
-        }}
-    >
-        <DialogTitle>Floor Change Required</DialogTitle>
-        <DialogContent>
-            {currentStep === 1 ? (
+              },
+            }}
+          >
+            <DialogTitle>Floor Change Required</DialogTitle>
+            <DialogContent>
+              {currentStep === 1 ? (
                 <>
-                    <img src={LiftStairs} alt="Lift GIF" style={{ width: "100%", marginBottom: "20px" }} />
-                    <DialogContentText style={{ fontSize: '18px', fontWeight: 'bold', lineHeight: '1.5' }}>
-                        Step 1: Go to the lift/elevator.
-                    </DialogContentText>
+                  <img src={LiftStairs} alt="Lift GIF" style={{ width: "100%", marginBottom: "20px" }} />
+                  <DialogContentText style={{ fontSize: '18px', fontWeight: 'bold', lineHeight: '1.5' }}>
+                    Step 1: Go to the lift/elevator.
+                  </DialogContentText>
                 </>
-            ) : (
+              ) : (
                 <>
-                    <img src={OutsideLift} alt="Floor GIF" style={{ width: "100%", marginBottom: "20px" }} />
-                    <DialogContentText style={{ fontSize: '18px', fontWeight: 'bold', lineHeight: '1.5' }}>
-                        Step 2: Press continue when reached to floor {nextFloor}.
-                    </DialogContentText>
+                  <img src={OutsideLift} alt="Floor GIF" style={{ width: "100%", marginBottom: "20px" }} />
+                  <DialogContentText style={{ fontSize: '18px', fontWeight: 'bold', lineHeight: '1.5' }}>
+                    Step 2: Press continue when reached to floor {nextFloor}.
+                  </DialogContentText>
                 </>
-            )}
-        </DialogContent>
-        <DialogActions>
-            {currentStep === 1 ? (
+              )}
+            </DialogContent>
+            <DialogActions>
+              {currentStep === 1 ? (
                 <CountdownButton
-                    handlePrevious={() => setCurrentStep(2)}
-                    buttonText="Next"
+                  handlePrevious={() => setCurrentStep(2)}
+                  buttonText="Next"
                 />
-            ) : (
+              ) : (
                 <CountdownButton
-                    handlePrevious={() => {
-                        setShowFloorChangePopup(false);
-                        setCurrentStep(1);
-                    }}
-                    buttonText="Continue"
+                  handlePrevious={() => {
+                    setShowFloorChangePopup(false);
+                    setCurrentStep(1);
+                  }}
+                  buttonText="Continue"
                 />
-            )}
-        </DialogActions>
-    </Dialog>
-)}
+              )}
+            </DialogActions>
+          </Dialog>
+        )}
 
       </div>
     </>
