@@ -1086,7 +1086,7 @@ const Navigation = () => {
           </div>
         </div>
 
-        <div style={{ marginTop: "20px" }}>
+        {/* <div style={{ marginTop: "20px" }}>
           <Button
             variant="contained"
             color="primary"
@@ -1098,7 +1098,7 @@ const Navigation = () => {
           >
             Add steps mannualy
           </Button>
-        </div>
+        </div> */}
 
         <CustomProgressBar
           shops={shopsData}
