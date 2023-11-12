@@ -5,8 +5,9 @@ import glimpassLogo from "../assets/glimpassLogo.png"
 const malls = [
   { id: 1, name: 'Ambience Mall, Gurugram', imageUrl: 'https://imgstaticcontent.lbb.in/lbbnew/wp-content/uploads/sites/1/2016/05/Exterior_of_Ambi_Mall.jpg?w=1200&h=628&fill=blur&fit=fill' },
   { id: 2, name: 'New friends colony', imageUrl: 'https://i.ytimg.com/vi/VV-r81_uVs0/maxresdefault.jpg' },
-  { id: 3, name: 'Airia Mall, Gurugram', imageUrl: "https://scontent.flko7-3.fna.fbcdn.net/v/t39.30808-6/325931988_5881934491853200_7104857377601345440_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=5f2048&_nc_ohc=FHrk7Is0mn0AX9xZsoR&_nc_ht=scontent.flko7-3.fna&oh=00_AfCY7BCFPWHAEhFHRDPSiIdI5V4EOeB3HT5lhsZFjmyjhw&oe=654CA49B"}
- 
+  { id: 3, name: 'Airia Mall, Gurugram', imageUrl: "https://scontent.flko7-3.fna.fbcdn.net/v/t39.30808-6/325931988_5881934491853200_7104857377601345440_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=5f2048&_nc_ohc=FHrk7Is0mn0AX9xZsoR&_nc_ht=scontent.flko7-3.fna&oh=00_AfCY7BCFPWHAEhFHRDPSiIdI5V4EOeB3HT5lhsZFjmyjhw&oe=654CA49B"},
+  // { id: 4, name: 'manish', imageUrl: "https://scontent.flko7-3.fna.fbcdn.net/v/t39.30808-6/325931988_5881934491853200_7104857377601345440_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=5f2048&_nc_ohc=FHrk7Is0mn0AX9xZsoR&_nc_ht=scontent.flko7-3.fna&oh=00_AfCY7BCFPWHAEhFHRDPSiIdI5V4EOeB3HT5lhsZFjmyjhw&oe=654CA49B"}
+  
    // ... other malls
 ];
 

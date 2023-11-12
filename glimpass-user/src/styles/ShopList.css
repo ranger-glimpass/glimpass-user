@@ -3,12 +3,19 @@
     height: auto;
 } 
 
+    /* .css-11b3ww9-MuiPaper-root-MuiAppBar-root {
+        background-color: #fff !important;
+        color: rgba(0, 0, 0, 0.87) !important;
+        
+    } */
+
 
 body {
     font-family: 'Arial', sans-serif;
     background-color: #f1faee; /* Mint Cream */
     margin: 0;
     padding: 0;
+
 }
 
 button {
@@ -259,7 +266,6 @@ button:hover {
         transform: rotate(360deg);
     }
 }
-
 
 
 

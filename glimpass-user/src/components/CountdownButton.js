@@ -30,7 +30,7 @@ const CountdownButton = ({ handlePrevious, buttonText }) => {
         color="primary"
         onClick={count > 0 ? null : handlePrevious}
       >
-        {count === 0 ? `${buttonText}` : `Read Carefully: ${count}`}
+        {count === 0 ? `${buttonText}` : `${buttonText}: ${count}`}
       </Button>
     </div>
   );

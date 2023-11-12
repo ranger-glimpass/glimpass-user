@@ -106,7 +106,7 @@ function App() {
     <span 
       className="close-add-to-screen-icon"
       onClick={() => setDeferredPrompt(null)}
-    >X</span>
+    >x</span>
   </div>
 )}
 

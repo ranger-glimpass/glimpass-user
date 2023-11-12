@@ -1,56 +1,65 @@
-/* For the searchbox container and input */
+/* For the search box container */
 .navbar-searchbox-container {
-  width: 100%; /* If you want it to occupy the entire width of the parent */
   position: relative;
+  width: 100%;
 }
 
+/* For the search input */
 .navbar-searchbox-input {
-  padding: 10px 15px;
-  font-size: 1.2rem;
-  border: 1px solid #ccc;
-  border-radius: 25px;
   width: 100%;
+  padding: 10px 15px;
+  font-size: 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 4px; /* Subtle curve */
   box-sizing: border-box;
   background: #fff;
+  color: #333;
 }
 
-/* For the dropdown list and individual list items */
+/* Placeholder style */
+.navbar-searchbox-input::placeholder {
+  color: #aaa;
+}
+
+/* For the dropdown list */
 .navbar-searchbox-dropdown {
-  border: 1px solid #ddd;
-  max-height: 150px;
-  overflow-y: auto;
-  width: 100%; 
+  padding-left: 0; /* Resets any default padding */
+  list-style-type: none; /* Removes bullet points */
   position: absolute;
+  width: 100%;
   top: 100%;
   left: 0;
-  margin: 5px 0 0;
-  padding: 0;
-  background: grey;
-  list-style-type: none;
+  margin-top: 8px;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px; /* Matching the input's border-radius */
+  max-height: 200px;
+  overflow-y: auto;
   z-index: 10;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+/* For individual list items */
 .navbar-searchbox-dropdown li {
-  position: relative;
+  margin: 0; /* Resets any default margin */
   padding: 10px 15px;
-  font-size: 1.2rem;
+  font-size: 1rem;
   cursor: pointer;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  color: #333;
 }
 
+/* Hover and active state for list items */
 .navbar-searchbox-dropdown li:hover,
 .navbar-searchbox-dropdown li.active {
-  background-color: #a9d5ff;
+  background-color: #f5f5f5;
 }
 
-/* For the floor label inside the dropdown list items */
+/* Style for the floor label */
 .navbar-searchbox-dropdown .align-right {
   font-style: italic;
   font-weight: bold;
-  font-size: 0.6rem;
-  position: absolute;
-  bottom: 0;
-  right: 0;
+  font-size: 0.75rem;
+  margin-left: auto; /* Aligns to the right within flex container */
 }

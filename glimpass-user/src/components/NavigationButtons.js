@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { Button } from "@mui/material";
+// import "../styles/NavigationButtons.css";
 
 const NavigationButtons = ({
   route,
@@ -11,8 +12,8 @@ const NavigationButtons = ({
     (item) =>
       item.shopOrCheckpoint.name === currentRoute[0]?.shopOrCheckpoint?.name
   );
-  console.log(route, "manish");
-  console.log(currentRoute, "manish");
+  console.log(route, "Route");
+  console.log(currentRoute, "Current - Route");
   // Determine the start and end indices for the buttons
   let start = currentIndex;
   let end = currentIndex;
@@ -51,7 +52,7 @@ const NavigationButtons = ({
     }
   }
   return (
-    <div>
+    <div className="horizontal-scroll">
       {nodesToDisplay.map((node, index) => (
         <Button
           key={index}
@@ -63,6 +64,7 @@ const NavigationButtons = ({
               : "inherit"
           }
           onClick={() => handleDropdownChange(node.shopOrCheckpoint?.name)}
+          className="button-fixed-width" // Ensure buttons have the same width
         >
           {node.shopOrCheckpoint.name ===
           currentRoute[0]?.shopOrCheckpoint?.name ? (

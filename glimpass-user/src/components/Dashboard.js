@@ -40,9 +40,9 @@ const Dashboard = () => {
   const [searchTerm, setSearchTerm] = useState(""); // <-- Add this state for search term
 
   const navigate = useNavigate();
-console.log(endNodesList, "endNodesList")
-  const handleMotion = () => {};
-  const handleOrientation = () => {};
+  console.log(endNodesList, "endNodesList")
+  const handleMotion = () => { };
+  const handleOrientation = () => { };
 
   const [currentSlide, setCurrentSlide] = useState(0);
 
@@ -77,8 +77,8 @@ console.log(endNodesList, "endNodesList")
       const shopsArray = Object.values(data);
       let withoutMultientryShops = [];
       shopsArray.forEach(newShop);
-      function newShop(i){
-        if(i?.entryType!=="multientry"){
+      function newShop(i) {
+        if (i?.entryType !== "multientry") {
           withoutMultientryShops.push(i);
         }
       }
@@ -140,9 +140,9 @@ console.log(endNodesList, "endNodesList")
     }
 
     const currentLocationId = currentLocation?.nodeId;
-              if(currentLocation?.nearby){
-                currentLocationId = currentLocation?.nearby;
-              }
+    if (currentLocation?.nearby) {
+      currentLocationId = currentLocation?.nearby;
+    }
     navigate("/navigation", {
       state: {
         currentLocation: currentLocationId,
@@ -156,17 +156,17 @@ console.log(endNodesList, "endNodesList")
   if (isLoading) {
     return (
       <Box
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      height="100vh"
-      flexDirection="column"
-    >
-      {/* Replace CircularProgress with your custom spinner */}
-      <div><LoadingSpinner /></div>
-      <h3>Hang On!</h3>
-      <h4>Finding your location...</h4>
-    </Box>
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="100vh"
+        flexDirection="column"
+      >
+        {/* Replace CircularProgress with your custom spinner */}
+        <div><LoadingSpinner /></div>
+        <h3>Hang On!</h3>
+        <h4>Finding your location...</h4>
+      </Box>
     );
   }
 
@@ -174,89 +174,95 @@ console.log(endNodesList, "endNodesList")
     shop.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const checkFill =() =>{
+    if(currentLocation){
+      setOpen(true);
+    }
+  }
+
   return (
     <>
-       <Container style={{ padding: '20px', maxWidth: '600px', margin: 'auto' }}>
+      <Container style={{ padding: '20px', maxWidth: '600px', margin: 'auto' }}>
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '30px' }}>
           <img src={glimpassLogo} alt="Logo" style={{ maxWidth: '150px', height: 'auto' }} />
         </div>
-        
+
         <Box mt={4} display="flex" flexDirection="column" alignItems="center">
           <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', color: themeStyles.primary, textAlign: 'center' }}>
             Welcome, {sessionStorage.getItem("name")}
           </Typography>
 
           <Typography variant="subtitle1" sx={{ color: themeStyles.textSecondary, my: 2, textAlign: 'center' }}>
-            Let's find your location.
+            Where are you?
           </Typography>
 
           <SearchBox data={shops} value={currentLocation} onChange={setCurrentLocation} onShopSelected={setCurrentLocation} sx={{ width: '100%', mt: 2 }} />
 
-          <Button variant="contained" sx={{ mt: 2, bgcolor: themeStyles.primary, '&:hover': { bgcolor: themeStyles.primary }, borderRadius: 20, px: 3, py: 1 }} onClick={() => setOpen(true)}>
+          <Button variant="contained" sx={{ mt: 2, bgcolor: themeStyles.primary, '&:hover': { bgcolor: themeStyles.primary }, borderRadius: 20, px: 3, py: 1 }} onClick={() => checkFill()}>
             Confirm Location
           </Button>
-        
+
 
           <Modal open={open} onClose={() => setOpen(false)}>
-    <Box
-        sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: "95%",
-            bgcolor: "background.paper",
-            border: "2px solid #000",
-            boxShadow: 24,
-            p: 4,
-        }}
-    >
-        <Typography variant="h6" id="modal-title">
-            Calibration Required
-        </Typography>
-        <Carousel
-            showThumbs={false}
-            showStatus={false}
-            showIndicators={false}
-            selectedItem={currentSlide}
-            showArrows={false}
-        >
-            <div>
-                <img src={goingToShop} alt="Step 1" />
-                <Typography 
-                    variant="body2" 
-                    id="modal-description" 
-                    gutterBottom 
+            <Box
+              sx={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                width: "95%",
+                bgcolor: "background.paper",
+                border: "2px solid #000",
+                boxShadow: 24,
+                p: 4,
+              }}
+            >
+              <Typography variant="h6" id="modal-title">
+                Calibration Required
+              </Typography>
+              <Carousel
+                showThumbs={false}
+                showStatus={false}
+                showIndicators={false}
+                selectedItem={currentSlide}
+                showArrows={false}
+              >
+                <div>
+                  <img src={goingToShop} alt="Step 1" />
+                  <Typography
+                    variant="body2"
+                    id="modal-description"
+                    gutterBottom
                     style={{ fontSize: '18px', fontWeight: 'bold', lineHeight: '1.5' }}
-                >
+                  >
                     <b>Step 1:</b> Go to the {currentLocation?.name}.
-                </Typography>
-            </div>
-            <div>
-                <img src={facingToShop} alt="Step 2" />
-                <Typography 
-                    variant="body2" 
-                    id="modal-description" 
-                    gutterBottom 
+                  </Typography>
+                </div>
+                <div>
+                  <img src={facingToShop} alt="Step 2" />
+                  <Typography
+                    variant="body2"
+                    id="modal-description"
+                    gutterBottom
                     style={{ fontSize: '18px', fontWeight: 'bold', lineHeight: '1.5' }}
-                >
+                  >
                     <b>Step 2:</b> Face towards the shop: {currentLocation?.name}.
-                </Typography>
-            </div>
-        </Carousel>
-        <Box display="flex" justifyContent="space-between" mt={2}>
-            {currentSlide === 1 && (
-                <Button variant="text" onClick={handlePrevious}>
+                  </Typography>
+                </div>
+              </Carousel>
+              <Box display="flex" justifyContent="space-between" mt={2}>
+                {currentSlide === 1 && (
+                  <Button variant="text" onClick={handlePrevious}>
                     &lt; Previous
-                </Button>
-            )}
-            <CountdownButton
-                handlePrevious={handleNext}
-                buttonText={currentSlide === 0 ? "Next" : "Calibrate"}
-            />
-        </Box>
-    </Box>
-</Modal>
+                  </Button>
+                )}
+                <CountdownButton
+                  handlePrevious={handleNext}
+                  buttonText={currentSlide === 0 ? "Next" : "Calibrate"}
+                />
+              </Box>
+            </Box>
+          </Modal>
 
         </Box>
       </Container>

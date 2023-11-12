@@ -66,7 +66,7 @@ const Navigation = () => {
   const [stepsWalked, setStepsWalked] = useState(0);
   const [selectedShopIndex, setSelectedShopIndex] = useState(0);
 
-  const [showMap, setShowMap] = useState(false);
+  const [showMap, setShowMap] = useState(true);
   const changeSlectedIndexDynamic = (index) => {
     console.log(index, "manish");
     setSelectedShopIndex(index);
@@ -1141,8 +1141,8 @@ const Navigation = () => {
             alt="Navigation Arrow"
             style={{
               transform: `rotate(${adjustedAng}deg)`,
-              width: "151px",
-              height: "193px",
+              width: "244px",
+              height: "278px",
               margin: "10px"
             }}
           />

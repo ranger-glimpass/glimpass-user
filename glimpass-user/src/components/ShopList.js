@@ -38,6 +38,9 @@ import {
 import CategoryIcon from "@mui/icons-material/Category";
 import DiscountIcon from "@mui/icons-material/LocalOffer";
 import { Bathroom, Margin, NoAccounts } from "@mui/icons-material";
+import defaultDP from '../assets/defaultDP.png';
+
+
 const ShopList = (props) => {
   const navigate = useNavigate();
   const [shops, setShops] = useState([]);
@@ -217,7 +220,7 @@ onShopSelected={(selectedShop) => {
         </Typography>
     </Toolbar>
 </AppBar> */}
-<AppBar position="fixed">
+<AppBar position="fixed"  style={{ background: 'white' }}>
         <Toolbar>
           
           <IconButton
@@ -230,38 +233,60 @@ onShopSelected={(selectedShop) => {
             {/* Replace with your logo if this isn't a menu */}
           </IconButton>
           <div style={{ flexGrow: 1 }}></div>
-          <IconButton color="inherit" onClick={toggleSearch}>
-            <img src={searchIcon} width='25px' height='25px' styles="margin-right: 2px"/> {/* Replace with your searchIcon if necessary */}
-          </IconButton>
-          <Typography onClick={handleMenu} style={{ cursor: 'pointer' }}>
-            Hello, {sessionStorage.getItem('name') || 'Guest'}! 🠻
-          </Typography>
-          <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={handleClose}
-          >
-            <MenuItem onClick={handleLogout}>Logout</MenuItem>
-          </Menu>
+          {/* <IconButton color="inherit" onClick={toggleSearch}>
+            <img src={searchIcon} width='25px' height='25px' styles="margin-right: 2px"/> Replace with your searchIcon if necessary
+          </IconButton> */}
+           <SearchBox
+          data={shops}
+          onShopSelected={(selectedShop) => {
+            handle(selectedShop); // set the details for the selected shop
+            }}
+          />
+          <IconButton
+  edge="end"
+  color="inherit"
+  aria-label="account of current user"
+  aria-controls="menu-appbar"
+  aria-haspopup="true"
+  onClick={handleMenu}
+>
+  <Avatar alt="Profile Picture" src={defaultDP} />
+</IconButton>
+<Menu
+  id="menu-appbar"
+  anchorEl={anchorEl}
+  anchorOrigin={{
+    vertical: 'top',
+    horizontal: 'right',
+  }}
+  keepMounted
+  transformOrigin={{
+    vertical: 'top',
+    horizontal: 'right',
+  }}
+  open={Boolean(anchorEl)}
+  onClose={handleClose}
+>
+  <MenuItem>Hello, {sessionStorage.getItem('name') || 'Guest'}</MenuItem>
+  <MenuItem onClick={handleLogout}>Logout</MenuItem>
+</Menu>
         </Toolbar>
-        {showSearch &&(
+        {/* {showSearch &&(
           <SearchBox
           data={shops}
           onShopSelected={(selectedShop) => {
             handle(selectedShop); // set the details for the selected shop
             }}
           />
-        )}
+        )} */}
       </AppBar>
-
-<div>
+{/* <div>
 <SearchBox
 data={shops}
 />
-  
-</div>
+</div> */}
 
-      <br></br>
+      <br></br><br></br><br></br>
       <Box
         sx={{ opacity: `${isExpanded ? "0.2" : "1"}` }}
         mt={4}
