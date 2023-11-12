@@ -7,10 +7,10 @@ function SearchBox({ data, value, onChange, onShopSelected }) {
     const [showDropdown, setShowDropdown] = useState(false);
 
     const ref = useRef(null);
-
     // Sample data for suggestions
 
-    const filteredData = data.filter((item) =>
+    const filteredData = data.filter(item =>
+        item.nodeType === "shop" && 
         item.name.toLowerCase().includes(query.toLowerCase())
     );
 

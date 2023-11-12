@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Typography, Paper, TextareaAutosize, Container, Box, Divider } from '@mui/material';
-
+import glimpassLogo from "../assets/glimpassLogo.png"
 const ThanksComponent = ({ route, stepsWalked, totalSteps }) => {
     const navigate = useNavigate();
     const [feedback, setFeedback] = useState(''); // State to hold feedback
@@ -43,6 +43,8 @@ const ThanksComponent = ({ route, stepsWalked, totalSteps }) => {
     return (
         <Container maxWidth="sm">
             <Paper elevation={3} style={{ padding: '24px', borderRadius: '15px' }}>
+            <img src={glimpassLogo} alt="Logo" style={{ maxWidth: '170px', height: 'auto', marginBottom: '20px' }} />
+       
                 <Typography variant="h5" align="center" gutterBottom>
                     Thank You!
                 </Typography>

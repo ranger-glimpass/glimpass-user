@@ -23,8 +23,12 @@ import { inertialFrame } from "./helper";
 import ThanksComponent from "../components/Thanks";
 import { useNavigate, useLocation } from "react-router-dom";
 import Path from "../components/Path";
-
+import LiftStairs from "../assets/LiftStairs.png";
+import OutsideLift from "../assets/OutsideLift.png";
+import CountdownButton from "./CountdownButton";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import LoadingSpinner from "./LoadingSpinner";
+import arrowTorch from "../assets/arrowTorch.png"
 window.currentStep = 0;
 window.modifyDy = 1;
 
@@ -48,6 +52,7 @@ const Navigation = () => {
   const currentLocation = location.state.currentLocation;
   const calibratedShopAngle = location.state?.calibratedShopAngle || 0;
   const destinationShopId = location.state.destinationShopId;
+  const endNodesList = location.state.endNodesList;
   const [conn, setConn] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshed, setIsRefreshed] = useState(true);
@@ -61,22 +66,23 @@ const Navigation = () => {
   const [stepsWalked, setStepsWalked] = useState(0);
   const [selectedShopIndex, setSelectedShopIndex] = useState(0);
 
+  const [showMap, setShowMap] = useState(true);
   const changeSlectedIndexDynamic = (index) => {
     console.log(index, "manish");
     setSelectedShopIndex(index);
   };
-  useEffect(() => {
-    // Check if the page was loaded via a refresh
-    if (
-      window.performance &&
-      window.performance.navigation.type ===
-        window.performance.navigation.TYPE_RELOAD
-    ) {
-      // Redirect to the shops page
-      console.log("refreshed!!!!!!!!!!!!!!!!");
-      window.location.href = "/markets";
-    }
-  }, []);
+  // useEffect(() => {
+  //   // Check if the page was loaded via a refresh
+  //   if (
+  //     window.performance &&
+  //     window.performance.navigation.type ===
+  //       window.performance.navigation.TYPE_RELOAD
+  //   ) {
+  //     // Redirect to the shops page
+  //     console.log("refreshed!!!!!!!!!!!!!!!!");
+  //     window.location.href = "/markets";
+  //   }
+  // }, []);
 
   useEffect(() => {
     // Ensure both currentLocation and destinationShopId are available
@@ -84,8 +90,9 @@ const Navigation = () => {
       const currDest = JSON.stringify({
         currentNode: currentLocation,
         destinationNode: destinationShopId,
+        endNodesList: endNodesList
       });
-      console.log(currDest);
+      console.log(currDest, "currDest");
       const fetchShortestPath = async () => {
         const requestOptions = {
           method: "POST",
@@ -686,6 +693,7 @@ const Navigation = () => {
       );
     return {
       name: item.shopOrCheckpoint.name,
+      nodeType: item.shopOrCheckpoint.nodeType,
       step: progressToThisPoint,
       anglesIn: anglesIn,
     };
@@ -1003,16 +1011,28 @@ const Navigation = () => {
   // };
 
   const [currentStep, setCurrentStep] = useState(1);
+
+
+  // Function to toggle the map view
+  const toggleShowMap = () => {
+    setShowMap(!showMap);
+  };
+
+  // Button label based on the showMap state
+  const showMapButton = showMap ? "Hide Map" : "Show Map";
+
   return isLoading ? (
     <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100vh",
-      }}
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      height="100vh"
+      flexDirection="column"
     >
-      <CircularProgress />
+      {/* Replace CircularProgress with your custom spinner */}
+      <div><LoadingSpinner /></div>
+      <h3>Hang On!</h3>
+      <h4>Finding shortest path...</h4>
     </div>
   ) : showThanks ? (
     <ThanksComponent
@@ -1055,7 +1075,7 @@ const Navigation = () => {
             </Typography>
           </div>
           <br></br>
-          <div
+          {/* <div
             style={{ cursor: "pointer" }}
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           >
@@ -1082,8 +1102,8 @@ const Navigation = () => {
                   </ListItem>
                 ))}
               </List>
-            )} */}
-          </div>
+            )} 
+          </div>*/}
         </div>
 
         {/* <div style={{ marginTop: "20px" }}>
@@ -1115,17 +1135,20 @@ const Navigation = () => {
             changeSlectedIndexDynamic={changeSlectedIndexDynamic}
           />
         </div>
-        <div style={{ marginBottom: "10px", marginTop: "100px" }}>
+        <div style={{ marginBottom: "10px", marginTop: "30px" }}>
           <img
-            src={navigationArrow}
+            src={arrowTorch} //{navigationArrow}
             alt="Navigation Arrow"
             style={{
               transform: `rotate(${adjustedAng}deg)`,
-              width: "250px",
-              height: "250px",
+              width: "244px",
+              height: "278px",
+              margin: "10px"
             }}
           />
         </div>
+
+
 
         <div
           style={{
@@ -1136,35 +1159,43 @@ const Navigation = () => {
             borderTop: "1px solid #ddd",
           }}
         >
-          <div
-            style={{
-              flexGrow: 1,
-              border: "1px solid #ddd",
-              borderRadius: "10px",
-              overflow: "hidden",
-              marginBottom: "20px",
-            }}
-          >
-            <SvgIcon
-              viewBox="0 0 500 400"
-              style={{
-                width: "80%",
-                height: "100%",
-              }}
-            >
-              <Path
-                route={flattenedRoute}
-                ref={pathRef}
-                setViewBox={setViewBox}
-                stepsWalked={dy}
-                totalSteps={totalSteps}
-                adjustedAng={adjustedAng}
-                selectedShopCoords={selectedShopCoords}
-                nodeSelected={nodeSelected}
-                setNodeSelected={setNodeSelected}
-              />
-            </SvgIcon>
+          <button onClick={toggleShowMap}>{showMapButton}</button>
+          <div style={{ transition: 'opacity 2s ease', opacity: showMap ? 1 : 0, height: showMap ? 'auto' : 0, overflow: 'hidden' }}>
+
+
+            {showMap && (
+              <div
+                style={{
+                  flexGrow: 1,
+                  border: "1px solid #ddd",
+                  borderRadius: "10px",
+                  overflow: "hidden",
+                  marginBottom: "20px",
+                }}
+              >
+                <SvgIcon
+                  viewBox="0 0 500 400"
+                  style={{
+                    width: "80%",
+                    height: "100%",
+                  }}
+                >
+                  <Path
+                    route={flattenedRoute}
+                    ref={pathRef}
+                    setViewBox={setViewBox}
+                    stepsWalked={dy}
+                    totalSteps={totalSteps}
+                    adjustedAng={adjustedAng}
+                    selectedShopCoords={selectedShopCoords}
+                    nodeSelected={nodeSelected}
+                    setNodeSelected={setNodeSelected}
+                  />
+                </SvgIcon>
+              </div>
+            )}
           </div>
+
           {/* <Typography variant="body1" style={{ fontWeight: "bold", marginBottom: '10px' }}>
         Steps: {dy}
       </Typography>
@@ -1175,6 +1206,7 @@ const Navigation = () => {
             Navigate other shops
           </Button>
         </div>
+
 
         {/* ... your Dialog components */}
         {showReachedPopup && (
@@ -1213,12 +1245,12 @@ const Navigation = () => {
             open={showFloorChangePopup}
             onClose={() => {
               setShowFloorChangePopup(false);
-              setCurrentStep(1); // Reset the step when closing the modal
+              setCurrentStep(1);
               window.modifyDy = 1;
             }}
             PaperProps={{
               style: {
-                borderRadius: 15, // Rounded corners
+                borderRadius: 15,
                 padding: "20px",
               },
             }}
@@ -1227,23 +1259,15 @@ const Navigation = () => {
             <DialogContent>
               {currentStep === 1 ? (
                 <>
-                  <img
-                    src="path_to_your_gif_1.gif"
-                    alt="Lift GIF"
-                    style={{ width: "100%", marginBottom: "20px" }}
-                  />
-                  <DialogContentText>
+                  <img src={LiftStairs} alt="Lift GIF" style={{ width: "100%", marginBottom: "20px" }} />
+                  <DialogContentText style={{ fontSize: '18px', fontWeight: 'bold', lineHeight: '1.5' }}>
                     Step 1: Go to the lift/elevator.
                   </DialogContentText>
                 </>
               ) : (
                 <>
-                  <img
-                    src="path_to_your_gif_2.gif"
-                    alt="Floor GIF"
-                    style={{ width: "100%", marginBottom: "20px" }}
-                  />
-                  <DialogContentText>
+                  <img src={OutsideLift} alt="Floor GIF" style={{ width: "100%", marginBottom: "20px" }} />
+                  <DialogContentText style={{ fontSize: '18px', fontWeight: 'bold', lineHeight: '1.5' }}>
                     Step 2: Press continue when reached to floor {nextFloor}.
                   </DialogContentText>
                 </>
@@ -1251,28 +1275,23 @@ const Navigation = () => {
             </DialogContent>
             <DialogActions>
               {currentStep === 1 ? (
-                <Button
-                  onClick={() => setCurrentStep(2)}
-                  color="primary"
-                  variant="contained"
-                >
-                  Next
-                </Button>
+                <CountdownButton
+                  handlePrevious={() => setCurrentStep(2)}
+                  buttonText="Next"
+                />
               ) : (
-                <Button
-                  onClick={() => {
+                <CountdownButton
+                  handlePrevious={() => {
                     setShowFloorChangePopup(false);
-                    setCurrentStep(1); // Reset the step after closing the modal
+                    setCurrentStep(1);
                   }}
-                  color="primary"
-                  variant="contained"
-                >
-                  Continue
-                </Button>
+                  buttonText="Continue"
+                />
               )}
             </DialogActions>
           </Dialog>
         )}
+
       </div>
     </>
   );

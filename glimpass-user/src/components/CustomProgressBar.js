@@ -6,6 +6,7 @@ import directionImage from "../assets/atm.png";
 import leftImage from "../assets/leftTurn.jpg"; // Replace with your image's path and extension
 import rightImage from "../assets/rightTurn.jpg";
 import straightImage from "../assets/keepStaright.png";
+import reached from "../assets/reached.png";
 
 const useStyles = makeStyles({
   root: {
@@ -185,7 +186,7 @@ const CustomProgressBar = ({
       case "Keep Straight":
         return straightImage;
       default:
-        return null; // Default case if no direction matches
+        return reached; // Default case if no direction matches
     }
   };
 
@@ -207,9 +208,14 @@ const CustomProgressBar = ({
           ></div>
         ))} */}
       </div>
-      {shops[selectedShopIndex + 1] && (
+      {shops[selectedShopIndex + 1]?.nodeType != "checkpoint" && (
         <div className={classes.nextShop}>
-          Next Shop: {shops[selectedShopIndex + 1].name}
+          Next Stop: {shops[selectedShopIndex + 1]?.name}
+        </div>
+      )}
+      {shops[selectedShopIndex + 1]?.nodeType === "checkpoint" && (
+        <div className={classes.nextShop}>
+          Upcoming turn
         </div>
       )}
 

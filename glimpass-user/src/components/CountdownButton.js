@@ -1,4 +1,3 @@
-// src/CountdownButton.js
 import React, { useState, useEffect } from "react";
 import Button from "@mui/material/Button";
 
@@ -6,7 +5,7 @@ const CountdownButton = ({ handlePrevious, buttonText }) => {
   const [count, setCount] = useState(3);
 
   useEffect(() => {
-    setCount(3);
+    setCount(5);
   }, [buttonText]);
 
   useEffect(() => {
@@ -31,7 +30,7 @@ const CountdownButton = ({ handlePrevious, buttonText }) => {
         color="primary"
         onClick={count > 0 ? null : handlePrevious}
       >
-        {count === 0 ? `${buttonText}` : `Counting down: ${count}`}
+        {count === 0 ? `${buttonText}` : `${buttonText}: ${count}`}
       </Button>
     </div>
   );

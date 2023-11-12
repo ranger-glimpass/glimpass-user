@@ -17,6 +17,7 @@
 
 .App-header {
   background-color: white;
+  /* background-color: #fff3e9; */
   /* Powder Blue */
   min-height: 100vh;
   display: flex;
@@ -69,9 +70,21 @@
 .show-add-to-screen {
   position: fixed;
   bottom: 0;
-  padding: 12px;
-  background-color: #0080ff;
-  width: 90%;
-  color: white;
-  text-decoration: solid;
+  left: 0;
+  right: 0;
+  background-color: lightyellow;
+  text-align: center;
+  padding: 10px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  z-index: 1001;  /* Ensure it stays on top of other page elements */
+}
+
+.close-add-to-screen-icon {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  cursor: pointer;
 }

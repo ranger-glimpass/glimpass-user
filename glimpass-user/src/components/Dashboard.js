@@ -17,11 +17,22 @@ import "react-responsive-carousel/lib/styles/carousel.min.css"; // Import carous
 
 import facingToShop from "../assets/facingToShop.gif";
 import goingToShop from "../assets/goingToShop.gif";
-import CountdownButton from "./CountdownButton";import SearchBox from './SearchBox';
+import CountdownButton from "./CountdownButton";
+import SearchBox from './SearchBox';
+import LoadingSpinner from "./LoadingSpinner";
+import glimpassLogo from "../assets/glimpassLogo.png"
 
+const themeStyles = {
+  primary: '#1976d2', // Primary color
+  secondary: '#8F8F8F', // Secondary color
+  background: '#FFFFFF', // Background color
+  textPrimary: '#000000', // Primary text color
+  textSecondary: '#575757', // Secondary text color
+};
 const Dashboard = () => {
   const location = useLocation();
   const destinationShopId = location.state.destinationShopId;
+  const endNodesList = location.state.endNodesList;
   const [open, setOpen] = useState(false);
   const [shops, setShops] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -29,9 +40,9 @@ const Dashboard = () => {
   const [searchTerm, setSearchTerm] = useState(""); // <-- Add this state for search term
 
   const navigate = useNavigate();
-
-  const handleMotion = () => {};
-  const handleOrientation = () => {};
+  console.log(endNodesList, "endNodesList")
+  const handleMotion = () => { };
+  const handleOrientation = () => { };
 
   const [currentSlide, setCurrentSlide] = useState(0);
 
@@ -64,7 +75,15 @@ const Dashboard = () => {
       );
       const data = await response.json();
       const shopsArray = Object.values(data);
-      setShops(shopsArray);
+      let withoutMultientryShops = [];
+      shopsArray.forEach(newShop);
+      function newShop(i) {
+        if (i?.entryType !== "multientry") {
+          withoutMultientryShops.push(i);
+        }
+      }
+      setShops(withoutMultientryShops);
+      console.log(withoutMultientryShops, "Shops without multientry");
       setIsLoading(false);
     };
 
@@ -121,13 +140,14 @@ const Dashboard = () => {
     }
 
     const currentLocationId = currentLocation?.nodeId;
-              if(currentLocation?.nearby){
-                currentLocationId = currentLocation?.nearby;
-              }
+    if (currentLocation?.nearby) {
+      currentLocationId = currentLocation?.nearby;
+    }
     navigate("/navigation", {
       state: {
         currentLocation: currentLocationId,
         destinationShopId: updatedDestinationShopId,
+        endNodesList: endNodesList,
         calibratedShopAngle: currentLocation?.shop_angle || 0,
       },
     });
@@ -140,8 +160,12 @@ const Dashboard = () => {
         justifyContent="center"
         alignItems="center"
         height="100vh"
+        flexDirection="column"
       >
-        <CircularProgress />
+        {/* Replace CircularProgress with your custom spinner */}
+        <div><LoadingSpinner /></div>
+        <h3>Hang On!</h3>
+        <h4>Finding your location...</h4>
       </Box>
     );
   }
@@ -150,101 +174,34 @@ const Dashboard = () => {
     shop.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const checkFill =() =>{
+    if(currentLocation){
+      setOpen(true);
+    }
+  }
+
   return (
     <>
-      <Typography
-        variant="h6" // This makes the text bold
-        sx={{
-          display: { xs: "contents", sm: "block" }, // Hide on smaller screens
-          whiteSpace: "nowrap", // Prevent wrapping to the next line
-          overflow: "hidden",
-          textOverflow: "ellipsis", // Add ellipsis for long names
-          maxWidth: "20%", // Adjust this width as needed
-          pl: "10px",
-          fontSize: "1rem",
-          marginRight: "2px",
-        }}
-      >
-        Hello, {sessionStorage.getItem("name")}!
-      </Typography>
-      <Container>
+      <Container style={{ padding: '20px', maxWidth: '600px', margin: 'auto' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '30px' }}>
+          <img src={glimpassLogo} alt="Logo" style={{ maxWidth: '150px', height: 'auto' }} />
+        </div>
+
         <Box mt={4} display="flex" flexDirection="column" alignItems="center">
-          <Typography variant="h5" gutterBottom>
-            Where are you at?
+          <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', color: themeStyles.primary, textAlign: 'center' }}>
+            Welcome, {sessionStorage.getItem("name")}
           </Typography>
 
-        <Box mt={2} width="100%">
-        {/* <Autocomplete
-    fullWidth
-    options={shops}
-    getOptionLabel={(option) => option.name}
-    value={currentLocation?.nodeId}
-    onChange={(event, newValue) => setCurrentLocation(newValue)}
-    renderInput={(params) => (
-        <TextField {...params} label="Select a Shop" variant="outlined" />
-    )}
-    renderOption={(props, option) => (
-        <Box 
-            component="li" 
-            sx={{ 
-                position: 'relative', 
-                display: 'flex', 
-                justifyContent: 'space-between', 
-                alignItems: 'center', 
-                '& > img': { mr: 2, flexShrink: 0 } 
-            }} 
-            {...props}
-        >
-            {option.name}
-            <Typography 
-                variant="body2" 
-                sx={{ 
-                    position: 'absolute', 
-                    bottom: 0, 
-                    right: 0, 
-                    fontStyle: 'italic', 
-                    fontWeight: 'bold', 
-                    fontSize: '0.6rem' 
-                }}
-            >
-                ({option.floor} floor)
-            </Typography>
-        </Box>
-    )}
-    sx={{
-        '& .MuiAutocomplete-input': {
-            fontSize: '1.2rem', // Increase font size of input
-        },
-        '& .MuiAutocomplete-option': {
-            fontSize: '1.2rem', // Increase font size of dropdown options
-            padding: '10px 15px', // Add padding for elegance
-        },
-        '& .MuiOutlinedInput-root': {
-            borderRadius: '25px', // Rounded corners for elegance
-        },
-    }}
-/> */}
-    <SearchBox
-        data={shops}
-        value={currentLocation} // Pass the current selected shop
-        onChange={setCurrentLocation} // Handle when the shop changes
-        onShopSelected={(selectedShop) => {
-            console.log(selectedShop,"selected on dashboard");
-            setCurrentLocation(selectedShop); 
-        }}
-    />
-</Box>
+          <Typography variant="subtitle1" sx={{ color: themeStyles.textSecondary, my: 2, textAlign: 'center' }}>
+            Where are you?
+          </Typography>
 
+          <SearchBox data={shops} value={currentLocation} onChange={setCurrentLocation} onShopSelected={setCurrentLocation} sx={{ width: '100%', mt: 2 }} />
 
-          <Box mt={2}>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => setOpen(true)}
-            >
-              I'm here!
-            </Button>
-          </Box>
+          <Button variant="contained" sx={{ mt: 2, bgcolor: themeStyles.primary, '&:hover': { bgcolor: themeStyles.primary }, borderRadius: 20, px: 3, py: 1 }} onClick={() => checkFill()}>
+            Confirm Location
+          </Button>
+
 
           <Modal open={open} onClose={() => setOpen(false)}>
             <Box
@@ -276,6 +233,7 @@ const Dashboard = () => {
                     variant="body2"
                     id="modal-description"
                     gutterBottom
+                    style={{ fontSize: '18px', fontWeight: 'bold', lineHeight: '1.5' }}
                   >
                     <b>Step 1:</b> Go to the {currentLocation?.name}.
                   </Typography>
@@ -286,9 +244,9 @@ const Dashboard = () => {
                     variant="body2"
                     id="modal-description"
                     gutterBottom
+                    style={{ fontSize: '18px', fontWeight: 'bold', lineHeight: '1.5' }}
                   >
-                    <b>Step 2:</b> Face towards the shop:{" "}
-                    {currentLocation?.name}.
+                    <b>Step 2:</b> Face towards the shop: {currentLocation?.name}.
                   </Typography>
                 </div>
               </Carousel>
@@ -305,6 +263,7 @@ const Dashboard = () => {
               </Box>
             </Box>
           </Modal>
+
         </Box>
       </Container>
     </>
