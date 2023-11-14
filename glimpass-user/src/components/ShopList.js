@@ -51,28 +51,28 @@ const ShopList = (props) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const [openModal, setOpenModal] = useState(false);
-const [selectedShopDetails, setSelectedShopDetails] = useState(null);
+  const [selectedShopDetails, setSelectedShopDetails] = useState(null);
   const [frequencyMap, setFrequencyMap] = useState(null);
-  
 
-  
+
+
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [showSearch, setShowSearch] = React.useState(false);
   const location = useLocation();
 
 
-  const handleNavigateClick = async(shopId) => {
+  const handleNavigateClick = async (shopId) => {
     setActiveCard(shopId);
     const email = sessionStorage.getItem('email');
     const name = sessionStorage.getItem('name');
     const response = await fetch('https://app.glimpass.com/user/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify( {email, name} ),
+      body: JSON.stringify({ email, name }),
     });
     const data = await response.json();
     sessionStorage.setItem('_id', data[0].user._id);
-    console.log(data,"register");
+    console.log(data, "register");
     const endNodeName = null;
     setTimeout(() => {
       navigate("/dashboard", { state: { destinationShopId: shopId, market: location.state?.market } });
@@ -81,19 +81,19 @@ const [selectedShopDetails, setSelectedShopDetails] = useState(null);
 
   const getAllNodes = async () => {
     const response = await fetch("https://app.glimpass.com/graph/get-all-nodes-by-market", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            market: location.state?.market,
-          })
-          // Add any necessary body data for the POST request
-        });
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        market: location.state?.market,
+      })
+      // Add any necessary body data for the POST request
+    });
     const data = await response.json();
     const shopsArray = Object.values(data);
 
-const amb = Object.values(ambienceShops);
+    const amb = Object.values(ambienceShops);
     console.log(amb, "ambeinceshop")
     //setShops(shopsArray);
     console.log(shops, "shops fetched!")
@@ -103,18 +103,18 @@ const amb = Object.values(ambienceShops);
         shopFrequency[shop.name][1] += 1; // Increment if already exists
         shopFrequency[shop.name][2].push(shop.nodeId);
       } else {
-        shopFrequency[shop.name] = [shop, 1,[shop.nodeId]]; // Initialize with [shop, 1]
+        shopFrequency[shop.name] = [shop, 1, [shop.nodeId]]; // Initialize with [shop, 1]
       }
     });
-  setFrequencyMap(shopFrequency, "shopFrquency with shop object");
-  console.log(shopFrequency); // Here you have your hashmap with shop frequencies
+    setFrequencyMap(shopFrequency, "shopFrquency with shop object");
+    console.log(shopFrequency); // Here you have your hashmap with shop frequencies
 
-  let newShopsArray = [];
-Object.values(shopFrequency).forEach(([shop, frequency]) => {
-    newShopsArray.push(shop);
-});
-console.log(newShopsArray,"newShopsArray");
-setShops(newShopsArray);
+    let newShopsArray = [];
+    Object.values(shopFrequency).forEach(([shop, frequency]) => {
+      newShopsArray.push(shop);
+    });
+    console.log(newShopsArray, "newShopsArray");
+    setShops(newShopsArray);
 
     setIsLoading(false); // Set loading to false once data is fetched
   };
@@ -133,17 +133,17 @@ setShops(newShopsArray);
   if (isLoading) {
     return (
       <Box
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      height="100vh"
-      flexDirection="column"
-    >
-      {/* Replace CircularProgress with your custom spinner */}
-      <div><LoadingSpinner /></div>
-      <h3>Hang On!</h3>
-      <h4>Getting shops in the market...</h4>
-    </Box>
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="100vh"
+        flexDirection="column"
+      >
+        {/* Replace CircularProgress with your custom spinner */}
+        <div><LoadingSpinner /></div>
+        <h3>Hang On!</h3>
+        <h4>Getting shops in the market...</h4>
+      </Box>
     );
   }
 
@@ -156,7 +156,7 @@ setShops(newShopsArray);
     }
   };
 
-  
+
 
   const filteredShops = selectedShop
     ? shops.filter((shop) => shop.nodeId === selectedShop.nodeId)
@@ -185,91 +185,66 @@ setShops(newShopsArray);
   const toggleSearch = () => {
     setShowSearch(!showSearch);
   };
+
+  const checkDP = () => {
+    if (sessionStorage.getItem("imageUrl")) {
+      return sessionStorage.getItem("imageUrl");
+    }
+    return defaultDP;
+  }
+
   return (
     <Container>
-  {/* <AppBar position="fixed" elevation={0} sx={{ height: 64 }}>
-    <Toolbar
-        sx={{
-            justifyContent: "space-between", // Adjust this to space-between
-            minHeight: "64px",
-            pr: 2,
-            pl: 2,
-        }}
-    >
-
-<SearchBox
-data={shops}
-onShopSelected={(selectedShop) => {
-  handle(selectedShop); // set the details for the selected shop
-  }}
-/>
-        <Typography
-            variant="h6" // This makes the text bold
-            sx={{ 
-                display: { xs: 'contents', sm: 'block' }, // Hide on smaller screens
-                whiteSpace: 'nowrap', // Prevent wrapping to the next line
-                overflow: 'hidden',
-                textOverflow: 'ellipsis', // Add ellipsis for long names
-                maxWidth: '20%', // Adjust this width as needed
-                pl: '10px',
-                fontSize: '1rem',
-                marginRight: '2px'
-            }}
-        >
-            Hello, {sessionStorage.getItem('name') || 'Guest'}!
-        </Typography>
-    </Toolbar>
-</AppBar> */}
-<AppBar position="fixed"  style={{ background: 'white' }}>
+      <AppBar position="fixed" style={{ background: 'white' }}>
         <Toolbar>
-          
+
           <IconButton
             edge="start"
             color="inherit"
             aria-label="menu"
-            // onClick={handleMenu}
+          // onClick={handleMenu}
           >
-             <img src={logo} width='53px' height='60px'/>
+            <img src={logo} width='53px' height='60px' />
             {/* Replace with your logo if this isn't a menu */}
           </IconButton>
           <div style={{ flexGrow: 1 }}></div>
           {/* <IconButton color="inherit" onClick={toggleSearch}>
             <img src={searchIcon} width='25px' height='25px' styles="margin-right: 2px"/> Replace with your searchIcon if necessary
           </IconButton> */}
-           <SearchBox
-          data={shops}
-          onShopSelected={(selectedShop) => {
-            handle(selectedShop); // set the details for the selected shop
+          <SearchBox
+            data={shops}
+            onShopSelected={(selectedShop) => {
+              handle(selectedShop); // set the details for the selected shop
             }}
           />
           <IconButton
-  edge="end"
-  color="inherit"
-  aria-label="account of current user"
-  aria-controls="menu-appbar"
-  aria-haspopup="true"
-  onClick={handleMenu}
->
-  <Avatar alt="Profile Picture" src={defaultDP} />
-</IconButton>
-<Menu
-  id="menu-appbar"
-  anchorEl={anchorEl}
-  anchorOrigin={{
-    vertical: 'top',
-    horizontal: 'right',
-  }}
-  keepMounted
-  transformOrigin={{
-    vertical: 'top',
-    horizontal: 'right',
-  }}
-  open={Boolean(anchorEl)}
-  onClose={handleClose}
->
-  <MenuItem>Hello, {sessionStorage.getItem('name') || 'Guest'}</MenuItem>
-  <MenuItem onClick={handleLogout}>Logout</MenuItem>
-</Menu>
+            edge="end"
+            color="inherit"
+            aria-label="account of current user"
+            aria-controls="menu-appbar"
+            aria-haspopup="true"
+            onClick={handleMenu}
+          >
+            <Avatar alt="Profile Picture" src={checkDP()} />
+          </IconButton>
+          <Menu
+            id="menu-appbar"
+            anchorEl={anchorEl}
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+            keepMounted
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+            open={Boolean(anchorEl)}
+            onClose={handleClose}
+          >
+            <MenuItem>Hello, {sessionStorage.getItem('name') || 'Guest'}</MenuItem>
+            <MenuItem onClick={handleLogout}>Logout</MenuItem>
+          </Menu>
         </Toolbar>
         {/* {showSearch &&(
           <SearchBox
@@ -280,7 +255,7 @@ onShopSelected={(selectedShop) => {
           />
         )} */}
       </AppBar>
-{/* <div>
+      {/* <div>
 <SearchBox
 data={shops}
 />
@@ -316,11 +291,11 @@ data={shops}
                   p: 1,
                   mx: { xs: 0, sm: 2 },
                 }}
-               // onClick={() => handleNavigateClick(shop.nodeId)}
+              // onClick={() => handleNavigateClick(shop.nodeId)}
               >
                 <CardActionArea
                   sx={{ display: "flex", flexDirection: "row", flexGrow: 1 }}
-    onClick={() => handle(shop.nodeId)}
+                  onClick={() => handle(shop.nodeId)}
 
                 >
                   {shop && (
@@ -390,7 +365,7 @@ data={shops}
             <IconButton
               onClick={() =>
                 navigate("/dashboard", {
-                  state: {endNodesList: [], destinationShopId: "nearestWashroom", market: location.state?.market },
+                  state: { endNodesList: [], destinationShopId: "nearestWashroom", market: location.state?.market },
                 })
               }
             >
@@ -453,59 +428,59 @@ data={shops}
       </Box>
 
       <Dialog open={openModal} onClose={() => setOpenModal(false)} fullWidth maxWidth="xs">
-    <DialogTitle sx={{ textAlign: 'center', pb: 1 }}>
-        <Typography variant="h6" component="div">
+        <DialogTitle sx={{ textAlign: 'center', pb: 1 }}>
+          <Typography variant="h6" component="div">
             {selectedShopDetails?.name}
-        </Typography>
-    </DialogTitle>
-    <DialogContent>
-        <Box display="flex" flexDirection="column" alignItems="center">
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <Box display="flex" flexDirection="column" alignItems="center">
             <CardMedia
-                component="img"
-                image={logo} // Replace with selectedShopDetails?.image or similar
-                alt={selectedShopDetails?.name}
-                sx={{
-                    width: '80%',
-                    height: 'auto',
-                    borderRadius: '15px',
-                    mb: 2
-                }}
+              component="img"
+              image={logo} // Replace with selectedShopDetails?.image or similar
+              alt={selectedShopDetails?.name}
+              sx={{
+                width: '80%',
+                height: 'auto',
+                borderRadius: '15px',
+                mb: 2
+              }}
             />
             <Typography variant="subtitle1" color="textSecondary" gutterBottom>
-                Floor: {selectedShopDetails?.floor}
+              Floor: {selectedShopDetails?.floor}
             </Typography>
             <Typography variant="subtitle1" color="textSecondary" gutterBottom>
-                Category: {selectedShopDetails?.category?.join(", ")}
+              Category: {selectedShopDetails?.category?.join(", ")}
             </Typography>
             {/* Add more details as needed */}
-        </Box>
-    </DialogContent>
-    <DialogActions sx={{ justifyContent: 'center', mt: 2 }}>
-        <Button variant="outlined" onClick={() => setOpenModal(false)} color="primary" sx={{ mr: 2 }}>
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: 'center', mt: 2 }}>
+          <Button variant="outlined" onClick={() => setOpenModal(false)} color="primary" sx={{ mr: 2 }}>
             Cancel
-        </Button>
-        <Button 
+          </Button>
+          <Button
             variant="contained"
             onClick={() => {
               const destinationNodeId = selectedShopDetails?.nodeId;
-              if(selectedShopDetails?.nearby){
+              if (selectedShopDetails?.nearby) {
                 destinationNodeId = selectedShopDetails?.nearby;
               }
               const selectedShop = shops.find(shop => shop.nodeId === destinationNodeId);
               const endNodesList = frequencyMap[selectedShop.name][2];
-              navigate("/dashboard", { state: {endNodesList: endNodesList, destinationShopId: destinationNodeId, market: location.state?.market } });
+              navigate("/dashboard", { state: { endNodesList: endNodesList, destinationShopId: destinationNodeId, market: location.state?.market } });
               setOpenModal(false);
-            }} 
+            }}
             color="primary"
-        >
+          >
             Navigate
-        </Button>
-    </DialogActions>
-</Dialog>
+          </Button>
+        </DialogActions>
+      </Dialog>
 
     </Container>
 
-    
+
   );
 };
 

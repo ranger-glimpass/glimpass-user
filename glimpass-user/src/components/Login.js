@@ -5,6 +5,10 @@ import glimpassLogo from "../assets/glimpassLogo.png"
 import logoGif from "../assets/logoGif.gif"
 import LoadingSpinner from './LoadingSpinner'; // Assuming your Loading component is in the same directory
 
+
+import { GoogleLogin } from 'react-google-login';
+
+import { gapi } from 'gapi-script';
 const Login = () => {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
@@ -14,6 +18,9 @@ const Login = () => {
   const [showGif, setShowGif] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingText, setLoadingText] = useState('');
+  const [googleEmail, setGoogleEmail] = useState(null);
+  const [googleName, setGoogleName] = useState(null);
+
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -32,51 +39,102 @@ const Login = () => {
     }
   }, [navigate]);
 
+
+
   const handleLogin = async () => {
+    // Determine if email is from Google or manual input
+    const emailToCheck = googleEmail || email;
     setIsLoading(true);
     setLoadingText('Checking if you\'re registered...');
+
     const response = await fetch('https://app.glimpass.com/user/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ email: emailToCheck }),
     });
+
     const data = await response.json();
     setIsLoading(false);
-    if (data) {
-      console.log(data, "data");
+
+    if (data && data._id) { // If user exists
       sessionStorage.setItem('_id', data._id);
       sessionStorage.setItem('email', data.email);
       sessionStorage.setItem('name', data.name);
       navigate('/markets');
-    } else {
-      setIsEmailSubmitted(true);
+    } else { // If user does not exist
+      if(googleName)
+        {
+          handleRegister(emailToCheck, googleName);
+        }
+      else{
+        setIsEmailSubmitted(true);
+      }
     }
   };
 
-  const handleRegister = async () => {
+  const handleRegister = async (emailToRegister, nameToRegister) => {
     setIsLoading(true);
     setLoadingText('Registering...');
+
     const response = await fetch('https://app.glimpass.com/user/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, name }),
+      body: JSON.stringify({ email: emailToRegister, name: nameToRegister }),
     });
+
     const data = await response.json();
     setIsLoading(false);
-    console.log(data, "register");
-    sessionStorage.setItem('_id', data[0].user._id);
-    sessionStorage.setItem('email', data[0].user.email);
-    sessionStorage.setItem('name', data[0].user.name);
-    navigate('/markets');
+
+    if (data && data[0] && data[0].user) {
+      sessionStorage.setItem('_id', data[0].user._id);
+      sessionStorage.setItem('email', data[0].user.email);
+      sessionStorage.setItem('name', data[0].user.name);
+      navigate('/markets');
+    }
   };
 
   const handleContinue = () => {
     if (!isEmailSubmitted && email) {
       handleLogin();
     } else if (isEmailSubmitted && name) {
-      handleRegister();
+      handleRegister(email, name);
     }
   };
+
+
+  const responseGoogle = (response) => {
+    if (response.error) {
+      console.error('Google sign-in error:', response.error);
+    } else {
+      console.log('Google sign-in success:', response);
+      const { email, name, imageUrl } = response.profileObj;
+      setGoogleEmail(email);
+      
+      setGoogleName(name);
+
+      sessionStorage.setItem('imageUrl', imageUrl);
+      // setTimeout(() => handleLogin(), 100);
+    }
+  };
+
+  useEffect(() => {
+    if (googleEmail && googleName) {
+      handleLogin(googleEmail, googleName);
+    }
+  }, [googleEmail, googleName]); // Dependency array
+
+  
+  useEffect(() => {
+    function start() {
+      gapi.client.init({
+        clientId: "861745707029-dtgh9bdhksivrg2rshpe71ugpr9k21hk.apps.googleusercontent.com",
+        scope: 'email',
+      });
+    }
+  
+    gapi.load('client:auth2', start);
+  }, []);
+  
 
   return (
     <>
@@ -149,11 +207,25 @@ const Login = () => {
             >
               {isEmailSubmitted ? 'Login' : 'Continue'}
             </Button>
+            <br></br>
+            <hr></hr>
+            <GoogleLogin
+    clientId="861745707029-dtgh9bdhksivrg2rshpe71ugpr9k21hk.apps.googleusercontent.com" // Replace with your Google Client ID
+    buttonText="Continue with Google"
+    onSuccess={responseGoogle}
+    onFailure={responseGoogle}
+    cookiePolicy={'single_host_origin'}
+    style={{ marginTop: '20px' }}
+  />
           </Box>
+   
         </Box>
       </Paper>
     </Container>
+    
     )}
+
+
     </>
   );
 };
