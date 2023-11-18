@@ -45,7 +45,16 @@ const Dashboard = () => {
   const handleOrientation = () => { };
 
   const [currentSlide, setCurrentSlide] = useState(0);
+  
 
+  // useEffect(()=>{
+  //   if(!sessionStorage.getItem('email')){
+  //     navigate('/login');
+  //   }
+  //   if(destinationShopId == null){
+  //     navigate('/shops');
+  //   }
+  // },[destinationShopId])
   const handleNext = () => {
     if (currentSlide === 0) {
       setCurrentSlide(1);
