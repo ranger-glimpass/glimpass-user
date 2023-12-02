@@ -1136,6 +1136,7 @@ const Navigation = () => {
           />
         </div>
         <div style={{ marginBottom: "10px", marginTop: "30px" }}>
+          <p>{adjustedAng}</p>
           <img
             src={arrowTorch} //{navigationArrow}
             alt="Navigation Arrow"
