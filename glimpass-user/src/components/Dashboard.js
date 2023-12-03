@@ -18,16 +18,16 @@ import "react-responsive-carousel/lib/styles/carousel.min.css"; // Import carous
 import facingToShop from "../assets/facingToShop.gif";
 import goingToShop from "../assets/goingToShop.gif";
 import CountdownButton from "./CountdownButton";
-import SearchBox from './SearchBox';
+import SearchBox from "./SearchBox";
 import LoadingSpinner from "./LoadingSpinner";
-import glimpassLogo from "../assets/glimpassLogo.png"
+import glimpassLogo from "../assets/glimpassLogo.png";
 
 const themeStyles = {
-  primary: '#1976d2', // Primary color
-  secondary: '#8F8F8F', // Secondary color
-  background: '#FFFFFF', // Background color
-  textPrimary: '#000000', // Primary text color
-  textSecondary: '#575757', // Secondary text color
+  primary: "#1976d2", // Primary color
+  secondary: "#8F8F8F", // Secondary color
+  background: "#FFFFFF", // Background color
+  textPrimary: "#000000", // Primary text color
+  textSecondary: "#575757", // Secondary text color
 };
 const Dashboard = () => {
   const location = useLocation();
@@ -40,12 +40,11 @@ const Dashboard = () => {
   const [searchTerm, setSearchTerm] = useState(""); // <-- Add this state for search term
 
   const navigate = useNavigate();
-  console.log(endNodesList, "endNodesList")
-  const handleMotion = () => { };
-  const handleOrientation = () => { };
+  console.log(endNodesList, "endNodesList");
+  const handleMotion = () => {};
+  const handleOrientation = () => {};
 
   const [currentSlide, setCurrentSlide] = useState(0);
-  
 
   // useEffect(()=>{
   //   if(!sessionStorage.getItem('email')){
@@ -172,7 +171,9 @@ const Dashboard = () => {
         flexDirection="column"
       >
         {/* Replace CircularProgress with your custom spinner */}
-        <div><LoadingSpinner /></div>
+        <div>
+          <LoadingSpinner />
+        </div>
         <h3>Hang On!</h3>
         <h4>Finding your location...</h4>
       </Box>
@@ -183,34 +184,75 @@ const Dashboard = () => {
     shop.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const checkFill =() =>{
-    if(currentLocation){
+  const checkFill = () => {
+    if (currentLocation) {
       setOpen(true);
     }
-  }
+  };
 
   return (
     <>
-      <Container style={{ padding: '20px', maxWidth: '600px', margin: 'auto' }}>
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '30px' }}>
-          <img src={glimpassLogo} alt="Logo" style={{ maxWidth: '150px', height: 'auto' }} />
+      <Container style={{ padding: "20px", maxWidth: "600px", margin: "auto" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginBottom: "30px",
+          }}
+        >
+          <img
+            src={glimpassLogo}
+            alt="Logo"
+            style={{ maxWidth: "150px", height: "auto" }}
+          />
         </div>
 
         <Box mt={4} display="flex" flexDirection="column" alignItems="center">
-          <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', color: themeStyles.primary, textAlign: 'center' }}>
+          <Typography
+            variant="h5"
+            gutterBottom
+            sx={{
+              fontWeight: "bold",
+              color: themeStyles.primary,
+              textAlign: "center",
+            }}
+          >
             Welcome, {sessionStorage.getItem("name")}
           </Typography>
 
-          <Typography variant="subtitle1" sx={{ color: themeStyles.textSecondary, my: 2, textAlign: 'center' }}>
+          <Typography
+            variant="subtitle1"
+            sx={{
+              color: themeStyles.textSecondary,
+              my: 2,
+              textAlign: "center",
+            }}
+          >
             Where are you?
           </Typography>
 
-          <SearchBox data={shops} value={currentLocation} onChange={setCurrentLocation} onShopSelected={setCurrentLocation} sx={{ width: '100%', mt: 2 }} />
+          <SearchBox
+            data={shops}
+            value={currentLocation}
+            onChange={setCurrentLocation}
+            onShopSelected={setCurrentLocation}
+            sx={{ width: "100%", mt: 2 }}
+          />
 
-          <Button variant="contained" sx={{ mt: 2, bgcolor: themeStyles.primary, '&:hover': { bgcolor: themeStyles.primary }, borderRadius: 20, px: 3, py: 1 }} onClick={() => checkFill()}>
+          <Button
+            variant="contained"
+            sx={{
+              mt: 2,
+              bgcolor: themeStyles.primary,
+              "&:hover": { bgcolor: themeStyles.primary },
+              borderRadius: 20,
+              px: 3,
+              py: 1,
+            }}
+            onClick={() => checkFill()}
+          >
             Confirm Location
           </Button>
-
 
           <Modal open={open} onClose={() => setOpen(false)}>
             <Box
@@ -242,7 +284,11 @@ const Dashboard = () => {
                     variant="body2"
                     id="modal-description"
                     gutterBottom
-                    style={{ fontSize: '18px', fontWeight: 'bold', lineHeight: '1.5' }}
+                    style={{
+                      fontSize: "18px",
+                      fontWeight: "bold",
+                      lineHeight: "1.5",
+                    }}
                   >
                     <b>Step 1:</b> Go to the {currentLocation?.name}.
                   </Typography>
@@ -253,9 +299,14 @@ const Dashboard = () => {
                     variant="body2"
                     id="modal-description"
                     gutterBottom
-                    style={{ fontSize: '18px', fontWeight: 'bold', lineHeight: '1.5' }}
+                    style={{
+                      fontSize: "18px",
+                      fontWeight: "bold",
+                      lineHeight: "1.5",
+                    }}
                   >
-                    <b>Step 2:</b> Face towards the shop: {currentLocation?.name}.
+                    <b>Step 2:</b> Face towards the shop:{" "}
+                    {currentLocation?.name}.
                   </Typography>
                 </div>
               </Carousel>
@@ -272,7 +323,6 @@ const Dashboard = () => {
               </Box>
             </Box>
           </Modal>
-
         </Box>
       </Container>
     </>
