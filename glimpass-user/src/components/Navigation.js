@@ -1141,11 +1141,6 @@ const Navigation = () => {
           />
         </div>
         <div style={{ marginBottom: "10px", marginTop: "30px" }}>
-          <p>{adjustedAng} adjsuted angle</p>
-          <p>{alpha} alpha value</p>
-          <p>{testAlpha} test alpha</p>
-          <p>{calibratedShopAngle} shop angle</p>
-          <p>{aa} raw alpha</p>
           <img
             src={arrowTorch} //{navigationArrow}
             alt="Navigation Arrow"
