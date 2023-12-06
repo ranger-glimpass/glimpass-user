@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react";
 import Button from "@mui/material/Button";
 
 const CountdownButton = ({ handlePrevious, buttonText }) => {
-  const [count, setCount] = useState(3);
+  const [count, setCount] = useState(0);
 
   useEffect(() => {
-    setCount(5);
+    setCount(0);
   }, [buttonText]);
 
   useEffect(() => {

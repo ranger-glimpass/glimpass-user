@@ -28,7 +28,7 @@ import OutsideLift from "../assets/OutsideLift.png";
 import CountdownButton from "./CountdownButton";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import LoadingSpinner from "./LoadingSpinner";
-import arrowTorch from "../assets/arrowTorch.png"
+import arrowTorch from "../assets/arrowTorch.png";
 window.currentStep = 0;
 window.modifyDy = 1;
 
@@ -43,8 +43,6 @@ const Navigation = () => {
     window.location.href = "/markets";
   };
 
-  const svgWidth = 400;
-  const svgHeight = 400;
   const scaleFactor = 3;
 
   const pathRef = useRef(null);
@@ -90,7 +88,7 @@ const Navigation = () => {
       const currDest = JSON.stringify({
         currentNode: currentLocation,
         destinationNode: destinationShopId,
-        endNodesList: endNodesList
+        endNodesList: endNodesList,
       });
       console.log(currDest, "currDest");
       const fetchShortestPath = async () => {
@@ -155,6 +153,8 @@ const Navigation = () => {
   const [showThanks, setShowThanks] = useState(false);
 
   const [alpha, setAlpha] = useState(0);
+  const [testAlpha, setTestAlpha] = useState(0);
+  const [aa, setAa] = useState(0);
   const dirRef = useRef({ alpha: 0, beta: 0, gamma: 0 });
   const accRef = useRef();
   const totalAccX = useRef(0);
@@ -368,16 +368,15 @@ const Navigation = () => {
 
   const handleOrientation = (event) => {
     dirRef.current = event;
+    setAa(event.alpha);
     if (!window.firstTime) {
       offset.current = -1 * parseInt(event.alpha);
       window.firstTime = 1;
     }
-    let calibratedAlpha = event.alpha + offset.current;
-    if (calibratedAlpha < 0) {
-      calibratedAlpha = -1 * calibratedAlpha;
-      calibratedAlpha = 360 - calibratedAlpha;
-    }
-    calibratedAlpha = (calibratedAlpha - calibratedShopAngle + 360) % 360;
+    let calibratedAlpha = parseInt(event.alpha) + offset.current; // calibratedalpha==0
+    calibratedAlpha = (360 + calibratedAlpha) % 360;
+    setTestAlpha(calibratedAlpha); //2
+    // calibratedAlpha = (360 - calibratedAlpha - calibratedShopAngle) % 360;
     setAlpha(calibratedAlpha);
   };
 
@@ -445,18 +444,23 @@ const Navigation = () => {
     const stepsToNextShop = currentRoute[0]?.connection?.steps || 1000000;
     if (dy - lastRecordedStep.current >= stepsToNextShop) {
       let initialNextShopAngle = currentRoute[1]?.connection?.angle || 0;
+      // initialNextShopAngle = 360 - initialNextShopAngle;
       // const initialAdjustedAngle = (alpha + initialNextShopAngle - 45) % 360;
       // initialNextShopAngle =
       //   (360 + initialNextShopAngle + calibratedShopAngle) % 360;
-      const initialAdjustedAngle = (alpha + initialNextShopAngle) % 360;
+      let initialAdjustedAngle =
+        (360 - alpha + initialNextShopAngle - calibratedShopAngle) % 360;
 
       setAdjustedAng(initialAdjustedAngle);
     } else {
       let initialNextShopAngle = currentRoute[0]?.connection?.angle || 0;
+      // initialNextShopAngle = 360 - initialNextShopAngle;
       //const initialAdjustedAngle = (alpha + initialNextShopAngle - 45) % 360;
       // initialNextShopAngle =
       //   (360 + initialNextShopAngle + calibratedShopAngle) % 360;
-      const initialAdjustedAngle = (alpha + initialNextShopAngle) % 360;
+      let initialAdjustedAngle =
+        (360 - alpha + initialNextShopAngle - calibratedShopAngle) % 360;
+      // initialAdjustedAngle = 360 - initialAdjustedAngle;
 
       setAdjustedAng(initialAdjustedAngle);
     }
@@ -1012,7 +1016,6 @@ const Navigation = () => {
 
   const [currentStep, setCurrentStep] = useState(1);
 
-
   // Function to toggle the map view
   const toggleShowMap = () => {
     setShowMap(!showMap);
@@ -1030,7 +1033,9 @@ const Navigation = () => {
       flexDirection="column"
     >
       {/* Replace CircularProgress with your custom spinner */}
-      <div><LoadingSpinner /></div>
+      <div>
+        <LoadingSpinner />
+      </div>
       <h3>Hang On!</h3>
       <h4>Finding shortest path...</h4>
     </div>
@@ -1140,15 +1145,13 @@ const Navigation = () => {
             src={arrowTorch} //{navigationArrow}
             alt="Navigation Arrow"
             style={{
-              transform: `rotate(${adjustedAng}deg)`,
+              transform: `rotate(${360 - adjustedAng}deg)`,
               width: "244px",
               height: "278px",
-              margin: "10px"
+              margin: "10px",
             }}
           />
         </div>
-
-
 
         <div
           style={{
@@ -1160,9 +1163,14 @@ const Navigation = () => {
           }}
         >
           <button onClick={toggleShowMap}>{showMapButton}</button>
-          <div style={{ transition: 'opacity 2s ease', opacity: showMap ? 1 : 0, height: showMap ? 'auto' : 0, overflow: 'hidden' }}>
-
-
+          <div
+            style={{
+              transition: "opacity 2s ease",
+              opacity: showMap ? 1 : 0,
+              height: showMap ? "auto" : 0,
+              overflow: "hidden",
+            }}
+          >
             {showMap && (
               <div
                 style={{
@@ -1206,7 +1214,6 @@ const Navigation = () => {
             Navigate other shops
           </Button>
         </div>
-
 
         {/* ... your Dialog components */}
         {showReachedPopup && (
@@ -1259,15 +1266,35 @@ const Navigation = () => {
             <DialogContent>
               {currentStep === 1 ? (
                 <>
-                  <img src={LiftStairs} alt="Lift GIF" style={{ width: "100%", marginBottom: "20px" }} />
-                  <DialogContentText style={{ fontSize: '18px', fontWeight: 'bold', lineHeight: '1.5' }}>
+                  <img
+                    src={LiftStairs}
+                    alt="Lift GIF"
+                    style={{ width: "100%", marginBottom: "20px" }}
+                  />
+                  <DialogContentText
+                    style={{
+                      fontSize: "18px",
+                      fontWeight: "bold",
+                      lineHeight: "1.5",
+                    }}
+                  >
                     Step 1: Go to the lift/elevator.
                   </DialogContentText>
                 </>
               ) : (
                 <>
-                  <img src={OutsideLift} alt="Floor GIF" style={{ width: "100%", marginBottom: "20px" }} />
-                  <DialogContentText style={{ fontSize: '18px', fontWeight: 'bold', lineHeight: '1.5' }}>
+                  <img
+                    src={OutsideLift}
+                    alt="Floor GIF"
+                    style={{ width: "100%", marginBottom: "20px" }}
+                  />
+                  <DialogContentText
+                    style={{
+                      fontSize: "18px",
+                      fontWeight: "bold",
+                      lineHeight: "1.5",
+                    }}
+                  >
                     Step 2: Press continue when reached to floor {nextFloor}.
                   </DialogContentText>
                 </>
@@ -1291,7 +1318,6 @@ const Navigation = () => {
             </DialogActions>
           </Dialog>
         )}
-
       </div>
     </>
   );
