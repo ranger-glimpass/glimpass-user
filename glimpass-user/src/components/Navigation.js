@@ -474,7 +474,7 @@ const Navigation = () => {
     if (currentRoute.length === 1) {
       setShowReachedPopup(true);
     }
-    globalArray.push(360 - alpha);
+    globalArray.push(alpha);
     globalTimeArray.push(new Date().getSeconds());
 
     const len = globalArray.length;
@@ -485,19 +485,19 @@ const Navigation = () => {
 
       const timeDiffInterval =
         (60 + globalTimeArray[len - 3] - globalTimeArray[len - 1]) % 60;
-      const percentageError = 15;
+      const percentageError = 20;
 
-      let angleDiff = Math.abs(currentWalkAngle - nextNodeAngle);
+      let angleDiff = Math.abs(currentWalkAngle - nextNodeAngle + 360) % 360;
       let angleDiff2 = Math.abs(180 - angleDiff);
       angleDiff = Math.min(angleDiff, angleDiff2);
-      straightPath.current = angleDiff <= 15;
+      straightPath.current = angleDiff <= percentageError;
 
       if (
         averageAngle >= currentWalkAngle - percentageError &&
         averageAngle <= currentWalkAngle + percentageError
       ) {
         // true walking in right direction;
-        reachRef.current = "ok walk position";
+        reachRef.current = averageAngle;
       } else if (
         averageAngle >= nextNodeAngle - percentageError &&
         averageAngle <= nextNodeAngle + percentageError &&
@@ -506,9 +506,9 @@ const Navigation = () => {
         // turns or not
         // signal to path.js
         setTurnAngle(true);
-        reachRef.current = "turn angle is true";
+        reachRef.current = averageAngle;
       } else {
-        reachRef.current = "inside else condition";
+        reachRef.current = averageAngle;
       }
     }
   }, [stepsV2.current]);
