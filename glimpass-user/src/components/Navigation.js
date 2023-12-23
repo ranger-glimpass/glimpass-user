@@ -39,7 +39,7 @@ const globalTimeArray = [];
 const Navigation = () => {
   const navigate = useNavigate();
 
-  const navigateToShops = (event) => {
+  const navigateToShops = event => {
     window.location.href = "/markets";
   };
 
@@ -65,7 +65,7 @@ const Navigation = () => {
   const [selectedShopIndex, setSelectedShopIndex] = useState(0);
 
   const [showMap, setShowMap] = useState(true);
-  const changeSlectedIndexDynamic = (index) => {
+  const changeSlectedIndexDynamic = index => {
     console.log(index, "manish");
     setSelectedShopIndex(index);
   };
@@ -119,7 +119,7 @@ const Navigation = () => {
 
           // Find the first shop and set it as the active shop
           const firstShop = data.find(
-            (item) => item.shopOrCheckpoint?.type === "shop"
+            item => item.shopOrCheckpoint?.type === "shop"
           );
           if (firstShop) {
             setCurrentRoute([firstShop]);
@@ -193,9 +193,10 @@ const Navigation = () => {
   const lroh_push = useRef(0);
   const lroh_final = useRef(0);
 
-  const reachRef = useRef("here");
+  const reachRef = useRef(0);
+  const whereRef = useRef("nowhere");
 
-  const handleMotion = (event) => {
+  const handleMotion = event => {
     accRef.current = event.acceleration;
     totalAccX.current += parseInt(event.acceleration.x);
     totalAccY.current += parseInt(event.acceleration.y);
@@ -366,7 +367,7 @@ const Navigation = () => {
     setDyV2(parseFloat(steps.current));
   };
 
-  const handleOrientation = (event) => {
+  const handleOrientation = event => {
     dirRef.current = event;
     setAa(event.alpha);
     if (!window.firstTime) {
@@ -474,7 +475,7 @@ const Navigation = () => {
     if (currentRoute.length === 1) {
       setShowReachedPopup(true);
     }
-    globalArray.push(alpha);
+    globalArray.push((alpha + calibratedShopAngle) % 360);
     globalTimeArray.push(new Date().getSeconds());
 
     const len = globalArray.length;
@@ -487,8 +488,8 @@ const Navigation = () => {
         (60 + globalTimeArray[len - 3] - globalTimeArray[len - 1]) % 60;
       const percentageError = 20;
 
-      let angleDiff = Math.abs(currentWalkAngle - nextNodeAngle + 360) % 360;
-      let angleDiff2 = Math.abs(180 - angleDiff);
+      let angleDiff = Math.abs(currentWalkAngle - nextNodeAngle);
+      let angleDiff2 = Math.abs(360 - angleDiff);
       angleDiff = Math.min(angleDiff, angleDiff2);
       straightPath.current = angleDiff <= percentageError;
 
@@ -498,6 +499,7 @@ const Navigation = () => {
       ) {
         // true walking in right direction;
         reachRef.current = averageAngle;
+        whereRef.current = "staright walk path";
       } else if (
         averageAngle >= nextNodeAngle - percentageError &&
         averageAngle <= nextNodeAngle + percentageError &&
@@ -507,8 +509,10 @@ const Navigation = () => {
         // signal to path.js
         setTurnAngle(true);
         reachRef.current = averageAngle;
+        whereRef.current = "moved to next shop angle";
       } else {
         reachRef.current = averageAngle;
+        whereRef.current = "walking somewhere else";
       }
     }
   }, [stepsV2.current]);
@@ -540,12 +544,12 @@ const Navigation = () => {
       // If it's the last shop in the route
       window.modifyDy = 1;
       setTurnAngle(false);
-      setCurrentRoute((prevRoute) => prevRoute.slice(1));
+      setCurrentRoute(prevRoute => prevRoute.slice(1));
       lastRecordedStep.current = dy; // Reset the step count
     } else if (dy - lastRecordedStep.current >= stepsToNextShop) {
       floorPopupfn();
       if (currentRoute.length === 2) {
-        setCurrentRoute((prevRoute) => prevRoute.slice(1));
+        setCurrentRoute(prevRoute => prevRoute.slice(1));
       } else if (currentRoute.length == 1) {
         setShowReachedPopup(true);
       }
@@ -553,7 +557,8 @@ const Navigation = () => {
       window.modifyDy = 0;
       setTurnAngle(false);
       if (straightPath.current) {
-        reachRef.current = "turn angle is true";
+        reachRef.current = 0;
+        whereRef.current = "we are inside staright path condition";
         setTurnAngle(true);
       }
     } else if (turnAngle) {
@@ -563,9 +568,9 @@ const Navigation = () => {
     // setCurrentShop(currentRoute[0].shopOrCheckpoint?.name);
   }, [dy, currentRoute, turnAngle]);
 
-  const handleDropdownChange = (selectedShopName) => {
+  const handleDropdownChange = selectedShopName => {
     const selectedIndex = route.findIndex(
-      (item) => item.shopOrCheckpoint.name === selectedShopName
+      item => item.shopOrCheckpoint.name === selectedShopName
     );
     setCurrentRoute(route.slice(selectedIndex));
 
@@ -611,7 +616,7 @@ const Navigation = () => {
     // Reset stepsWalked and set the selected shop index
     setStepsWalked(0);
     const index = route.findIndex(
-      (item) => item.shopOrCheckpoint.name === selectedShopName
+      item => item.shopOrCheckpoint.name === selectedShopName
     );
     setSelectedShopIndex(index);
   };
@@ -644,7 +649,7 @@ const Navigation = () => {
     const stepsTaken = dy - dyPrevious.current;
 
     // Update the remaining steps
-    setRemainingSteps((prevSteps) => Math.max(0, prevSteps - stepsTaken));
+    setRemainingSteps(prevSteps => Math.max(0, prevSteps - stepsTaken));
 
     // Update the previous dy value for the next calculation
     dyPrevious.current = dy;
@@ -702,7 +707,7 @@ const Navigation = () => {
       anglesIn: anglesIn,
     };
   });
-  const resetSteps = (index) => {
+  const resetSteps = index => {
     if (index === 0) {
       steps.current = 0;
       stepsV2.current = 0;
@@ -739,7 +744,7 @@ const Navigation = () => {
   }, [selectedShopIndex]);
 
   let flattenedRoute = [];
-  route.forEach((item) => {
+  route.forEach(item => {
     flattenedRoute.push(item.shopOrCheckpoint);
     if (item.connection) {
       flattenedRoute.push(item.connection);
@@ -840,27 +845,6 @@ const Navigation = () => {
   //           </List>
   //         )}
   //       </div>
-  //       {/* <div style={{ marginTop: "20px" }}>
-  //         <Button
-  //           variant="contained"
-  //           color="primary"
-  //           onClick={() => {
-  //             steps.current++;
-  //             stepsV2.current++;
-  //             setdy(steps.current);
-  //           }}
-  //         >
-  //           Add steps mannualy
-  //         </Button>
-  //       </div> */}
-  //       {/* <div>
-  //         {/* {averageAngle && <p>{averageAngle}</p>}
-  //         <p>{turnAngle ? "Trueeee" : "Falseeee"}</p>
-  //         <p>{reachRef.current}</p>
-  //         <p>{currentWalkAngle}</p>
-  //         <p>{nextNodeAngle}</p>
-  //         <p>{adjustedAng}</p>
-  //       </div> */}
 
   // <Typography variant="h5" gutterBottom>
   //           Navigation to {destinationName}
@@ -1162,7 +1146,35 @@ const Navigation = () => {
             borderTop: "1px solid #ddd",
           }}
         >
-          <button onClick={toggleShowMap}>{showMapButton}</button>
+          <div>
+            <p>{turnAngle ? "Trueeee" : "Falseeee"}</p>
+            <p>device raw alhpa value{aa?.toFixed(4)}</p>
+            <p>after calibrated value{alpha}</p>
+            <p>
+              user average current walking angle {reachRef.current?.toFixed(4)}
+            </p>
+            <p>where code is executing {whereRef.current}</p>
+            <p>user need to walk in this angle{currentWalkAngle}</p>
+            <p>next node angle in route{nextNodeAngle}</p>
+            <p>angle to be shown on arrow {adjustedAng}</p>
+            <p>shop angle is {calibratedShopAngle}</p>
+            <p>user steps{steps.current}</p>
+            <p>user actual steps{stepsV2.current}</p>
+          </div>
+          <div style={{ marginTop: "20px" }}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => {
+                steps.current++;
+                stepsV2.current++;
+                setdy(steps.current);
+              }}
+            >
+              Add steps mannualy
+            </Button>
+          </div>
+          ;<button onClick={toggleShowMap}>{showMapButton}</button>
           <div
             style={{
               transition: "opacity 2s ease",
@@ -1203,7 +1215,6 @@ const Navigation = () => {
               </div>
             )}
           </div>
-
           {/* <Typography variant="body1" style={{ fontWeight: "bold", marginBottom: '10px' }}>
         Steps: {dy}
       </Typography>
