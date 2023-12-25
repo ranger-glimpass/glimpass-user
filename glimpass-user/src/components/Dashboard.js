@@ -33,11 +33,11 @@ const Dashboard = () => {
   const location = useLocation();
   const destinationShopId = location.state.destinationShopId;
   const endNodesList = location.state.endNodesList;
+  const market = location.state?.market;
   const [open, setOpen] = useState(false);
   const [shops, setShops] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentLocation, setCurrentLocation] = useState(null);
-  const [searchTerm, setSearchTerm] = useState(""); // <-- Add this state for search term
 
   const navigate = useNavigate();
   console.log(endNodesList, "endNodesList");
@@ -96,6 +96,11 @@ const Dashboard = () => {
     };
 
     fetchShops();
+
+    return () => {
+      window.removeEventListener("deviceorientation", handleOrientation);
+      window.removeEventListener("devicemotion", handleMotion);
+    };
   }, []);
 
   const [updatedDestinationShopId, setUpdatedDestinationShopId] =
@@ -157,6 +162,7 @@ const Dashboard = () => {
         destinationShopId: updatedDestinationShopId,
         endNodesList: endNodesList,
         calibratedShopAngle: currentLocation?.shop_angle || 0,
+        market: market,
       },
     });
   };
@@ -179,10 +185,6 @@ const Dashboard = () => {
       </Box>
     );
   }
-
-  const filteredShops = shops.filter((shop) =>
-    shop.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   const checkFill = () => {
     if (currentLocation) {

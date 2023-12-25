@@ -1,14 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import navigationArrow from "../assets/navigationArrow.svg";
 import CustomProgressBar from "../components/CustomProgressBar";
 import NavigationButtons from "./NavigationButtons";
 import {
   Button,
-  CircularProgress,
   Typography,
-  List,
-  ListItem,
-  ListItemText,
   Dialog,
   DialogActions,
   DialogContent,
@@ -29,6 +24,10 @@ import CountdownButton from "./CountdownButton";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import LoadingSpinner from "./LoadingSpinner";
 import arrowTorch from "../assets/arrowTorch.png";
+import reCalibrate from "../assets/reCalibrate.png";
+import areULost from "../assets/areULost.png";
+import ReRouting from "./ReRouting";
+
 window.currentStep = 0;
 window.modifyDy = 1;
 
@@ -36,10 +35,11 @@ window.modifyDy = 1;
 
 const globalArray = [];
 const globalTimeArray = [];
+
 const Navigation = () => {
   const navigate = useNavigate();
 
-  const navigateToShops = event => {
+  const navigateToShops = (event) => {
     window.location.href = "/markets";
   };
 
@@ -65,7 +65,7 @@ const Navigation = () => {
   const [selectedShopIndex, setSelectedShopIndex] = useState(0);
 
   const [showMap, setShowMap] = useState(true);
-  const changeSlectedIndexDynamic = index => {
+  const changeSlectedIndexDynamic = (index) => {
     console.log(index, "manish");
     setSelectedShopIndex(index);
   };
@@ -111,7 +111,7 @@ const Navigation = () => {
             return;
           }
 
-          setConn(data); // Assuming the API returns the data in the desired format
+          setConn(data); // Assuming the API returns the data in the desirrerouteeled format
           console.log(data, "shortest path");
 
           const lastShop = conn[conn.length - 1]?.name;
@@ -119,7 +119,7 @@ const Navigation = () => {
 
           // Find the first shop and set it as the active shop
           const firstShop = data.find(
-            item => item.shopOrCheckpoint?.type === "shop"
+            (item) => item.shopOrCheckpoint?.type === "shop"
           );
           if (firstShop) {
             setCurrentRoute([firstShop]);
@@ -196,7 +196,7 @@ const Navigation = () => {
   const reachRef = useRef(0);
   const whereRef = useRef("nowhere");
 
-  const handleMotion = event => {
+  const handleMotion = (event) => {
     accRef.current = event.acceleration;
     totalAccX.current += parseInt(event.acceleration.x);
     totalAccY.current += parseInt(event.acceleration.y);
@@ -367,7 +367,7 @@ const Navigation = () => {
     setDyV2(parseFloat(steps.current));
   };
 
-  const handleOrientation = event => {
+  const handleOrientation = (event) => {
     dirRef.current = event;
     setAa(event.alpha);
     if (!window.firstTime) {
@@ -381,13 +381,23 @@ const Navigation = () => {
     setAlpha(calibratedAlpha);
   };
 
-  useEffect(() => {
-    window.addEventListener("deviceorientation", handleOrientation);
-    window.addEventListener("devicemotion", handleMotion);
-
-    return () => {
+  const configureDeviceSensors = (flag) => {
+    if (flag) {
+      console.log("hello");
+      window.addEventListener("deviceorientation", handleOrientation);
+      window.addEventListener("devicemotion", handleMotion);
+    } else {
+      console.log("hi");
+      delete window.firstTime;
       window.removeEventListener("deviceorientation", handleOrientation);
       window.removeEventListener("devicemotion", handleMotion);
+    }
+  };
+
+  useEffect(() => {
+    configureDeviceSensors(true);
+    return () => {
+      configureDeviceSensors(false);
     };
   }, []);
 
@@ -544,12 +554,12 @@ const Navigation = () => {
       // If it's the last shop in the route
       window.modifyDy = 1;
       setTurnAngle(false);
-      setCurrentRoute(prevRoute => prevRoute.slice(1));
+      setCurrentRoute((prevRoute) => prevRoute.slice(1));
       lastRecordedStep.current = dy; // Reset the step count
     } else if (dy - lastRecordedStep.current >= stepsToNextShop) {
       floorPopupfn();
       if (currentRoute.length === 2) {
-        setCurrentRoute(prevRoute => prevRoute.slice(1));
+        setCurrentRoute((prevRoute) => prevRoute.slice(1));
       } else if (currentRoute.length == 1) {
         setShowReachedPopup(true);
       }
@@ -568,9 +578,9 @@ const Navigation = () => {
     // setCurrentShop(currentRoute[0].shopOrCheckpoint?.name);
   }, [dy, currentRoute, turnAngle]);
 
-  const handleDropdownChange = selectedShopName => {
+  const handleDropdownChange = (selectedShopName) => {
     const selectedIndex = route.findIndex(
-      item => item.shopOrCheckpoint.name === selectedShopName
+      (item) => item.shopOrCheckpoint.name === selectedShopName
     );
     setCurrentRoute(route.slice(selectedIndex));
 
@@ -616,7 +626,7 @@ const Navigation = () => {
     // Reset stepsWalked and set the selected shop index
     setStepsWalked(0);
     const index = route.findIndex(
-      item => item.shopOrCheckpoint.name === selectedShopName
+      (item) => item.shopOrCheckpoint.name === selectedShopName
     );
     setSelectedShopIndex(index);
   };
@@ -649,7 +659,7 @@ const Navigation = () => {
     const stepsTaken = dy - dyPrevious.current;
 
     // Update the remaining steps
-    setRemainingSteps(prevSteps => Math.max(0, prevSteps - stepsTaken));
+    setRemainingSteps((prevSteps) => Math.max(0, prevSteps - stepsTaken));
 
     // Update the previous dy value for the next calculation
     dyPrevious.current = dy;
@@ -707,7 +717,7 @@ const Navigation = () => {
       anglesIn: anglesIn,
     };
   });
-  const resetSteps = index => {
+  const resetSteps = (index) => {
     if (index === 0) {
       steps.current = 0;
       stepsV2.current = 0;
@@ -744,7 +754,7 @@ const Navigation = () => {
   }, [selectedShopIndex]);
 
   let flattenedRoute = [];
-  route.forEach(item => {
+  route.forEach((item) => {
     flattenedRoute.push(item.shopOrCheckpoint);
     if (item.connection) {
       flattenedRoute.push(item.connection);
@@ -752,7 +762,6 @@ const Navigation = () => {
   });
 
   //console.log("routeF: ",flattenedRoute)
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const [viewBox, setViewBox] = useState("0 0 500 300");
 
@@ -1008,6 +1017,32 @@ const Navigation = () => {
   // Button label based on the showMap state
   const showMapButton = showMap ? "Hide Map" : "Show Map";
 
+  const reRouteEle = [
+    {
+      type: areULost,
+      action: () => {
+        navigate("/dashboard", {
+          state: {
+            destinationShopId,
+            endNodesList: endNodesList,
+            market: location.state?.market,
+          },
+        });
+      },
+    },
+    {
+      type: reCalibrate,
+      action: () => {
+        configureDeviceSensors(false);
+        setTimeout(() => {
+          window.alert("we are re configured");
+          configureDeviceSensors(true);
+        }, 3000);
+      },
+    },
+    // Add more icons as needed
+  ];
+
   return isLoading ? (
     <div
       display="flex"
@@ -1037,6 +1072,7 @@ const Navigation = () => {
       stepsWalked={dy}
       totalSteps={totalSteps}
     /> */}
+      <ReRouting icons={reRouteEle} />
       <div
         style={{
           display: "flex",
@@ -1095,7 +1131,7 @@ const Navigation = () => {
           </div>*/}
         </div>
 
-        {/* <div style={{ marginTop: "20px" }}>
+        <div style={{ marginTop: "20px" }}>
           <Button
             variant="contained"
             color="primary"
@@ -1107,7 +1143,7 @@ const Navigation = () => {
           >
             Add steps mannualy
           </Button>
-        </div> */}
+        </div>
 
         <CustomProgressBar
           shops={shopsData}
@@ -1160,21 +1196,10 @@ const Navigation = () => {
             <p>shop angle is {calibratedShopAngle}</p>
             <p>user steps{steps.current}</p>
             <p>user actual steps{stepsV2.current}</p>
+            <p>is walking : {window.modifyDy}</p>
           </div>
-          <div style={{ marginTop: "20px" }}>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => {
-                steps.current++;
-                stepsV2.current++;
-                setdy(steps.current);
-              }}
-            >
-              Add steps mannualy
-            </Button>
-          </div>
-          ;<button onClick={toggleShowMap}>{showMapButton}</button>
+
+          <button onClick={toggleShowMap}>{showMapButton}</button>
           <div
             style={{
               transition: "opacity 2s ease",
