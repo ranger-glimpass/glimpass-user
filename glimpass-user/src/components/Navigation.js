@@ -39,7 +39,7 @@ const globalTimeArray = [];
 const Navigation = () => {
   const navigate = useNavigate();
 
-  const navigateToShops = (event) => {
+  const navigateToShops = event => {
     window.location.href = "/markets";
   };
 
@@ -65,7 +65,7 @@ const Navigation = () => {
   const [selectedShopIndex, setSelectedShopIndex] = useState(0);
 
   const [showMap, setShowMap] = useState(true);
-  const changeSlectedIndexDynamic = (index) => {
+  const changeSlectedIndexDynamic = index => {
     console.log(index, "manish");
     setSelectedShopIndex(index);
   };
@@ -119,7 +119,7 @@ const Navigation = () => {
 
           // Find the first shop and set it as the active shop
           const firstShop = data.find(
-            (item) => item.shopOrCheckpoint?.type === "shop"
+            item => item.shopOrCheckpoint?.type === "shop"
           );
           if (firstShop) {
             setCurrentRoute([firstShop]);
@@ -196,7 +196,7 @@ const Navigation = () => {
   const reachRef = useRef(0);
   const whereRef = useRef("nowhere");
 
-  const handleMotion = (event) => {
+  const handleMotion = event => {
     accRef.current = event.acceleration;
     totalAccX.current += parseInt(event.acceleration.x);
     totalAccY.current += parseInt(event.acceleration.y);
@@ -367,7 +367,7 @@ const Navigation = () => {
     setDyV2(parseFloat(steps.current));
   };
 
-  const handleOrientation = (event) => {
+  const handleOrientation = event => {
     dirRef.current = event;
     setAa(event.alpha);
     if (!window.firstTime) {
@@ -381,7 +381,7 @@ const Navigation = () => {
     setAlpha(calibratedAlpha);
   };
 
-  const configureDeviceSensors = (flag) => {
+  const configureDeviceSensors = flag => {
     if (flag) {
       console.log("hello");
       window.addEventListener("deviceorientation", handleOrientation);
@@ -554,12 +554,12 @@ const Navigation = () => {
       // If it's the last shop in the route
       window.modifyDy = 1;
       setTurnAngle(false);
-      setCurrentRoute((prevRoute) => prevRoute.slice(1));
+      setCurrentRoute(prevRoute => prevRoute.slice(1));
       lastRecordedStep.current = dy; // Reset the step count
     } else if (dy - lastRecordedStep.current >= stepsToNextShop) {
       floorPopupfn();
       if (currentRoute.length === 2) {
-        setCurrentRoute((prevRoute) => prevRoute.slice(1));
+        setCurrentRoute(prevRoute => prevRoute.slice(1));
       } else if (currentRoute.length == 1) {
         setShowReachedPopup(true);
       }
@@ -578,12 +578,13 @@ const Navigation = () => {
     // setCurrentShop(currentRoute[0].shopOrCheckpoint?.name);
   }, [dy, currentRoute, turnAngle]);
 
-  const handleDropdownChange = (selectedShopName) => {
+  const handleDropdownChange = selectedShopName => {
+    console.log(selectedShopName, "test");
     const selectedIndex = route.findIndex(
-      (item) => item.shopOrCheckpoint.name === selectedShopName
+      item => item.shopOrCheckpoint.nodeId === selectedShopName
     );
     setCurrentRoute(route.slice(selectedIndex));
-
+    console.log(currentRoute, "test t");
     // If the first shop is selected, set the coordinates to (200, 200)
     if (selectedIndex === 0) {
       setSelectedShopCoords({ x: 200, y: 200 });
@@ -626,8 +627,9 @@ const Navigation = () => {
     // Reset stepsWalked and set the selected shop index
     setStepsWalked(0);
     const index = route.findIndex(
-      (item) => item.shopOrCheckpoint.name === selectedShopName
+      item => item.shopOrCheckpoint.nodeId === selectedShopName
     );
+    console.log(index, "test t");
     setSelectedShopIndex(index);
   };
 
@@ -659,7 +661,7 @@ const Navigation = () => {
     const stepsTaken = dy - dyPrevious.current;
 
     // Update the remaining steps
-    setRemainingSteps((prevSteps) => Math.max(0, prevSteps - stepsTaken));
+    setRemainingSteps(prevSteps => Math.max(0, prevSteps - stepsTaken));
 
     // Update the previous dy value for the next calculation
     dyPrevious.current = dy;
@@ -717,7 +719,7 @@ const Navigation = () => {
       anglesIn: anglesIn,
     };
   });
-  const resetSteps = (index) => {
+  const resetSteps = index => {
     if (index === 0) {
       steps.current = 0;
       stepsV2.current = 0;
@@ -754,7 +756,7 @@ const Navigation = () => {
   }, [selectedShopIndex]);
 
   let flattenedRoute = [];
-  route.forEach((item) => {
+  route.forEach(item => {
     flattenedRoute.push(item.shopOrCheckpoint);
     if (item.connection) {
       flattenedRoute.push(item.connection);
@@ -767,7 +769,7 @@ const Navigation = () => {
 
   useEffect(() => {
     if (isRefreshed && route.length > 0) {
-      handleDropdownChange(route[0].shopOrCheckpoint?.name);
+      handleDropdownChange(route[0].shopOrCheckpoint?.nodeId);
       setIsRefreshed(false); // Reset isRefreshed to false after handling
     }
 

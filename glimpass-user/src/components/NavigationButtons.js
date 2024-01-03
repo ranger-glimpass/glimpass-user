@@ -8,9 +8,10 @@ const NavigationButtons = ({
   handleDropdownChange,
   changeSlectedIndexDynamic,
 }) => {
+  console.log(currentRoute, "test");
   let currentIndex = route.findIndex(
-    (item) =>
-      item.shopOrCheckpoint.name === currentRoute[0]?.shopOrCheckpoint?.name
+    item =>
+      item.shopOrCheckpoint.nodeId === currentRoute[0]?.shopOrCheckpoint?.nodeId
   );
   console.log(route, "Route");
   console.log(currentRoute, "Current - Route");
@@ -43,14 +44,13 @@ const NavigationButtons = ({
 
   const nodesToDisplay = route.slice(start, end + 1);
 
-  const checkpointOrStop=(node)=>{
-    if(node.shopOrCheckpoint?.nodeType === "checkpoint"){
-      return 'Just a Turn'
-    }
-    else{
+  const checkpointOrStop = node => {
+    if (node.shopOrCheckpoint?.nodeType === "checkpoint") {
+      return "Just a Turn";
+    } else {
       return node.shopOrCheckpoint?.name;
     }
-  }
+  };
   return (
     <div className="horizontal-scroll">
       {nodesToDisplay.map((node, index) => (
@@ -58,12 +58,15 @@ const NavigationButtons = ({
           key={index}
           variant="contained"
           color={
-            node.shopOrCheckpoint.name ===
-            currentRoute[0]?.shopOrCheckpoint?.name
+            node.shopOrCheckpoint.nodeId ===
+            currentRoute[0]?.shopOrCheckpoint?.nodeId
               ? "primary"
               : "inherit"
           }
-          onClick={() => handleDropdownChange(node.shopOrCheckpoint?.name)}
+          onClick={() => {
+            console.log(node, "test t");
+            handleDropdownChange(node.shopOrCheckpoint?.nodeId);
+          }}
           className="button-fixed-width" // Ensure buttons have the same width
         >
           {node.shopOrCheckpoint.name ===
