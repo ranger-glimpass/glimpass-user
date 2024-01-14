@@ -54,6 +54,8 @@ const Navigation = () => {
   const destinationShopId = location.state.destinationShopId;
   const endNodesList = location.state.endNodesList;
   const [conn, setConn] = useState([]);
+  const [route, setRoute] = useState([]);
+  const [currentRoute, setCurrentRoute] = useState(route);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshed, setIsRefreshed] = useState(true);
   const [turnAngle, setTurnAngle] = useState(false);
@@ -404,20 +406,30 @@ const Navigation = () => {
   }, []);
 
   //conn is where we store {node, connection, node , connection ,....}
-  let route = [];
-  for (let i = 0; i < conn.length; i++) {
-    if (
-      conn[i].nodeType === "shop" ||
-      conn[i].nodeType === "washroom" ||
-      conn[i].nodeType === "checkpoint" ||
-      conn[i].nodeType === "floor_change"
-    ) {
-      const shopOrCheckpoint = conn[i];
-      const connection = conn[i + 1];
-      route.push({ shopOrCheckpoint, connection });
-      i++; // Increment by one more to skip the connection object
+
+  useEffect(() => {
+    let tempRoute = [];
+    for (let i = 0; i < conn.length; i++) {
+      if (
+        conn[i].nodeType === "shop" ||
+        conn[i].nodeType === "washroom" ||
+        conn[i].nodeType === "checkpoint" ||
+        conn[i].nodeType === "floor_change"
+      ) {
+        const shopOrCheckpoint = conn[i];
+        const connection = conn[i + 1];
+        if (i + 2 < conn.length) {
+          connection.steps = connection.steps - conn[i + 2]?.nodeWeight;
+        }
+        console.log(connection, "manishhh");
+        tempRoute.push({ shopOrCheckpoint, connection });
+        i++; // Increment by one more to skip the connection object
+      }
     }
-  }
+    setRoute(tempRoute);
+  }, [conn]);
+
+  console.log(conn, "conn");
   console.log(route, "route");
   // const getDirection = (targetAngle, alpha) => {
   //   let angleDifference = ((targetAngle - alpha + 180) % 360) - 180;
@@ -439,7 +451,6 @@ const Navigation = () => {
   //     route.push({ shopOrCheckpoint: conn[conn.length - 1], connection: null });
   // }
 
-  const [currentRoute, setCurrentRoute] = useState(route);
   const [totalStep, setTotalStep] = useState(0);
   const [adjustedAng, setAdjustedAng] = useState(0);
   const [nextNodeAngle, setNextNodeAngle] = useState(0);
@@ -481,7 +492,7 @@ const Navigation = () => {
     setTotalStep(initialTotalSteps);
     setCurrentWalkAngle(currentRoute[0]?.connection?.angle || 0);
     setNextNodeAngle(currentRoute[1]?.connection?.angle || 0);
-  }, [currentRoute, alpha]);
+  }, [currentRoute, alpha, route]);
 
   useEffect(() => {
     if (currentRoute.length === 1) {
@@ -756,7 +767,7 @@ const Navigation = () => {
 
     // Update the selectedShopCoords state
     setSelectedShopCoords({ x: currentX, y: currentY });
-  }, [selectedShopIndex]);
+  }, [selectedShopIndex, route]);
 
   let flattenedRoute = [];
   route.forEach(item => {
@@ -806,7 +817,6 @@ const Navigation = () => {
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-
 
   const [currentStep, setCurrentStep] = useState(1);
 
@@ -953,7 +963,7 @@ const Navigation = () => {
           adjustedAng={adjustedAng}
           selectedShopIndex={selectedShopIndex}
         />
-     
+
         <div>
           <NavigationButtons
             route={route}
@@ -1001,8 +1011,10 @@ const Navigation = () => {
             <p>is walking : {window.modifyDy}</p>
           </div> */}
 
-          
-        <RouteSummary shops={shopsData} selectedShopIndex={selectedShopIndex} />
+          <RouteSummary
+            shops={shopsData}
+            selectedShopIndex={selectedShopIndex}
+          />
 
           <button onClick={toggleShowMap}>{showMapButton}</button>
           <div

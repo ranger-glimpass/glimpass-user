@@ -109,6 +109,12 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchUpdatedDestination = async () => {
       if (destinationShopId === "nearestWashroom") {
+        const payload = {
+          nodeId: currentLocation?.nodeId,
+        };
+        if (location?.state?.clickedItem) {
+          payload.nodeType = location.state.clickedItem;
+        }
         const response = await fetch(
           "https://app.glimpass.com/user/get-nearest-washroom",
           {
@@ -116,9 +122,7 @@ const Dashboard = () => {
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({
-              nodeId: currentLocation?.nodeId,
-            }),
+            body: JSON.stringify(payload),
             // Add any necessary body data for the POST request
           }
         );
@@ -140,8 +144,8 @@ const Dashboard = () => {
       typeof DeviceOrientationEvent.requestPermission === "function"
     ) {
       DeviceOrientationEvent.requestPermission()
-        .then((response) => {
-          if (response == "granted") {
+        .then(response => {
+          if (response === "granted") {
             window.addEventListener("deviceorientation", handleOrientation);
             window.addEventListener("devicemotion", handleMotion);
           }

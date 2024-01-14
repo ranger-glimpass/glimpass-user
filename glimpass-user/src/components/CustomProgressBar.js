@@ -12,11 +12,7 @@ import reached from "../assets/reached.png";
 const Popup = ({ message }) => {
   if (!message) return null;
 
-  return (
-    <div className="popup">
-      {message}
-    </div>
-  );
+  return <div className="popup">{message}</div>;
 };
 
 const useStyles = makeStyles({
@@ -96,7 +92,7 @@ const CustomProgressBar = ({
 
     // Update the steps between the current shop and the next shop
     if (nextShopIndex === 0) {
-      setStepsBetweenShops(parseInt(shops[0].step, 10));
+      setStepsBetweenShops(parseInt(shops[0]?.step, 10));
     } else {
       setStepsBetweenShops(
         parseInt(shops[nextShopIndex].step, 10) -
@@ -111,7 +107,7 @@ const CustomProgressBar = ({
 
   useEffect(() => {
     if (selectedShopIndex === 0) {
-      setStepsBetweenShops(parseInt(shops[selectedShopIndex].step, 10));
+      setStepsBetweenShops(parseInt(shops[selectedShopIndex]?.step, 10));
     } else {
       if (shops[selectedShopIndex]) {
         setStepsBetweenShops(
@@ -129,12 +125,12 @@ const CustomProgressBar = ({
   const currentShopStep =
     selectedShopIndex === 0
       ? 0
-      : parseInt(shops[selectedShopIndex - 1].step, 10);
+      : parseInt(shops[selectedShopIndex - 1]?.step, 10);
 
-  const nextShopStep = parseInt(shops[selectedShopIndex].step, 10);
+  const nextShopStep = parseInt(shops[selectedShopIndex]?.step, 10);
   const clampedStepsWalked = Math.max(
     currentShopStep,
-    Math.min(stepsWalked, parseInt(shops[selectedShopIndex].step, 10))
+    Math.min(stepsWalked, parseInt(shops[selectedShopIndex]?.step, 10))
   );
   const progressPercentage =
     ((clampedStepsWalked - currentShopStep) / stepsBetweenShops) * 100;
@@ -188,7 +184,7 @@ const CustomProgressBar = ({
     }
   }, [direction]);
 
-  const getDirectionImage = (direction) => {
+  const getDirectionImage = direction => {
     switch (direction) {
       case "Ready to turn Left":
         return leftImage;
@@ -201,13 +197,9 @@ const CustomProgressBar = ({
     }
   };
 
-
-
-
   const [showPopup, setShowPopup] = useState(false);
-  const [routeSummary, setRouteSummary] = useState('');
+  const [routeSummary, setRouteSummary] = useState("");
   const [popupTimer, setPopupTimer] = useState(null);
-
 
   // useEffect(() => {
   //   const newSummary = generateRouteSummary();
@@ -226,26 +218,24 @@ const CustomProgressBar = ({
   //   }
   // }, [shops, selectedShopIndex]);
 
-  
-
   // const generateRouteSummary = () => {
   //   let summary = '';
   //   let currentPoint = shops[selectedShopIndex];
   //   let nextPoints = shops.slice(selectedShopIndex + 1, selectedShopIndex + 4);
-  
+
   //   if (currentPoint) {
   //     // Description for the current location.
   //     summary += currentPoint.nodeType === 'floor_change' ? 'Currently at Lift/Escalator, \n' :
   //                currentPoint.nodeType === 'washroom' ? 'Currently at Washroom corner, \n' :
   //                `Currently at ${currentPoint.name}, \n`;
-  
+
   //     let straightPath = [];
   //     let hasAddedPath = false;
-  
+
   //     for (let i = 0; i < nextPoints.length; i++) {
   //       let point = nextPoints[i];
   //       let nextPoint = nextPoints[i + 1];
-  
+
   //       if (point.nodeType === "checkpoint") {
   //         if (straightPath.length > 0 && !hasAddedPath) {
   //           summary += `Go through ${straightPath.join(", ")}, \n`;
@@ -277,18 +267,15 @@ const CustomProgressBar = ({
   //         }
   //       }
   //     }
-  
+
   //     // Handle any remaining straight path
   //     if (straightPath.length > 0 && !hasAddedPath) {
   //       summary += `Go through ${straightPath.join(", ")}. \n`;
   //     }
   //   }
-  
+
   //   return summary;
   // };
-  
-  
-  
 
   // console.log(generateRouteSummary(),'routesumm')
 
@@ -296,15 +283,12 @@ const CustomProgressBar = ({
   //   setRouteSummary(generateRouteSummary());
   // }, [shops, selectedShopIndex]);
 
-
-
   return (
     <div className="custom-progress-bar-container">
-
-       {/* <Button onClick={() => !showPopup ? setShowPopup(true) : setShowPopup(false)}>Show Route Summary</Button>
+      {/* <Button onClick={() => !showPopup ? setShowPopup(true) : setShowPopup(false)}>Show Route Summary</Button>
       {showPopup && <Popup message={routeSummary} />}
      */}
-     {/* <RouteSummary shops={shops} selectedShopIndex={selectedShopIndex} />
+      {/* <RouteSummary shops={shops} selectedShopIndex={selectedShopIndex} />
        */}
       <div className={classes.root}>
         <LinearProgress
@@ -328,9 +312,7 @@ const CustomProgressBar = ({
         </div>
       )}
       {shops[selectedShopIndex + 1]?.nodeType === "checkpoint" && (
-        <div className={classes.nextShop}>
-          Upcoming turn
-        </div>
+        <div className={classes.nextShop}>Upcoming turn</div>
       )}
 
       {direction && (
