@@ -121,34 +121,51 @@ const NavigationButtons = ({
   // };
 
 
+  const getFloorChangeMessage = (currentIndex, route) => {
+    if (route[currentIndex].shopOrCheckpoint.nodeType !== "floor_change") {
+      return null; // Return null if it's not a floor_change node
+    }
+  
+    const prevNode = route[currentIndex - 1]?.shopOrCheckpoint;
+    const nextNode = route[currentIndex + 1]?.shopOrCheckpoint;
+  
+    if (!prevNode || !nextNode) {
+      return null; // Return null if there is no previous or next node
+    }
+  
+    if (prevNode.floor !== nextNode.floor) {
+      return "Take the lift/escalator";
+    } else {
+      return "Cross the lift";
+    }
+  };
+  
   return (
     <div className="horizontal-scroll">
        {/* <Button onClick={handleShowSummary}>Show Route Summary</Button><br></br> */}
      
-      {nodesToDisplay.map((node, index) => (
-        <Button
-          key={index}
-          variant="contained"
-          color={
-            node.shopOrCheckpoint.nodeId ===
-            currentRoute[0]?.shopOrCheckpoint?.nodeId
-              ? "primary"
-              : "inherit"
-          }
-          onClick={() => {
-            console.log(node, "test t");
-            handleDropdownChange(node.shopOrCheckpoint.nodeId);
-          }}
-          className="button-fixed-width" // Ensure buttons have the same width
-        >
-          {node.shopOrCheckpoint.name ===
-          currentRoute[0]?.shopOrCheckpoint?.name ? (
-            <>📍 {checkpointOrStop(node)}</>
-          ) : (
-            checkpointOrStop(node)
-          )}
-        </Button>
-      ))}
+       {nodesToDisplay.map((node, index) => {
+  const buttonColor = node.shopOrCheckpoint.nodeId === currentRoute[0]?.shopOrCheckpoint?.nodeId ? "primary" : "inherit";
+  let buttonText = checkpointOrStop(node); // Your existing function to get the node text
+
+  // Check if it's a floor_change node and update the button text accordingly
+  const floorChangeMessage = getFloorChangeMessage(index + start, route);
+  if (floorChangeMessage) {
+    buttonText = floorChangeMessage;
+  }
+
+  return (
+    <Button
+      key={index}
+      variant="contained"
+      color={buttonColor}
+      onClick={() => handleDropdownChange(node.shopOrCheckpoint.nodeId)}
+      className="button-fixed-width"
+    >
+      {buttonText}
+    </Button>
+  );
+})}
       {/* {showPopup && <Popup message={popupMessage} />} */}
 
 {/* <div className="horizontal-scroll">
