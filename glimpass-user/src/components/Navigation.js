@@ -28,6 +28,8 @@ import reCalibrate from "../assets/reCalibrate.png";
 import areULost from "../assets/areULost.png";
 import ReRouting from "./ReRouting";
 
+import RouteSummary from "./RouteSummary";
+
 window.currentStep = 0;
 window.modifyDy = 1;
 
@@ -64,7 +66,7 @@ const Navigation = () => {
   const [stepsWalked, setStepsWalked] = useState(0);
   const [selectedShopIndex, setSelectedShopIndex] = useState(0);
 
-  const [showMap, setShowMap] = useState(true);
+  const [showMap, setShowMap] = useState(false);
   const changeSlectedIndexDynamic = index => {
     console.log(index, "manish");
     setSelectedShopIndex(index);
@@ -107,7 +109,7 @@ const Navigation = () => {
           // Check if the data is empty or not in the desired format
           if (!data || data.length === 0) {
             alert("No route found!");
-            navigate("/shops"); // Assuming '/shops' is the route for the shops page
+            navigate("/markets"); // Assuming '/markets' is the route for the market page
             return;
           }
 
@@ -383,11 +385,11 @@ const Navigation = () => {
 
   const configureDeviceSensors = flag => {
     if (flag) {
-      console.log("hello");
+      // console.log("hello");
       window.addEventListener("deviceorientation", handleOrientation);
       window.addEventListener("devicemotion", handleMotion);
     } else {
-      console.log("hi");
+      // console.log("hi");
       delete window.firstTime;
       window.removeEventListener("deviceorientation", handleOrientation);
       window.removeEventListener("devicemotion", handleMotion);
@@ -417,19 +419,19 @@ const Navigation = () => {
     }
   }
   console.log(route, "route");
-  const getDirection = (targetAngle, alpha) => {
-    let angleDifference = ((targetAngle - alpha + 180) % 360) - 180;
+  // const getDirection = (targetAngle, alpha) => {
+  //   let angleDifference = ((targetAngle - alpha + 180) % 360) - 180;
 
-    if (angleDifference > 180) angleDifference -= 360;
-    if (angleDifference < -180) angleDifference += 360;
+  //   if (angleDifference > 180) angleDifference -= 360;
+  //   if (angleDifference < -180) angleDifference += 360;
 
-    if (angleDifference >= -10 && angleDifference <= 10) return "straight";
-    if (angleDifference > 10 && angleDifference <= 45) return "slightly right";
-    if (angleDifference > 45 && angleDifference <= 135) return "sharp right";
-    if (angleDifference < -10 && angleDifference >= -45) return "slightly left";
-    if (angleDifference < -45 && angleDifference >= -135) return "sharp left";
-    return "U-turn";
-  };
+  //   if (angleDifference >= -10 && angleDifference <= 10) return "straight";
+  //   if (angleDifference > 10 && angleDifference <= 45) return "slightly right";
+  //   if (angleDifference > 45 && angleDifference <= 135) return "sharp right";
+  //   if (angleDifference < -10 && angleDifference >= -45) return "slightly left";
+  //   if (angleDifference < -45 && angleDifference >= -135) return "sharp left";
+  //   return "U-turn";
+  // };
 
   // If the conn array has an odd length, add the last shop without a connection
   // If the conn array has an odd length and the last element is a connection, add the last shop without a connection
@@ -676,24 +678,24 @@ const Navigation = () => {
     // setCurrentShop(currentRoute[0].shopOrCheckpoint?.name);
   }, [currentRoute]);
 
-  const directionsAndShops = route.reduce((acc, item, index) => {
-    if (item.shopOrCheckpoint.nodeType === "shop") {
-      acc.push(item.shopOrCheckpoint);
-    } else if (item.connection) {
-      acc.push({
-        direction: getDirection(item.connection.angle, dy),
-        steps: item.connection.steps,
-      });
-    }
-    return acc;
-  }, []);
+  // const directionsAndShops = route.reduce((acc, item, index) => {
+  //   if (item.shopOrCheckpoint.nodeType === "shop") {
+  //     acc.push(item.shopOrCheckpoint);
+  //   } else if (item.connection) {
+  //     acc.push({
+  //       direction: getDirection(item.connection.angle, dy),
+  //       steps: item.connection.steps,
+  //     });
+  //   }
+  //   return acc;
+  // }, []);
 
-  const totalStepsBetweenShops = directionsAndShops.reduce((acc, item) => {
-    if (item.steps) {
-      return acc + parseInt(item.steps);
-    }
-    return acc;
-  }, 0);
+  // const totalStepsBetweenShops = directionsAndShops.reduce((acc, item) => {
+  //   if (item.steps) {
+  //     return acc + parseInt(item.steps);
+  //   }
+  //   return acc;
+  // }, 0);
 
   // Prepare the data for the CustomProgressBar
   const shopsData = route.map((item, index) => {
@@ -715,6 +717,7 @@ const Navigation = () => {
     return {
       name: item.shopOrCheckpoint.name,
       nodeType: item.shopOrCheckpoint.nodeType,
+      floor: item.shopOrCheckpoint.floor,
       step: progressToThisPoint,
       anglesIn: anglesIn,
     };
@@ -804,210 +807,6 @@ const Navigation = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  //   return isLoading ? (
-  //     <div
-  //       style={{
-  //         display: "flex",
-  //         justifyContent: "center",
-  //         alignItems: "center",
-  //         height: "100vh",
-  //       }}
-  //     >
-  //       <CircularProgress />
-  //     </div>
-  //   ) : showThanks ? (
-  //     <ThanksComponent
-  //       route={directionsAndShops}
-  //       stepsWalked={dy}
-  //       totalSteps={totalSteps}
-  //     />
-  //   ) : (
-  //     <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
-  //       {/* Dropdown at top right */}
-  //       <div style={{ alignSelf: "flex-end", margin: "10px" }}>
-  //         <Typography
-  //           variant="h6"
-  //           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-  //         >
-  //           📍 {currentRoute[0]?.shopOrCheckpoint?.name || "In between"}
-  //         </Typography>
-
-  //         {/* {isRefreshed &&(
-  //   handleDropdownChange(currentRoute[0]?.shopOrCheckpoint?.name)
-  // )} */}
-  //         {isDropdownOpen && (
-  //           <List>
-  //             {route.map((item, index) => (
-  //               <ListItem
-  //                 key={index}
-  //                 button
-  //                 selected={
-  //                   currentRoute[0]?.shopOrCheckpoint?.name ===
-  //                   item.shopOrCheckpoint?.name
-  //                 }
-  //                 onClick={() => {
-  //                   handleDropdownChange(item.shopOrCheckpoint?.name);
-  //                   setIsDropdownOpen(false);
-  //                 }}
-  //               >
-  //                 <ListItemText primary={item.shopOrCheckpoint?.name} />
-  //               </ListItem>
-  //             ))}
-  //           </List>
-  //         )}
-  //       </div>
-
-  // <Typography variant="h5" gutterBottom>
-  //           Navigation to {destinationName}
-  //         </Typography>
-
-  //       {/* SVG Map */}
-  //       <div
-  //         // onTouchStart={handleTouchStart}
-  //         // onTouchMove={handleTouchMove}
-  //         // style={{
-  //         //   flexGrow: 1,
-  //         //   display: "flex",
-  //         //   justifyContent: "center",
-  //         //   alignItems: "center",
-  //         // }}
-  //       >
-  //         <SvgIcon
-  //           viewBox="0 0 500 500"
-  //           style={{
-  //             border: "1px solid red",
-  //             margin: "20px 0",
-  //             width: "80%",
-  //             height: "80%",
-  //           }}
-  //         >
-  //           <Path
-  //             route={flattenedRoute}
-  //             ref={pathRef}
-  //             setViewBox={setViewBox}
-  //             stepsWalked={dy}
-  //             totalSteps={totalSteps}
-  //             adjustedAng={adjustedAng}
-  //           />
-  //         </SvgIcon>
-  //       </div>
-
-  //        {/* Use CustomProgressBar, passing the necessary props to it */}
-  //        <CustomProgressBar shops={shopsData} stepsWalked={dy} totalSteps={totalSteps} />
-
-  //       <div
-  //         style={{
-  //           display: "flex",
-  //           justifyContent: "center",
-  //           alignItems: "center",
-  //           padding: "20px",
-  //         }}
-  //       >
-  //         <img
-  //           src={navigationArrow}
-  //           alt="Navigation Arrow"
-  //           style={{
-  //             transform: `rotate(${adjustedAng}deg)`,
-  //             width: "50px", // Adjust this value as needed
-  //             height: "50px", // Adjust this value as needed
-  //           }}
-  //         />
-  //       </div>
-
-  //       {/* Route Details */}
-  //       <div style={{ padding: "20px" }}>
-
-  //         <Typography
-  //           variant="body1"
-  //           style={{ fontSize: "24px", fontWeight: "bold", margin: "10px 0" }}
-  //         >
-  //           Steps: {dy}
-  //         </Typography>
-
-  //         {/* <Typography variant="h6" gutterBottom>
-  //           Route:
-  //         </Typography> */}
-  //         {/* <div>
-  //           {currentRoute.slice(0, 2).map((item, index) => (
-  //             <Typography key={index} variant="body1" gutterBottom>
-  //               {index === 0
-  //                 ? `📍 Now at: ${item.shopOrCheckpoint?.name}`
-  //                 : item.shopOrCheckpoint?.type === "shop"
-  //                 ? `👉 Next shop: ${item.shopOrCheckpoint?.name}`
-  //                 : `Take ${getDirection(
-  //                     item.connection?.angle,
-  //                     dy
-  //                   )} in next ${remainingSteps} steps`}
-  //             </Typography>
-  //           ))}
-  //         </div> */}
-
-  //         <Typography variant="h6" gutterBottom>
-  //           Total Steps: {Math.max(0, totalStep - dy + lastRecordedStep.current)}
-  //         </Typography>
-
-  //         {/* Button at the bottom */}
-  //         <div style={{ marginTop: "20px" }}>
-  //           <Button variant="contained" color="primary" onClick={navigateToShops}>
-  //             Navigate other shops
-  //           </Button>
-  //         </div>
-  //       </div>
-
-  //       {showReachedPopup && (
-  //         <Dialog
-  //           open={showReachedPopup}
-  //           onClose={() => setShowReachedPopup(false)}
-  //         >
-  //           <DialogTitle>Confirmation</DialogTitle>
-  //           <DialogContent>
-  //             <DialogContentText>
-  //               Did you reach {currentRoute[0]?.shopOrCheckpoint?.name}?
-  //             </DialogContentText>
-  //           </DialogContent>
-  //           <DialogActions>
-  //             <Button onClick={() => setShowReachedPopup(false)} color="primary">
-  //               No
-  //             </Button>
-  //             <Button
-  //               onClick={() => {
-  //                 setShowReachedPopup(false);
-  //                 setShowThanks(true);
-  //               }}
-  //               color="primary"
-  //             >
-  //               Yes
-  //             </Button>
-  //           </DialogActions>
-  //         </Dialog>
-  //       )}
-
-  //       {showFloorChangePopup && (
-  //         <Dialog
-  //           open={showFloorChangePopup}
-  //           onClose={() => setShowFloorChangePopup(false)}
-  //         >
-  //           <DialogTitle>Floor Change Required</DialogTitle>{" "}
-  //           <DialogContent>
-  //             {" "}
-  //             <DialogContentText>
-  //               Proceed to the lift and go to floor {nextFloor}.{" "}
-  //             </DialogContentText>{" "}
-  //           </DialogContent>{" "}
-  //           <DialogActions>
-  //             {" "}
-  //             <Button
-  //               onClick={() => setShowFloorChangePopup(false)}
-  //               color="primary"
-  //             >
-  //               OK{" "}
-  //             </Button>{" "}
-  //           </DialogActions>{" "}
-  //         </Dialog>
-  //       )}
-  //     </div>
-  //   );
-  // };
 
   const [currentStep, setCurrentStep] = useState(1);
 
@@ -1062,7 +861,7 @@ const Navigation = () => {
     </div>
   ) : showThanks ? (
     <ThanksComponent
-      route={directionsAndShops}
+      // route={directionsAndShops}
       stepsWalked={dy}
       totalSteps={totalSteps}
     />
@@ -1154,6 +953,7 @@ const Navigation = () => {
           adjustedAng={adjustedAng}
           selectedShopIndex={selectedShopIndex}
         />
+     
         <div>
           <NavigationButtons
             route={route}
@@ -1184,7 +984,7 @@ const Navigation = () => {
             borderTop: "1px solid #ddd",
           }}
         >
-          <div>
+          {/* <div>
             <p>{turnAngle ? "Trueeee" : "Falseeee"}</p>
             <p>device raw alhpa value{aa?.toFixed(4)}</p>
             <p>after calibrated value{alpha}</p>
@@ -1199,7 +999,10 @@ const Navigation = () => {
             <p>user steps{steps.current}</p>
             <p>user actual steps{stepsV2.current}</p>
             <p>is walking : {window.modifyDy}</p>
-          </div>
+          </div> */}
+
+          
+        <RouteSummary shops={shopsData} selectedShopIndex={selectedShopIndex} />
 
           <button onClick={toggleShowMap}>{showMapButton}</button>
           <div

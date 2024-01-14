@@ -1,12 +1,23 @@
 import React, { useState, useEffect } from "react";
 import LinearProgress from "@mui/material/LinearProgress";
 import { makeStyles } from "@mui/styles";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, Button } from "@mui/material";
 import directionImage from "../assets/atm.png";
 import leftImage from "../assets/leftTurn.jpg"; // Replace with your image's path and extension
 import rightImage from "../assets/rightTurn.jpg";
 import straightImage from "../assets/keepStaright.png";
 import reached from "../assets/reached.png";
+// import RouteSummary from "./RouteSummary";
+
+const Popup = ({ message }) => {
+  if (!message) return null;
+
+  return (
+    <div className="popup">
+      {message}
+    </div>
+  );
+};
 
 const useStyles = makeStyles({
   root: {
@@ -147,8 +158,8 @@ const CustomProgressBar = ({
     }
 
     if (Math.abs(difference) <= 20) return null; // No direction if within ±20 degrees
-    if (difference > 20) return "Right";
-    return "Left";
+    if (difference > 20) return "Left";
+    return "Right";
   };
 
   let direction;
@@ -190,8 +201,111 @@ const CustomProgressBar = ({
     }
   };
 
+
+
+
+  const [showPopup, setShowPopup] = useState(false);
+  const [routeSummary, setRouteSummary] = useState('');
+  const [popupTimer, setPopupTimer] = useState(null);
+
+
+  // useEffect(() => {
+  //   const newSummary = generateRouteSummary();
+  //   setRouteSummary(newSummary);
+
+  //   // Check if summary includes a turn and show popup
+  //   if (newSummary.includes("turn")) {
+  //     setShowPopup(true);
+
+  //     // Clear existing timer if there is one
+  //     if (popupTimer) clearTimeout(popupTimer);
+
+  //     // Set a new timer to hide the popup after 3 seconds
+  //     const timer = setTimeout(() => setShowPopup(false), 3000);
+  //     setPopupTimer(timer);
+  //   }
+  // }, [shops, selectedShopIndex]);
+
+  
+
+  // const generateRouteSummary = () => {
+  //   let summary = '';
+  //   let currentPoint = shops[selectedShopIndex];
+  //   let nextPoints = shops.slice(selectedShopIndex + 1, selectedShopIndex + 4);
+  
+  //   if (currentPoint) {
+  //     // Description for the current location.
+  //     summary += currentPoint.nodeType === 'floor_change' ? 'Currently at Lift/Escalator, \n' :
+  //                currentPoint.nodeType === 'washroom' ? 'Currently at Washroom corner, \n' :
+  //                `Currently at ${currentPoint.name}, \n`;
+  
+  //     let straightPath = [];
+  //     let hasAddedPath = false;
+  
+  //     for (let i = 0; i < nextPoints.length; i++) {
+  //       let point = nextPoints[i];
+  //       let nextPoint = nextPoints[i + 1];
+  
+  //       if (point.nodeType === "checkpoint") {
+  //         if (straightPath.length > 0 && !hasAddedPath) {
+  //           summary += `Go through ${straightPath.join(", ")}, \n`;
+  //           hasAddedPath = true;
+  //         }
+  //         const turnDirection = getTurnDirection(currentPoint.anglesIn, point.anglesIn);
+  //         summary += `Keep straight and take a ${turnDirection} turn. \n`;
+  //         break;
+  //       } else if (point.nodeType === "floor_change") {
+  //         if (straightPath.length > 0 && !hasAddedPath) {
+  //           summary += `Go through ${straightPath.join(", ")}, \n`;
+  //           hasAddedPath = true;
+  //         }
+  //         summary += `Take the Lift/Escalator to the next floor. \n`;
+  //         break;
+  //       } else {
+  //         straightPath.push(point.name);
+  //         currentPoint = point; // Update current point for the next iteration
+  //         if (nextPoint) {
+  //           const directionAfterShop = getTurnDirection(point.anglesIn, nextPoint.anglesIn);
+  //           if (directionAfterShop !== null) {
+  //             if (straightPath.length > 0 && !hasAddedPath) {
+  //               summary += `Go through ${straightPath.join(", ")}`;
+  //               hasAddedPath = true;
+  //             }
+  //             summary += ` and then turn ${directionAfterShop}. \n`;
+  //             break;
+  //           }
+  //         }
+  //       }
+  //     }
+  
+  //     // Handle any remaining straight path
+  //     if (straightPath.length > 0 && !hasAddedPath) {
+  //       summary += `Go through ${straightPath.join(", ")}. \n`;
+  //     }
+  //   }
+  
+  //   return summary;
+  // };
+  
+  
+  
+
+  // console.log(generateRouteSummary(),'routesumm')
+
+  // useEffect(() => {
+  //   setRouteSummary(generateRouteSummary());
+  // }, [shops, selectedShopIndex]);
+
+
+
   return (
     <div className="custom-progress-bar-container">
+
+       {/* <Button onClick={() => !showPopup ? setShowPopup(true) : setShowPopup(false)}>Show Route Summary</Button>
+      {showPopup && <Popup message={routeSummary} />}
+     */}
+     {/* <RouteSummary shops={shops} selectedShopIndex={selectedShopIndex} />
+       */}
       <div className={classes.root}>
         <LinearProgress
           variant="determinate"

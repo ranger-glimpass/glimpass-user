@@ -97,6 +97,8 @@ const ShopList = (props) => {
     console.log(amb, "ambeinceshop")
     //setShops(shopsArray);
     console.log(shops, "shops fetched!")
+    console.log(shops.length, "total shops")
+    
     const shopFrequency = {};
     shopsArray.forEach(shop => {
       if (shopFrequency[shop.name]) {
