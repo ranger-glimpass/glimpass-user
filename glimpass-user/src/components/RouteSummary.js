@@ -42,7 +42,8 @@ const RouteSummary = ({ shops, selectedShopIndex }) => {
       
         if (currentPoint) {
           // Description for the current location.
-          summary += currentPoint.nodeType === 'floor_change' ? 'Currently at Lift/Escalator, \n' :
+          summary += currentPoint.nodeType === 'floor_change' ? 'Currently at Escalator, \n' :
+                     currentPoint.nodeType === 'floor_change_lift' ? 'Currently at Lift, \n' :
                      currentPoint.nodeType === 'washroom' ? 'Currently at Washroom corner, \n' :
                      currentPoint.nodeType !== 'checkpoint' ? `Currently at ${currentPoint.name}, \n` : '';
       

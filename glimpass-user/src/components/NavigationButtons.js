@@ -122,10 +122,12 @@ const NavigationButtons = ({
 
 
   const getFloorChangeMessage = (currentIndex, route) => {
-    if (route[currentIndex].shopOrCheckpoint.nodeType !== "floor_change") {
+    if (route[currentIndex].shopOrCheckpoint.nodeType !== "floor_change" && route[currentIndex].shopOrCheckpoint.nodeType !== "floor_change_lift") {
       return null; // Return null if it's not a floor_change node
     }
   
+    const floorChangeEntity = route[currentIndex].shopOrCheckpoint.nodeType === "floor_change" ? "Escalator":
+                              route[currentIndex].shopOrCheckpoint.nodeType === "floor_change_lift" ? "Lift" : "";  
     const prevNode = route[currentIndex - 1]?.shopOrCheckpoint;
     const nextNode = route[currentIndex + 1]?.shopOrCheckpoint;
   
@@ -134,9 +136,9 @@ const NavigationButtons = ({
     }
   
     if (prevNode.floor !== nextNode.floor) {
-      return "Take the lift/escalator";
+      return "Take the "+floorChangeEntity+ " to floor "+nextNode.floor;
     } else {
-      return "Cross the lift";
+      return "Cross the "+floorChangeEntity;
     }
   };
   

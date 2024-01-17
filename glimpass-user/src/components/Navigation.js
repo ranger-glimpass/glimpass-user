@@ -414,7 +414,8 @@ const Navigation = () => {
         conn[i].nodeType === "shop" ||
         conn[i].nodeType === "washroom" ||
         conn[i].nodeType === "checkpoint" ||
-        conn[i].nodeType === "floor_change"
+        conn[i].nodeType === "floor_change" ||
+        conn[i].nodeType === "floor_change_lift" 
       ) {
         const shopOrCheckpoint = conn[i];
         const connection = conn[i + 1];
@@ -541,24 +542,36 @@ const Navigation = () => {
   }, [stepsV2.current]);
   // manish
 
+
   const floorPopupfn = () => {
-    const currentNodeType = currentRoute[1]?.shopOrCheckpoint?.nodeType;
-
-    let nextNode = currentRoute[2]?.shopOrCheckpoint;
-
-    let j = 2;
+    const currentIndex = currentRoute.findIndex(
+      item => item.shopOrCheckpoint.nodeType === "floor_change" || item.shopOrCheckpoint.nodeType === "floor_change_lift"
+    );
+  
+    if (currentIndex === -1) {
+      setShowFloorChangePopup(false);
+      return;
+    }
+  
+    const previousNode = currentIndex > 0 ? currentRoute[currentIndex - 1]?.shopOrCheckpoint : null;
+    let nextNode = currentRoute[currentIndex + 1]?.shopOrCheckpoint;
+  
+    let j = currentIndex + 1;
     while (j < currentRoute.length && nextNode?.nodeType === "checkpoint") {
       nextNode = currentRoute[j]?.shopOrCheckpoint;
       j++;
     }
-    if (currentNodeType === "floor_change" && nextNode) {
+  
+    if (previousNode && nextNode && previousNode.floor !== nextNode.floor) {
       setShowFloorChangePopup(true);
-      window.modifyDy = 0;
       setNextFloor(nextNode?.floor);
     } else {
       setShowFloorChangePopup(false);
     }
   };
+  
+
+
   useEffect(() => {
     // Check if you've reached the next destination
     const stepsToNextShop = currentRoute[0]?.connection?.steps || 1000000;

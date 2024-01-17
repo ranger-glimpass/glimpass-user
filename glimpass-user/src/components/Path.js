@@ -127,7 +127,10 @@ const Path = forwardRef(({ route, setViewBox, stepsWalked, totalSteps, adjustedA
                     name = shopOrCheckpoint?.name;
                 }
                 if (shopOrCheckpoint.nodeType === "floor_change") {
-                    name = "Stair/Lift";
+                    name = "Escalator";
+                }
+                if (shopOrCheckpoint.nodeType === "floor_change_lift") {
+                    name = "Lift";
                 }
                 return (
                     <g key={index}>
