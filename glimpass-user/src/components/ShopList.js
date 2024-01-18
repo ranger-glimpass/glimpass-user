@@ -40,22 +40,19 @@ import CategoryIcon from "@mui/icons-material/Category";
 import DiscountIcon from "@mui/icons-material/LocalOffer";
 import { Bathroom, Margin, NoAccounts } from "@mui/icons-material";
 import defaultDP from "../assets/defaultDP.png";
-import Chip from '@mui/material/Chip';
+import Chip from "@mui/material/Chip";
 
 const chipStyle = {
-  color: 'white', // Text color
-  border: '1px solid #e0e0e0', // Light grey border for minimalism
-  boxShadow: '1px 1px 3px rgba(0, 0, 0, 0.1)', // Subtle shadow for depth
+  color: "white", // Text color
+  border: "1px solid #e0e0e0", // Light grey border for minimalism
+  boxShadow: "1px 1px 3px rgba(0, 0, 0, 0.1)", // Subtle shadow for depth
   //fontWeight: 'bold', // Optional: if you want the text to be bold
-  borderRadius: '0px', // Makes the Chip square
-  padding: '0px 2px', // Adjust padding to your preference
-  backgroundColor: '#7e97f2', // White background to blend with the card
-  
- 
+  borderRadius: "0px", // Makes the Chip square
+  padding: "0px 2px", // Adjust padding to your preference
+  backgroundColor: "#7e97f2", // White background to blend with the card
 };
 
-
-const ShopList = props => {
+const ShopList = (props) => {
   const navigate = useNavigate();
   const [shops, setShops] = useState([]);
   const [isLoading, setIsLoading] = useState(true); // State to track loading status
@@ -72,7 +69,7 @@ const ShopList = props => {
   const [showSearch, setShowSearch] = React.useState(false);
   const location = useLocation();
 
-  const handleNavigateClick = async shopId => {
+  const handleNavigateClick = async (shopId) => {
     setActiveCard(shopId);
     const email = sessionStorage.getItem("email");
     const name = sessionStorage.getItem("name");
@@ -116,7 +113,7 @@ const ShopList = props => {
     console.log(shops.length, "total shops");
 
     const shopFrequency = {};
-    shopsArray.forEach(shop => {
+    shopsArray.forEach((shop) => {
       if (shopFrequency[shop.name]) {
         shopFrequency[shop.name][1] += 1; // Increment if already exists
         shopFrequency[shop.name][2].push(shop.nodeId);
@@ -137,8 +134,8 @@ const ShopList = props => {
     setIsLoading(false); // Set loading to false once data is fetched
   };
 
-  const handle = shopId => {
-    const selectedShop = shops.find(shop => shop.nodeId === shopId);
+  const handle = (shopId) => {
+    const selectedShop = shops.find((shop) => shop.nodeId === shopId);
     setSelectedShopDetails(selectedShop);
     setOpenModal(true);
   };
@@ -176,14 +173,14 @@ const ShopList = props => {
   };
 
   const filteredShops = selectedShop
-    ? shops.filter(shop => shop.nodeId === selectedShop.nodeId)
+    ? shops.filter((shop) => shop.nodeId === selectedShop.nodeId)
     : shops;
 
   const handleExpandClick = () => {
-    setIsExpanded(prev => !prev);
+    setIsExpanded((prev) => !prev);
   };
 
-  const handleMenu = event => {
+  const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
   };
 
@@ -209,8 +206,6 @@ const ShopList = props => {
     return defaultDP;
   };
 
-
-
   return (
     <Container>
       <AppBar position="fixed" style={{ background: "white" }}>
@@ -230,7 +225,7 @@ const ShopList = props => {
           </IconButton> */}
           <SearchBox
             data={shops}
-            onShopSelected={selectedShop => {
+            onShopSelected={(selectedShop) => {
               handle(selectedShop); // set the details for the selected shop
             }}
           />
@@ -289,24 +284,24 @@ data={shops}
         px={{ xs: 2, sm: 4 }}
       >
         {filteredShops
-          .filter(shop => shop.nodeType === "shop")
+          .filter((shop) => shop.nodeType === "shop")
           .map((shop, index) => {
             if (viewMode === "deals" && !shop.discount) {
               return null;
             }
             let pricingBadge;
-            switch(shop.pricingLevel) {
+            switch (shop.pricingLevel) {
               case 1:
-                pricingBadge = '₹';
+                pricingBadge = "₹";
                 break;
               case 2:
-                pricingBadge = '₹₹';
+                pricingBadge = "₹₹";
                 break;
               case 3:
-                pricingBadge = '₹₹₹';
+                pricingBadge = "₹₹₹";
                 break;
               default:
-                pricingBadge = ''; // or any default representation you prefer
+                pricingBadge = ""; // or any default representation you prefer
             }
 
             return (
@@ -317,7 +312,7 @@ data={shops}
                   boxShadow: 1,
                   borderRadius: 2,
                   transition: "transform 0.2s",
-                  position: 'relative', // This is important for the absolute positioning of the Chip
+                  position: "relative", // This is important for the absolute positioning of the Chip
                   "&:hover": {
                     transform: "scale(1.05)",
                   },
@@ -325,20 +320,21 @@ data={shops}
                   flexDirection: "row",
                   alignItems: "center",
                   p: 1,
+                  "z-index": "0",
                   mx: { xs: 0, sm: 2 },
                 }}
                 // onClick={() => handleNavigateClick(shop.nodeId)}
               >
-                 <Box
-          sx={{
-            position: 'absolute',
-            top: 8, // Adjust top and left as per your styling needs
-            left: 8,
-            zIndex: 'tooltip', // To ensure the badge is above other elements
-          }}
-        >
-          <Chip label={pricingBadge} sx={chipStyle} />
-        </Box>
+                <Box
+                  sx={{
+                    position: "absolute",
+                    top: 8, // Adjust top and left as per your styling needs
+                    left: 8,
+                    zIndex: "tooltip", // To ensure the badge is above other elements
+                  }}
+                >
+                  <Chip label={pricingBadge} sx={chipStyle} />
+                </Box>
                 <CardActionArea
                   sx={{ display: "flex", flexDirection: "row", flexGrow: 1 }}
                   onClick={() => handle(shop.nodeId)}
@@ -531,7 +527,7 @@ data={shops}
                 destinationNodeId = selectedShopDetails?.nearby;
               }
               const selectedShop = shops.find(
-                shop => shop.nodeId === destinationNodeId
+                (shop) => shop.nodeId === destinationNodeId
               );
               const endNodesList = frequencyMap[selectedShop.name][2];
               navigate("/dashboard", {
