@@ -34,7 +34,7 @@ const Login = () => {
     // Check if session storage exists
     const userId = sessionStorage.getItem('_id');
     if (userId) {
-      // If it does, redirect to the shops page
+      // If it does, redirect to the market page
       navigate('/markets');
     }
   }, [navigate]);

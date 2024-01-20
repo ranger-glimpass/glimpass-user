@@ -8,15 +8,15 @@ import close from "../assets/close.png";
 import nearby from "../assets/nearby.png";
 //import Fab from '@mui/material/Fab';
 import RestroomIcon from "@mui/icons-material/Wc"; // Assuming you want to use the WC icon for the restroom
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-import SearchBox from './SearchBox'
-import LoadingSpinner from './LoadingSpinner';
-import searchIcon from "../assets/searchIcon.png"
-import ambienceShops from '../data/ambienceWithCategory.js';
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
+import SearchBox from "./SearchBox";
+import LoadingSpinner from "./LoadingSpinner";
+import searchIcon from "../assets/searchIcon.png";
+import ambienceShops from "../data/ambienceWithCategory.js";
 import {
   Card,
   CardContent,
@@ -33,13 +33,24 @@ import {
   Autocomplete,
   TextField,
   Avatar,
-  Menu, MenuItem
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import CategoryIcon from "@mui/icons-material/Category";
 import DiscountIcon from "@mui/icons-material/LocalOffer";
 import { Bathroom, Margin, NoAccounts } from "@mui/icons-material";
-import defaultDP from '../assets/defaultDP.png';
+import defaultDP from "../assets/defaultDP.png";
+import Chip from "@mui/material/Chip";
 
+const chipStyle = {
+  color: "white", // Text color
+  border: "1px solid #e0e0e0", // Light grey border for minimalism
+  boxShadow: "1px 1px 3px rgba(0, 0, 0, 0.1)", // Subtle shadow for depth
+  //fontWeight: 'bold', // Optional: if you want the text to be bold
+  borderRadius: "0px", // Makes the Chip square
+  padding: "0px 2px", // Adjust padding to your preference
+  backgroundColor: "#7e97f2", // White background to blend with the card
+};
 
 const ShopList = (props) => {
   const navigate = useNavigate();
@@ -54,51 +65,55 @@ const ShopList = (props) => {
   const [selectedShopDetails, setSelectedShopDetails] = useState(null);
   const [frequencyMap, setFrequencyMap] = useState(null);
 
-
-
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [showSearch, setShowSearch] = React.useState(false);
   const location = useLocation();
 
-
   const handleNavigateClick = async (shopId) => {
     setActiveCard(shopId);
-    const email = sessionStorage.getItem('email');
-    const name = sessionStorage.getItem('name');
-    const response = await fetch('https://app.glimpass.com/user/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const email = sessionStorage.getItem("email");
+    const name = sessionStorage.getItem("name");
+    const response = await fetch("https://app.glimpass.com/user/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, name }),
     });
     const data = await response.json();
-    sessionStorage.setItem('_id', data[0].user._id);
+    sessionStorage.setItem("_id", data[0].user._id);
     console.log(data, "register");
     const endNodeName = null;
     setTimeout(() => {
-      navigate("/dashboard", { state: { destinationShopId: shopId, market: location.state?.market } });
+      navigate("/dashboard", {
+        state: { destinationShopId: shopId, market: location.state?.market },
+      });
     }, 300); // Delay for the fade-out effect
   };
 
   const getAllNodes = async () => {
-    const response = await fetch("https://app.glimpass.com/graph/get-all-nodes-by-market", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        market: location.state?.market,
-      })
-      // Add any necessary body data for the POST request
-    });
+    const response = await fetch(
+      "https://app.glimpass.com/graph/get-all-nodes-by-market",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          market: location.state?.market,
+        }),
+        // Add any necessary body data for the POST request
+      }
+    );
     const data = await response.json();
     const shopsArray = Object.values(data);
 
     const amb = Object.values(ambienceShops);
-    console.log(amb, "ambeinceshop")
+    console.log(amb, "ambeinceshop");
     //setShops(shopsArray);
-    console.log(shops, "shops fetched!")
+    console.log(shops, "shops fetched!");
+    console.log(shops.length, "total shops");
+
     const shopFrequency = {};
-    shopsArray.forEach(shop => {
+    shopsArray.forEach((shop) => {
       if (shopFrequency[shop.name]) {
         shopFrequency[shop.name][1] += 1; // Increment if already exists
         shopFrequency[shop.name][2].push(shop.nodeId);
@@ -120,10 +135,10 @@ const ShopList = (props) => {
   };
 
   const handle = (shopId) => {
-    const selectedShop = shops.find(shop => shop.nodeId === shopId);
+    const selectedShop = shops.find((shop) => shop.nodeId === shopId);
     setSelectedShopDetails(selectedShop);
     setOpenModal(true);
-  }
+  };
   useEffect(() => {
     getAllNodes();
   }, []);
@@ -140,13 +155,14 @@ const ShopList = (props) => {
         flexDirection="column"
       >
         {/* Replace CircularProgress with your custom spinner */}
-        <div><LoadingSpinner /></div>
+        <div>
+          <LoadingSpinner />
+        </div>
         <h3>Hang On!</h3>
         <h4>Getting shops in the market...</h4>
       </Box>
     );
   }
-
 
   const handleNavigateButtonClick = () => {
     if (selectedShop) {
@@ -156,8 +172,6 @@ const ShopList = (props) => {
     }
   };
 
-
-
   const filteredShops = selectedShop
     ? shops.filter((shop) => shop.nodeId === selectedShop.nodeId)
     : shops;
@@ -165,7 +179,6 @@ const ShopList = (props) => {
   const handleExpandClick = () => {
     setIsExpanded((prev) => !prev);
   };
-
 
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
@@ -191,20 +204,19 @@ const ShopList = (props) => {
       return sessionStorage.getItem("imageUrl");
     }
     return defaultDP;
-  }
+  };
 
   return (
     <Container>
-      <AppBar position="fixed" style={{ background: 'white' }}>
+      <AppBar position="fixed" style={{ background: "white" }}>
         <Toolbar>
-
           <IconButton
             edge="start"
             color="inherit"
             aria-label="menu"
-          // onClick={handleMenu}
+            // onClick={handleMenu}
           >
-            <img src={logo} width='53px' height='60px' />
+            <img src={logo} width="53px" height="60px" />
             {/* Replace with your logo if this isn't a menu */}
           </IconButton>
           <div style={{ flexGrow: 1 }}></div>
@@ -231,18 +243,20 @@ const ShopList = (props) => {
             id="menu-appbar"
             anchorEl={anchorEl}
             anchorOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
+              vertical: "top",
+              horizontal: "right",
             }}
             keepMounted
             transformOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
+              vertical: "top",
+              horizontal: "right",
             }}
             open={Boolean(anchorEl)}
             onClose={handleClose}
           >
-            <MenuItem>Hello, {sessionStorage.getItem('name') || 'Guest'}</MenuItem>
+            <MenuItem>
+              Hello, {sessionStorage.getItem("name") || "Guest"}
+            </MenuItem>
             <MenuItem onClick={handleLogout}>Logout</MenuItem>
           </Menu>
         </Toolbar>
@@ -261,7 +275,9 @@ data={shops}
 />
 </div> */}
 
-      <br></br><br></br><br></br>
+      <br></br>
+      <br></br>
+      <br></br>
       <Box
         sx={{ opacity: `${isExpanded ? "0.2" : "1"}` }}
         mt={4}
@@ -273,6 +289,20 @@ data={shops}
             if (viewMode === "deals" && !shop.discount) {
               return null;
             }
+            let pricingBadge;
+            switch (shop.pricingLevel) {
+              case 1:
+                pricingBadge = "₹";
+                break;
+              case 2:
+                pricingBadge = "₹₹";
+                break;
+              case 3:
+                pricingBadge = "₹₹₹";
+                break;
+              default:
+                pricingBadge = ""; // or any default representation you prefer
+            }
 
             return (
               <Card
@@ -282,6 +312,7 @@ data={shops}
                   boxShadow: 1,
                   borderRadius: 2,
                   transition: "transform 0.2s",
+                  position: "relative", // This is important for the absolute positioning of the Chip
                   "&:hover": {
                     transform: "scale(1.05)",
                   },
@@ -289,14 +320,24 @@ data={shops}
                   flexDirection: "row",
                   alignItems: "center",
                   p: 1,
+                  "z-index": "0",
                   mx: { xs: 0, sm: 2 },
                 }}
-              // onClick={() => handleNavigateClick(shop.nodeId)}
+                // onClick={() => handleNavigateClick(shop.nodeId)}
               >
+                <Box
+                  sx={{
+                    position: "absolute",
+                    top: 8, // Adjust top and left as per your styling needs
+                    left: 8,
+                    zIndex: "tooltip", // To ensure the badge is above other elements
+                  }}
+                >
+                  <Chip label={pricingBadge} sx={chipStyle} />
+                </Box>
                 <CardActionArea
                   sx={{ display: "flex", flexDirection: "row", flexGrow: 1 }}
                   onClick={() => handle(shop.nodeId)}
-
                 >
                   {shop && (
                     <CardMedia
@@ -319,7 +360,7 @@ data={shops}
                       color="textSecondary"
                       sx={{ mt: 1 }}
                     >
-                      Category: {shop.category?.join(", ")}
+                      Category: {shop.category}
                     </Typography>
                     {shop.discount && (
                       <Box display="flex" alignItems="center" mt={1}>
@@ -365,7 +406,12 @@ data={shops}
             <IconButton
               onClick={() =>
                 navigate("/dashboard", {
-                  state: { endNodesList: [], destinationShopId: "nearestWashroom", market: location.state?.market },
+                  state: {
+                    endNodesList: [],
+                    destinationShopId: "nearestWashroom",
+                    market: location.state?.market,
+                    clickedItem: "washroom",
+                  },
                 })
               }
             >
@@ -382,7 +428,9 @@ data={shops}
             <IconButton
               onClick={() => {
                 /* Handle navigation to main gate */
-                window.alert("No Gate mapped till now!\nWe will map it soon :) \nStay tuned!")
+                window.alert(
+                  "No Gate mapped till now!\nWe will map it soon :) \nStay tuned!"
+                );
               }}
             >
               <img
@@ -398,7 +446,9 @@ data={shops}
             <IconButton
               onClick={() => {
                 /* Handle navigation to ATM */
-                window.alert("No nearby ATM mapped till now!\nWe will map it soon :) \nstay tuned!")
+                window.alert(
+                  "No nearby ATM mapped till now!\nWe will map it soon :) \nstay tuned!"
+                );
               }}
             >
               <img
@@ -427,8 +477,13 @@ data={shops}
         </IconButton>
       </Box>
 
-      <Dialog open={openModal} onClose={() => setOpenModal(false)} fullWidth maxWidth="xs">
-        <DialogTitle sx={{ textAlign: 'center', pb: 1 }}>
+      <Dialog
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        fullWidth
+        maxWidth="xs"
+      >
+        <DialogTitle sx={{ textAlign: "center", pb: 1 }}>
           <Typography variant="h6" component="div">
             {selectedShopDetails?.name}
           </Typography>
@@ -440,23 +495,28 @@ data={shops}
               image={logo} // Replace with selectedShopDetails?.image or similar
               alt={selectedShopDetails?.name}
               sx={{
-                width: '80%',
-                height: 'auto',
-                borderRadius: '15px',
-                mb: 2
+                width: "80%",
+                height: "auto",
+                borderRadius: "15px",
+                mb: 2,
               }}
             />
             <Typography variant="subtitle1" color="textSecondary" gutterBottom>
               Floor: {selectedShopDetails?.floor}
             </Typography>
             <Typography variant="subtitle1" color="textSecondary" gutterBottom>
-              Category: {selectedShopDetails?.category?.join(", ")}
+              Category: {selectedShopDetails?.category}
             </Typography>
             {/* Add more details as needed */}
           </Box>
         </DialogContent>
-        <DialogActions sx={{ justifyContent: 'center', mt: 2 }}>
-          <Button variant="outlined" onClick={() => setOpenModal(false)} color="primary" sx={{ mr: 2 }}>
+        <DialogActions sx={{ justifyContent: "center", mt: 2 }}>
+          <Button
+            variant="outlined"
+            onClick={() => setOpenModal(false)}
+            color="primary"
+            sx={{ mr: 2 }}
+          >
             Cancel
           </Button>
           <Button
@@ -466,9 +526,17 @@ data={shops}
               if (selectedShopDetails?.nearby) {
                 destinationNodeId = selectedShopDetails?.nearby;
               }
-              const selectedShop = shops.find(shop => shop.nodeId === destinationNodeId);
+              const selectedShop = shops.find(
+                (shop) => shop.nodeId === destinationNodeId
+              );
               const endNodesList = frequencyMap[selectedShop.name][2];
-              navigate("/dashboard", { state: { endNodesList: endNodesList, destinationShopId: destinationNodeId, market: location.state?.market } });
+              navigate("/dashboard", {
+                state: {
+                  endNodesList: endNodesList,
+                  destinationShopId: destinationNodeId,
+                  market: location.state?.market,
+                },
+              });
               setOpenModal(false);
             }}
             color="primary"
@@ -477,10 +545,7 @@ data={shops}
           </Button>
         </DialogActions>
       </Dialog>
-
     </Container>
-
-
   );
 };
 

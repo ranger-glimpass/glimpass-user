@@ -1,6 +1,17 @@
-import React, { useEffect } from "react";
+import React, {useState, useEffect } from "react";
 import { Button } from "@mui/material";
-// import "../styles/NavigationButtons.css";
+import "../styles/NavigationButtons.css";
+
+
+// const Popup = ({ message }) => {
+//   if (!message) return null;
+
+//   return (
+//     <div className="popup">
+//       {message}
+//     </div>
+//   );
+// };
 
 const NavigationButtons = ({
   route,
@@ -8,9 +19,10 @@ const NavigationButtons = ({
   handleDropdownChange,
   changeSlectedIndexDynamic,
 }) => {
+  console.log(currentRoute, "test");
   let currentIndex = route.findIndex(
-    (item) =>
-      item.shopOrCheckpoint.name === currentRoute[0]?.shopOrCheckpoint?.name
+    item =>
+      item.shopOrCheckpoint.nodeId === currentRoute[0]?.shopOrCheckpoint?.nodeId
   );
   console.log(route, "Route");
   console.log(currentRoute, "Current - Route");
@@ -43,37 +55,133 @@ const NavigationButtons = ({
 
   const nodesToDisplay = route.slice(start, end + 1);
 
-  const checkpointOrStop=(node)=>{
-    if(node.shopOrCheckpoint?.nodeType === "checkpoint"){
-      return 'Just a Turn'
-    }
-    else{
+  const checkpointOrStop = node => {
+    if (node.shopOrCheckpoint?.nodeType === "checkpoint") {
+      return "Just a Turn";
+    } else {
       return node.shopOrCheckpoint?.name;
     }
-  }
+  };
+
+  // const [popupMessage, setPopupMessage] = useState('');
+  // const [showPopup, setShowPopup] = useState(false);
+
+
+  // const getDirection = (angle) => {
+  //   // Example: Convert angle to direction (this is a simplification)
+  //   if (angle > 45 && angle < 135) return 'right';
+  //   if (angle > 225 && angle < 315) return 'left';
+  //   return 'straight';
+  // };
+
+  // const generateRouteSummary = () => {
+  //   return route.map((node, index) => {
+  //     let directionText = '';
+  //     if (node.shopOrCheckpoint?.nodeType === "checkpoint") {
+  //       directionText = `Turn ${getDirection(node.connection.angle)}\n`;
+  //     } else {
+  //       directionText = `Go through ${node.shopOrCheckpoint.name}\n`;
+  //     }
+  //     return `${index === currentIndex ? 'Currently at' : ''} ${directionText}\n`;
+  //   }).join(', \n');
+  // };
+
+  // const handleShowSummary = () => {
+  //   setPopupMessage(generateRouteSummary());
+  //   console.log(generateRouteSummary(), 'routesummary')
+  //   setShowPopup(true);
+  // };
+
+  // useEffect(() => {
+  //   // Determine if popup needs to be shown
+  //   const directionText = generateDirectionText(currentIndex);
+  //   if (directionText) {
+  //     setPopupMessage(directionText);
+  //     setShowPopup(true);
+  //   }
+  // }, [currentIndex, route]);
+
+  // useEffect(() => {
+  //   let timer;
+  //   if (showPopup) {
+  //     timer = setTimeout(() => setShowPopup(false), 3000); // 3 seconds
+  //   }
+  //   return () => clearTimeout(timer);
+  // }, [showPopup]);
+
+  
+  // const handleButtonClick = (nodeId, currentIndex) => {
+  //   console.log(nodeId, "test t");
+  //   handleDropdownChange(nodeId);
+  //   const directionText = generateDirectionText(currentIndex);
+  //   if (directionText) {
+  //     setPopupMessage(directionText);
+  //     setShowPopup(true);
+  //   }
+  // };
+
+
+  const getFloorChangeMessage = (currentIndex, route) => {
+    if (route[currentIndex].shopOrCheckpoint.nodeType !== "floor_change" && route[currentIndex].shopOrCheckpoint.nodeType !== "floor_change_lift") {
+      return null; // Return null if it's not a floor_change node
+    }
+  
+    const floorChangeEntity = route[currentIndex].shopOrCheckpoint.nodeType === "floor_change" ? "Escalator":
+                              route[currentIndex].shopOrCheckpoint.nodeType === "floor_change_lift" ? "Lift" : "";  
+    const prevNode = route[currentIndex - 1]?.shopOrCheckpoint;
+    const nextNode = route[currentIndex + 1]?.shopOrCheckpoint;
+  
+    if (!prevNode || !nextNode) {
+      return null; // Return null if there is no previous or next node
+    }
+  
+    if (prevNode.floor !== nextNode.floor) {
+      return "Take the "+floorChangeEntity+ " to floor "+nextNode.floor;
+    } else {
+      return "Cross the "+floorChangeEntity;
+    }
+  };
+  
   return (
     <div className="horizontal-scroll">
+       {/* <Button onClick={handleShowSummary}>Show Route Summary</Button><br></br> */}
+     
+       {nodesToDisplay.map((node, index) => {
+  const buttonColor = node.shopOrCheckpoint.nodeId === currentRoute[0]?.shopOrCheckpoint?.nodeId ? "primary" : "inherit";
+  let buttonText = checkpointOrStop(node); // Your existing function to get the node text
+
+  // Check if it's a floor_change node and update the button text accordingly
+  const floorChangeMessage = getFloorChangeMessage(index + start, route);
+  if (floorChangeMessage) {
+    buttonText = floorChangeMessage;
+  }
+
+  return (
+    <Button
+      key={index}
+      variant="contained"
+      color={buttonColor}
+      onClick={() => handleDropdownChange(node.shopOrCheckpoint.nodeId)}
+      className="button-fixed-width"
+    >
+      {buttonText}
+    </Button>
+  );
+})}
+      {/* {showPopup && <Popup message={popupMessage} />} */}
+
+{/* <div className="horizontal-scroll">
       {nodesToDisplay.map((node, index) => (
-        <Button
+        <button
           key={index}
-          variant="contained"
-          color={
-            node.shopOrCheckpoint.name ===
-            currentRoute[0]?.shopOrCheckpoint?.name
-              ? "primary"
-              : "inherit"
-          }
-          onClick={() => handleDropdownChange(node.shopOrCheckpoint?.name)}
-          className="button-fixed-width" // Ensure buttons have the same width
+          onClick={() => handleButtonClick(node.shopOrCheckpoint.nodeId, index)}
+          className="button-fixed-width"
         >
-          {node.shopOrCheckpoint.name ===
-          currentRoute[0]?.shopOrCheckpoint?.name ? (
-            <>📍 {checkpointOrStop(node)}</>
-          ) : (
-            checkpointOrStop(node)
-          )}
-        </Button>
+          {checkpointOrStop(node)}
+        </button>
       ))}
+      {showPopup && <Popup message={popupMessage} />}
+    </div> */}
     </div>
   );
 };

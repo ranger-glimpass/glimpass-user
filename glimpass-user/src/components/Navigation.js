@@ -1,14 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import navigationArrow from "../assets/navigationArrow.svg";
 import CustomProgressBar from "../components/CustomProgressBar";
 import NavigationButtons from "./NavigationButtons";
 import {
   Button,
-  CircularProgress,
   Typography,
-  List,
-  ListItem,
-  ListItemText,
   Dialog,
   DialogActions,
   DialogContent,
@@ -29,6 +24,12 @@ import CountdownButton from "./CountdownButton";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import LoadingSpinner from "./LoadingSpinner";
 import arrowTorch from "../assets/arrowTorch.png";
+import reCalibrate from "../assets/reCalibrate.png";
+import areULost from "../assets/areULost.png";
+import ReRouting from "./ReRouting";
+
+import RouteSummary from "./RouteSummary";
+
 window.currentStep = 0;
 window.modifyDy = 1;
 
@@ -36,6 +37,7 @@ window.modifyDy = 1;
 
 const globalArray = [];
 const globalTimeArray = [];
+
 const Navigation = () => {
   const navigate = useNavigate();
 
@@ -52,6 +54,8 @@ const Navigation = () => {
   const destinationShopId = location.state.destinationShopId;
   const endNodesList = location.state.endNodesList;
   const [conn, setConn] = useState([]);
+  const [route, setRoute] = useState([]);
+  const [currentRoute, setCurrentRoute] = useState(route);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshed, setIsRefreshed] = useState(true);
   const [turnAngle, setTurnAngle] = useState(false);
@@ -64,7 +68,7 @@ const Navigation = () => {
   const [stepsWalked, setStepsWalked] = useState(0);
   const [selectedShopIndex, setSelectedShopIndex] = useState(0);
 
-  const [showMap, setShowMap] = useState(true);
+  const [showMap, setShowMap] = useState(false);
   const changeSlectedIndexDynamic = index => {
     console.log(index, "manish");
     setSelectedShopIndex(index);
@@ -107,11 +111,11 @@ const Navigation = () => {
           // Check if the data is empty or not in the desired format
           if (!data || data.length === 0) {
             alert("No route found!");
-            navigate("/shops"); // Assuming '/shops' is the route for the shops page
+            navigate("/markets"); // Assuming '/markets' is the route for the market page
             return;
           }
 
-          setConn(data); // Assuming the API returns the data in the desired format
+          setConn(data); // Assuming the API returns the data in the desirrerouteeled format
           console.log(data, "shortest path");
 
           const lastShop = conn[conn.length - 1]?.name;
@@ -381,45 +385,66 @@ const Navigation = () => {
     setAlpha(calibratedAlpha);
   };
 
-  useEffect(() => {
-    window.addEventListener("deviceorientation", handleOrientation);
-    window.addEventListener("devicemotion", handleMotion);
-
-    return () => {
+  const configureDeviceSensors = flag => {
+    if (flag) {
+      // console.log("hello");
+      window.addEventListener("deviceorientation", handleOrientation);
+      window.addEventListener("devicemotion", handleMotion);
+    } else {
+      // console.log("hi");
+      delete window.firstTime;
       window.removeEventListener("deviceorientation", handleOrientation);
       window.removeEventListener("devicemotion", handleMotion);
+    }
+  };
+
+  useEffect(() => {
+    configureDeviceSensors(true);
+    return () => {
+      configureDeviceSensors(false);
     };
   }, []);
 
   //conn is where we store {node, connection, node , connection ,....}
-  let route = [];
-  for (let i = 0; i < conn.length; i++) {
-    if (
-      conn[i].nodeType === "shop" ||
-      conn[i].nodeType === "washroom" ||
-      conn[i].nodeType === "checkpoint" ||
-      conn[i].nodeType === "floor_change"
-    ) {
-      const shopOrCheckpoint = conn[i];
-      const connection = conn[i + 1];
-      route.push({ shopOrCheckpoint, connection });
-      i++; // Increment by one more to skip the connection object
+
+  useEffect(() => {
+    let tempRoute = [];
+    for (let i = 0; i < conn.length; i++) {
+      if (
+        conn[i].nodeType === "shop" ||
+        conn[i].nodeType === "washroom" ||
+        conn[i].nodeType === "checkpoint" ||
+        conn[i].nodeType === "floor_change" ||
+        conn[i].nodeType === "floor_change_lift" 
+      ) {
+        const shopOrCheckpoint = conn[i];
+        const connection = conn[i + 1];
+        if (i + 2 < conn.length) {
+          connection.steps = connection.steps - conn[i + 2]?.nodeWeight;
+        }
+        console.log(connection, "manishhh");
+        tempRoute.push({ shopOrCheckpoint, connection });
+        i++; // Increment by one more to skip the connection object
+      }
     }
-  }
+    setRoute(tempRoute);
+  }, [conn]);
+
+  console.log(conn, "conn");
   console.log(route, "route");
-  const getDirection = (targetAngle, alpha) => {
-    let angleDifference = ((targetAngle - alpha + 180) % 360) - 180;
+  // const getDirection = (targetAngle, alpha) => {
+  //   let angleDifference = ((targetAngle - alpha + 180) % 360) - 180;
 
-    if (angleDifference > 180) angleDifference -= 360;
-    if (angleDifference < -180) angleDifference += 360;
+  //   if (angleDifference > 180) angleDifference -= 360;
+  //   if (angleDifference < -180) angleDifference += 360;
 
-    if (angleDifference >= -10 && angleDifference <= 10) return "straight";
-    if (angleDifference > 10 && angleDifference <= 45) return "slightly right";
-    if (angleDifference > 45 && angleDifference <= 135) return "sharp right";
-    if (angleDifference < -10 && angleDifference >= -45) return "slightly left";
-    if (angleDifference < -45 && angleDifference >= -135) return "sharp left";
-    return "U-turn";
-  };
+  //   if (angleDifference >= -10 && angleDifference <= 10) return "straight";
+  //   if (angleDifference > 10 && angleDifference <= 45) return "slightly right";
+  //   if (angleDifference > 45 && angleDifference <= 135) return "sharp right";
+  //   if (angleDifference < -10 && angleDifference >= -45) return "slightly left";
+  //   if (angleDifference < -45 && angleDifference >= -135) return "sharp left";
+  //   return "U-turn";
+  // };
 
   // If the conn array has an odd length, add the last shop without a connection
   // If the conn array has an odd length and the last element is a connection, add the last shop without a connection
@@ -427,7 +452,6 @@ const Navigation = () => {
   //     route.push({ shopOrCheckpoint: conn[conn.length - 1], connection: null });
   // }
 
-  const [currentRoute, setCurrentRoute] = useState(route);
   const [totalStep, setTotalStep] = useState(0);
   const [adjustedAng, setAdjustedAng] = useState(0);
   const [nextNodeAngle, setNextNodeAngle] = useState(0);
@@ -469,7 +493,7 @@ const Navigation = () => {
     setTotalStep(initialTotalSteps);
     setCurrentWalkAngle(currentRoute[0]?.connection?.angle || 0);
     setNextNodeAngle(currentRoute[1]?.connection?.angle || 0);
-  }, [currentRoute, alpha]);
+  }, [currentRoute, alpha, route]);
 
   useEffect(() => {
     if (currentRoute.length === 1) {
@@ -518,24 +542,36 @@ const Navigation = () => {
   }, [stepsV2.current]);
   // manish
 
+
   const floorPopupfn = () => {
-    const currentNodeType = currentRoute[1]?.shopOrCheckpoint?.nodeType;
-
-    let nextNode = currentRoute[2]?.shopOrCheckpoint;
-
-    let j = 2;
+    const currentIndex = currentRoute.findIndex(
+      item => item.shopOrCheckpoint.nodeType === "floor_change" || item.shopOrCheckpoint.nodeType === "floor_change_lift"
+    );
+  
+    if (currentIndex === -1) {
+      setShowFloorChangePopup(false);
+      return;
+    }
+  
+    const previousNode = currentIndex > 0 ? currentRoute[currentIndex - 1]?.shopOrCheckpoint : null;
+    let nextNode = currentRoute[currentIndex + 1]?.shopOrCheckpoint;
+  
+    let j = currentIndex + 1;
     while (j < currentRoute.length && nextNode?.nodeType === "checkpoint") {
       nextNode = currentRoute[j]?.shopOrCheckpoint;
       j++;
     }
-    if (currentNodeType === "floor_change" && nextNode) {
+  
+    if (previousNode && nextNode && previousNode.floor !== nextNode.floor) {
       setShowFloorChangePopup(true);
-      window.modifyDy = 0;
       setNextFloor(nextNode?.floor);
     } else {
       setShowFloorChangePopup(false);
     }
   };
+  
+
+
   useEffect(() => {
     // Check if you've reached the next destination
     const stepsToNextShop = currentRoute[0]?.connection?.steps || 1000000;
@@ -569,11 +605,12 @@ const Navigation = () => {
   }, [dy, currentRoute, turnAngle]);
 
   const handleDropdownChange = selectedShopName => {
+    console.log(selectedShopName, "test");
     const selectedIndex = route.findIndex(
-      item => item.shopOrCheckpoint.name === selectedShopName
+      item => item.shopOrCheckpoint.nodeId === selectedShopName
     );
     setCurrentRoute(route.slice(selectedIndex));
-
+    console.log(currentRoute, "test t");
     // If the first shop is selected, set the coordinates to (200, 200)
     if (selectedIndex === 0) {
       setSelectedShopCoords({ x: 200, y: 200 });
@@ -616,8 +653,9 @@ const Navigation = () => {
     // Reset stepsWalked and set the selected shop index
     setStepsWalked(0);
     const index = route.findIndex(
-      item => item.shopOrCheckpoint.name === selectedShopName
+      item => item.shopOrCheckpoint.nodeId === selectedShopName
     );
+    console.log(index, "test t");
     setSelectedShopIndex(index);
   };
 
@@ -664,24 +702,24 @@ const Navigation = () => {
     // setCurrentShop(currentRoute[0].shopOrCheckpoint?.name);
   }, [currentRoute]);
 
-  const directionsAndShops = route.reduce((acc, item, index) => {
-    if (item.shopOrCheckpoint.nodeType === "shop") {
-      acc.push(item.shopOrCheckpoint);
-    } else if (item.connection) {
-      acc.push({
-        direction: getDirection(item.connection.angle, dy),
-        steps: item.connection.steps,
-      });
-    }
-    return acc;
-  }, []);
+  // const directionsAndShops = route.reduce((acc, item, index) => {
+  //   if (item.shopOrCheckpoint.nodeType === "shop") {
+  //     acc.push(item.shopOrCheckpoint);
+  //   } else if (item.connection) {
+  //     acc.push({
+  //       direction: getDirection(item.connection.angle, dy),
+  //       steps: item.connection.steps,
+  //     });
+  //   }
+  //   return acc;
+  // }, []);
 
-  const totalStepsBetweenShops = directionsAndShops.reduce((acc, item) => {
-    if (item.steps) {
-      return acc + parseInt(item.steps);
-    }
-    return acc;
-  }, 0);
+  // const totalStepsBetweenShops = directionsAndShops.reduce((acc, item) => {
+  //   if (item.steps) {
+  //     return acc + parseInt(item.steps);
+  //   }
+  //   return acc;
+  // }, 0);
 
   // Prepare the data for the CustomProgressBar
   const shopsData = route.map((item, index) => {
@@ -703,6 +741,7 @@ const Navigation = () => {
     return {
       name: item.shopOrCheckpoint.name,
       nodeType: item.shopOrCheckpoint.nodeType,
+      floor: item.shopOrCheckpoint.floor,
       step: progressToThisPoint,
       anglesIn: anglesIn,
     };
@@ -741,7 +780,7 @@ const Navigation = () => {
 
     // Update the selectedShopCoords state
     setSelectedShopCoords({ x: currentX, y: currentY });
-  }, [selectedShopIndex]);
+  }, [selectedShopIndex, route]);
 
   let flattenedRoute = [];
   route.forEach(item => {
@@ -752,13 +791,12 @@ const Navigation = () => {
   });
 
   //console.log("routeF: ",flattenedRoute)
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const [viewBox, setViewBox] = useState("0 0 500 300");
 
   useEffect(() => {
     if (isRefreshed && route.length > 0) {
-      handleDropdownChange(route[0].shopOrCheckpoint?.name);
+      handleDropdownChange(route[0].shopOrCheckpoint?.nodeId);
       setIsRefreshed(false); // Reset isRefreshed to false after handling
     }
 
@@ -793,211 +831,6 @@ const Navigation = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  //   return isLoading ? (
-  //     <div
-  //       style={{
-  //         display: "flex",
-  //         justifyContent: "center",
-  //         alignItems: "center",
-  //         height: "100vh",
-  //       }}
-  //     >
-  //       <CircularProgress />
-  //     </div>
-  //   ) : showThanks ? (
-  //     <ThanksComponent
-  //       route={directionsAndShops}
-  //       stepsWalked={dy}
-  //       totalSteps={totalSteps}
-  //     />
-  //   ) : (
-  //     <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
-  //       {/* Dropdown at top right */}
-  //       <div style={{ alignSelf: "flex-end", margin: "10px" }}>
-  //         <Typography
-  //           variant="h6"
-  //           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-  //         >
-  //           📍 {currentRoute[0]?.shopOrCheckpoint?.name || "In between"}
-  //         </Typography>
-
-  //         {/* {isRefreshed &&(
-  //   handleDropdownChange(currentRoute[0]?.shopOrCheckpoint?.name)
-  // )} */}
-  //         {isDropdownOpen && (
-  //           <List>
-  //             {route.map((item, index) => (
-  //               <ListItem
-  //                 key={index}
-  //                 button
-  //                 selected={
-  //                   currentRoute[0]?.shopOrCheckpoint?.name ===
-  //                   item.shopOrCheckpoint?.name
-  //                 }
-  //                 onClick={() => {
-  //                   handleDropdownChange(item.shopOrCheckpoint?.name);
-  //                   setIsDropdownOpen(false);
-  //                 }}
-  //               >
-  //                 <ListItemText primary={item.shopOrCheckpoint?.name} />
-  //               </ListItem>
-  //             ))}
-  //           </List>
-  //         )}
-  //       </div>
-
-  // <Typography variant="h5" gutterBottom>
-  //           Navigation to {destinationName}
-  //         </Typography>
-
-  //       {/* SVG Map */}
-  //       <div
-  //         // onTouchStart={handleTouchStart}
-  //         // onTouchMove={handleTouchMove}
-  //         // style={{
-  //         //   flexGrow: 1,
-  //         //   display: "flex",
-  //         //   justifyContent: "center",
-  //         //   alignItems: "center",
-  //         // }}
-  //       >
-  //         <SvgIcon
-  //           viewBox="0 0 500 500"
-  //           style={{
-  //             border: "1px solid red",
-  //             margin: "20px 0",
-  //             width: "80%",
-  //             height: "80%",
-  //           }}
-  //         >
-  //           <Path
-  //             route={flattenedRoute}
-  //             ref={pathRef}
-  //             setViewBox={setViewBox}
-  //             stepsWalked={dy}
-  //             totalSteps={totalSteps}
-  //             adjustedAng={adjustedAng}
-  //           />
-  //         </SvgIcon>
-  //       </div>
-
-  //        {/* Use CustomProgressBar, passing the necessary props to it */}
-  //        <CustomProgressBar shops={shopsData} stepsWalked={dy} totalSteps={totalSteps} />
-
-  //       <div
-  //         style={{
-  //           display: "flex",
-  //           justifyContent: "center",
-  //           alignItems: "center",
-  //           padding: "20px",
-  //         }}
-  //       >
-  //         <img
-  //           src={navigationArrow}
-  //           alt="Navigation Arrow"
-  //           style={{
-  //             transform: `rotate(${adjustedAng}deg)`,
-  //             width: "50px", // Adjust this value as needed
-  //             height: "50px", // Adjust this value as needed
-  //           }}
-  //         />
-  //       </div>
-
-  //       {/* Route Details */}
-  //       <div style={{ padding: "20px" }}>
-
-  //         <Typography
-  //           variant="body1"
-  //           style={{ fontSize: "24px", fontWeight: "bold", margin: "10px 0" }}
-  //         >
-  //           Steps: {dy}
-  //         </Typography>
-
-  //         {/* <Typography variant="h6" gutterBottom>
-  //           Route:
-  //         </Typography> */}
-  //         {/* <div>
-  //           {currentRoute.slice(0, 2).map((item, index) => (
-  //             <Typography key={index} variant="body1" gutterBottom>
-  //               {index === 0
-  //                 ? `📍 Now at: ${item.shopOrCheckpoint?.name}`
-  //                 : item.shopOrCheckpoint?.type === "shop"
-  //                 ? `👉 Next shop: ${item.shopOrCheckpoint?.name}`
-  //                 : `Take ${getDirection(
-  //                     item.connection?.angle,
-  //                     dy
-  //                   )} in next ${remainingSteps} steps`}
-  //             </Typography>
-  //           ))}
-  //         </div> */}
-
-  //         <Typography variant="h6" gutterBottom>
-  //           Total Steps: {Math.max(0, totalStep - dy + lastRecordedStep.current)}
-  //         </Typography>
-
-  //         {/* Button at the bottom */}
-  //         <div style={{ marginTop: "20px" }}>
-  //           <Button variant="contained" color="primary" onClick={navigateToShops}>
-  //             Navigate other shops
-  //           </Button>
-  //         </div>
-  //       </div>
-
-  //       {showReachedPopup && (
-  //         <Dialog
-  //           open={showReachedPopup}
-  //           onClose={() => setShowReachedPopup(false)}
-  //         >
-  //           <DialogTitle>Confirmation</DialogTitle>
-  //           <DialogContent>
-  //             <DialogContentText>
-  //               Did you reach {currentRoute[0]?.shopOrCheckpoint?.name}?
-  //             </DialogContentText>
-  //           </DialogContent>
-  //           <DialogActions>
-  //             <Button onClick={() => setShowReachedPopup(false)} color="primary">
-  //               No
-  //             </Button>
-  //             <Button
-  //               onClick={() => {
-  //                 setShowReachedPopup(false);
-  //                 setShowThanks(true);
-  //               }}
-  //               color="primary"
-  //             >
-  //               Yes
-  //             </Button>
-  //           </DialogActions>
-  //         </Dialog>
-  //       )}
-
-  //       {showFloorChangePopup && (
-  //         <Dialog
-  //           open={showFloorChangePopup}
-  //           onClose={() => setShowFloorChangePopup(false)}
-  //         >
-  //           <DialogTitle>Floor Change Required</DialogTitle>{" "}
-  //           <DialogContent>
-  //             {" "}
-  //             <DialogContentText>
-  //               Proceed to the lift and go to floor {nextFloor}.{" "}
-  //             </DialogContentText>{" "}
-  //           </DialogContent>{" "}
-  //           <DialogActions>
-  //             {" "}
-  //             <Button
-  //               onClick={() => setShowFloorChangePopup(false)}
-  //               color="primary"
-  //             >
-  //               OK{" "}
-  //             </Button>{" "}
-  //           </DialogActions>{" "}
-  //         </Dialog>
-  //       )}
-  //     </div>
-  //   );
-  // };
-
   const [currentStep, setCurrentStep] = useState(1);
 
   // Function to toggle the map view
@@ -1007,6 +840,32 @@ const Navigation = () => {
 
   // Button label based on the showMap state
   const showMapButton = showMap ? "Hide Map" : "Show Map";
+
+  const reRouteEle = [
+    {
+      type: areULost,
+      action: () => {
+        navigate("/dashboard", {
+          state: {
+            destinationShopId,
+            endNodesList: endNodesList,
+            market: location.state?.market,
+          },
+        });
+      },
+    },
+    {
+      type: reCalibrate,
+      action: () => {
+        configureDeviceSensors(false);
+        setTimeout(() => {
+          window.alert("we are re configured");
+          configureDeviceSensors(true);
+        }, 3000);
+      },
+    },
+    // Add more icons as needed
+  ];
 
   return isLoading ? (
     <div
@@ -1025,7 +884,7 @@ const Navigation = () => {
     </div>
   ) : showThanks ? (
     <ThanksComponent
-      route={directionsAndShops}
+      // route={directionsAndShops}
       stepsWalked={dy}
       totalSteps={totalSteps}
     />
@@ -1037,6 +896,7 @@ const Navigation = () => {
       stepsWalked={dy}
       totalSteps={totalSteps}
     /> */}
+      <ReRouting icons={reRouteEle} />
       <div
         style={{
           display: "flex",
@@ -1095,7 +955,7 @@ const Navigation = () => {
           </div>*/}
         </div>
 
-        {/* <div style={{ marginTop: "20px" }}>
+        <div style={{ marginTop: "20px" }}>
           <Button
             variant="contained"
             color="primary"
@@ -1107,7 +967,7 @@ const Navigation = () => {
           >
             Add steps mannualy
           </Button>
-        </div> */}
+        </div>
 
         <CustomProgressBar
           shops={shopsData}
@@ -1116,6 +976,7 @@ const Navigation = () => {
           adjustedAng={adjustedAng}
           selectedShopIndex={selectedShopIndex}
         />
+
         <div>
           <NavigationButtons
             route={route}
@@ -1146,7 +1007,7 @@ const Navigation = () => {
             borderTop: "1px solid #ddd",
           }}
         >
-          <div>
+          {/* <div>
             <p>{turnAngle ? "Trueeee" : "Falseeee"}</p>
             <p>device raw alhpa value{aa?.toFixed(4)}</p>
             <p>after calibrated value{alpha}</p>
@@ -1160,21 +1021,15 @@ const Navigation = () => {
             <p>shop angle is {calibratedShopAngle}</p>
             <p>user steps{steps.current}</p>
             <p>user actual steps{stepsV2.current}</p>
-          </div>
-          <div style={{ marginTop: "20px" }}>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => {
-                steps.current++;
-                stepsV2.current++;
-                setdy(steps.current);
-              }}
-            >
-              Add steps mannualy
-            </Button>
-          </div>
-          ;<button onClick={toggleShowMap}>{showMapButton}</button>
+            <p>is walking : {window.modifyDy}</p>
+          </div> */}
+
+          <RouteSummary
+            shops={shopsData}
+            selectedShopIndex={selectedShopIndex}
+          />
+
+          <button onClick={toggleShowMap}>{showMapButton}</button>
           <div
             style={{
               transition: "opacity 2s ease",

@@ -33,11 +33,15 @@ const Dashboard = () => {
   const location = useLocation();
   const destinationShopId = location.state.destinationShopId;
   const endNodesList = location.state.endNodesList;
+  const market = location.state?.market;
   const [open, setOpen] = useState(false);
   const [shops, setShops] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentLocation, setCurrentLocation] = useState(null);
-  const [searchTerm, setSearchTerm] = useState(""); // <-- Add this state for search term
+  const [isButtonActive, setIsButtonActive] = useState(true);
+  const [updatedDestinationShopId, setUpdatedDestinationShopId] = useState(destinationShopId);
+
+
 
   const navigate = useNavigate();
   console.log(endNodesList, "endNodesList");
@@ -66,68 +70,59 @@ const Dashboard = () => {
     setCurrentSlide(0);
   };
 
-  useEffect(() => {
-    const fetchShops = async () => {
-      const response = await fetch(
-        "https://app.glimpass.com/graph/get-all-nodes-by-market",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            market: location.state?.market,
-          }),
-          // Add any necessary body data for the POST request
-        }
-      );
+  const fetchShops = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch("https://app.glimpass.com/graph/get-all-nodes-by-market", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ market }),
+      });
       const data = await response.json();
-      const shopsArray = Object.values(data);
-      let withoutMultientryShops = [];
-      shopsArray.forEach(newShop);
-      function newShop(i) {
-        if (i?.entryType !== "multientry") {
-          withoutMultientryShops.push(i);
-        }
-      }
-      setShops(withoutMultientryShops);
-      console.log(withoutMultientryShops, "Shops without multientry");
-      setIsLoading(false);
-    };
-
-    fetchShops();
-  }, []);
-
-  const [updatedDestinationShopId, setUpdatedDestinationShopId] =
-    useState(destinationShopId);
+      setShops(Object.values(data).filter(shop => shop?.entryType !== "multientry"));
+    } catch (error) {
+      console.error("Error fetching shops:", error);
+    }
+    setIsLoading(false);
+  };
 
   useEffect(() => {
-    const fetchUpdatedDestination = async () => {
-      if (destinationShopId === "nearestWashroom") {
-        const response = await fetch(
-          "https://app.glimpass.com/user/get-nearest-washroom",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              nodeId: currentLocation?.nodeId,
-            }),
-            // Add any necessary body data for the POST request
-          }
-        );
-        const data = await response.json();
-        setUpdatedDestinationShopId(data._id);
-        //destinationShopId = updatedDestinationShopId;
-        console.log("current id :", currentLocation?.nodeId);
-        console.log("Destination Shop ID from different API:", data._id);
-        console.log("DestinationShopID from different API:", destinationShopId);
-      }
+    fetchShops();
+    return () => {
+      window.removeEventListener("deviceorientation", handleOrientation);
+      window.removeEventListener("devicemotion", handleMotion);
     };
+  }, [market]);
 
-    fetchUpdatedDestination();
+  useEffect(() => {
+    if (destinationShopId === "nearestWashroom" && location.state.clickedItem) {
+      setIsButtonActive(false);
+      fetchNearestWashroom();
+    }
   }, [destinationShopId, currentLocation]);
+
+  const fetchNearestWashroom = async () => {
+    try {
+      const payload = { nodeId: currentLocation?.nodeId };
+      if (location?.state?.clickedItem) {
+        payload.nodeType = location.state.clickedItem;
+      }
+      const response = await fetch("https://app.glimpass.com/user/get-nearest-washroom", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await response.json();
+      setUpdatedDestinationShopId(data._id);
+    } catch (error) {
+      console.error("Error fetching nearest washroom:", error);
+    }
+    // console.log("current id :", currentLocation?.nodeId);
+    // console.log("Destination Shop ID from different API:", data._id);
+    // console.log("DestinationShopID from different API:", destinationShopId);
+    setIsButtonActive(true);
+  };
+
 
   const requestPermission = () => {
     if (
@@ -135,8 +130,8 @@ const Dashboard = () => {
       typeof DeviceOrientationEvent.requestPermission === "function"
     ) {
       DeviceOrientationEvent.requestPermission()
-        .then((response) => {
-          if (response == "granted") {
+        .then(response => {
+          if (response === "granted") {
             window.addEventListener("deviceorientation", handleOrientation);
             window.addEventListener("devicemotion", handleMotion);
           }
@@ -157,6 +152,7 @@ const Dashboard = () => {
         destinationShopId: updatedDestinationShopId,
         endNodesList: endNodesList,
         calibratedShopAngle: currentLocation?.shop_angle || 0,
+        market: market,
       },
     });
   };
@@ -179,10 +175,6 @@ const Dashboard = () => {
       </Box>
     );
   }
-
-  const filteredShops = shops.filter((shop) =>
-    shop.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   const checkFill = () => {
     if (currentLocation) {
@@ -239,20 +231,23 @@ const Dashboard = () => {
             sx={{ width: "100%", mt: 2 }}
           />
 
-          <Button
-            variant="contained"
-            sx={{
-              mt: 2,
-              bgcolor: themeStyles.primary,
-              "&:hover": { bgcolor: themeStyles.primary },
-              borderRadius: 20,
-              px: 3,
-              py: 1,
-            }}
-            onClick={() => checkFill()}
-          >
-            Confirm Location
-          </Button>
+<Button
+  variant="contained"
+  sx={{
+    mt: 2,
+    bgcolor: isButtonActive ? themeStyles.primary : themeStyles.secondary,
+    "&:hover": { bgcolor: isButtonActive ? themeStyles.primary : themeStyles.secondary },
+    borderRadius: 20,
+    px: 3,
+    py: 1,
+    color: isButtonActive ? 'white' : 'black' // Optional: change text color too
+  }}
+  onClick={() => checkFill()}
+  disabled={!isButtonActive} // Optional: disable the button click when grey
+>
+  Confirm Location
+</Button>
+
 
           <Modal open={open} onClose={() => setOpen(false)}>
             <Box
