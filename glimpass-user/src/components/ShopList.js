@@ -143,7 +143,19 @@ const ShopList = (props) => {
     getAllNodes();
   }, []);
 
+  
+  useEffect(() => {
+    // Check if session storage exists
+    const marketValue = location.state?.market;
+    if (marketValue == null) {
+      // If it does, redirect to the shops page
+      navigate('/markets');
+    }
+  }, [navigate]);
+
+
   const [viewMode, setViewMode] = useState("shop");
+
 
   if (isLoading) {
     return (
@@ -342,7 +354,7 @@ data={shops}
                   {shop && (
                     <CardMedia
                       component="img"
-                      image={logo}
+                      image={shop.imageUrl ? shop.imageUrl : logo}
                       alt={shop.name}
                       sx={{
                         width: 80,
@@ -492,7 +504,7 @@ data={shops}
           <Box display="flex" flexDirection="column" alignItems="center">
             <CardMedia
               component="img"
-              image={logo} // Replace with selectedShopDetails?.image or similar
+              image={selectedShopDetails.imageUrl ? selectedShopDetails.imageUrl : logo} // Replace with selectedShopDetails?.image or similar
               alt={selectedShopDetails?.name}
               sx={{
                 width: "80%",

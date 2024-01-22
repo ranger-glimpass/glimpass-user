@@ -58,6 +58,17 @@ const Dashboard = () => {
   //     navigate('/shops');
   //   }
   // },[destinationShopId])
+
+  // useEffect(() => {
+  //   // Check if session storage exists
+  //   const destinationValue = destinationShopId ;
+  //   if (destinationValue == null) {
+  //     // If it does, redirect to the shops page
+  //     navigate('/shops');
+  //   }
+  // }, [navigate,location.state]);
+
+
   const handleNext = () => {
     if (currentSlide === 0) {
       setCurrentSlide(1);
@@ -156,6 +167,9 @@ const Dashboard = () => {
       },
     });
   };
+
+
+
   console.log(currentLocation, "currentLocation");
   if (isLoading) {
     return (
@@ -181,6 +195,8 @@ const Dashboard = () => {
       setOpen(true);
     }
   };
+
+  
 
   return (
     <>
