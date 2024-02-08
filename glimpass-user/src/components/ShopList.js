@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import logo from "../assets/glimpassLogo.png";
 import atm from "../assets/atm.png";
+import parking from "../assets/parking.jpg";
 import gate from "../assets/gate.png";
 import bathroom from "../assets/bathroom.png";
 import close from "../assets/close.png";
@@ -354,7 +355,7 @@ data={shops}
                   {shop && (
                     <CardMedia
                       component="img"
-                      image={shop.imageUrl ? shop.imageUrl : logo}
+                      image={shop?.imageUrl ? shop?.imageUrl : logo}
                       alt={shop.name}
                       sx={{
                         width: 80,
@@ -473,6 +474,22 @@ data={shops}
                 }}
               />
             </IconButton>
+            <IconButton
+              onClick={() => navigate("/searchVehical", {
+                /* Handle navigation to Parking */
+                
+              })}
+            >
+              <img
+                src={parking}
+                alt="PARKING"
+                style={{
+                  width: "60px",
+                  height: "60px",
+                  borderRadius: "0%",
+                }}
+              />
+            </IconButton>
             {/* Add more buttons as needed */}
           </>
         )}
@@ -504,7 +521,7 @@ data={shops}
           <Box display="flex" flexDirection="column" alignItems="center">
             <CardMedia
               component="img"
-              image={selectedShopDetails.imageUrl ? selectedShopDetails.imageUrl : logo} // Replace with selectedShopDetails?.image or similar
+              image={selectedShopDetails?.imageUrl ? selectedShopDetails?.imageUrl : logo} // Replace with selectedShopDetails?.image or similar
               alt={selectedShopDetails?.name}
               sx={{
                 width: "80%",
