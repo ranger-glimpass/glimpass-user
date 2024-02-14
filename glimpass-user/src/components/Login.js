@@ -40,11 +40,15 @@ const Login = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  const [marketDirected, setMarketDirected] = useState(null);
+  const [goTo, setGoTo] = useState(null);
   const location = useLocation();
   useEffect(() => {
     // Parse query parameters
     const queryParams = new URLSearchParams(location.search);
     const nodeId = queryParams.get('nodeId');
+    setGoTo(queryParams.get('goTo'));
+    setMarketDirected(queryParams.get('marketDirected'));
 
     if (nodeId) {
       sessionStorage.setItem('currentLocation', `nodes/${nodeId}`);
@@ -110,7 +114,15 @@ const Login = () => {
       sessionStorage.setItem('_id', data._id);
       sessionStorage.setItem('email', data.email);
       sessionStorage.setItem('name', data.name);
-      navigate('/markets');
+      if(goTo && goTo.toLowerCase() === 'parking' && marketDirected){
+        navigate("/searchVehicle", {
+          state: {
+            market: marketDirected
+          }})
+      }
+      else{
+        navigate('/markets');
+      }
     } else { // If user does not exist
       if(googleName)
         {

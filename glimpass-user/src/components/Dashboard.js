@@ -109,11 +109,6 @@ const Dashboard = () => {
     } catch (error) {
       console.error("Error fetching shops:", error);
     }
-
-
-    
-
-
     setIsLoading(false);
   };
 
