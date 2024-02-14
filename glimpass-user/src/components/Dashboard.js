@@ -91,9 +91,29 @@ const Dashboard = () => {
       });
       const data = await response.json();
       setShops(Object.values(data).filter(shop => shop?.entryType !== "multientry"));
+      if(sessionStorage.getItem('currentLocation')){
+        const currentLocationDetailList = Object.values(data).filter(shop => shop?.nodeId === sessionStorage.getItem('currentLocation'))
+        const currentLocationDetail = currentLocationDetailList[0];
+        console.log(currentLocationDetail,'xxxxxxx')
+        navigate('/navigation', {
+          state: {
+            currentLocation: currentLocationDetail.nodeId,
+            // Include any other parameters required by the navigation component
+            destinationShopId: location.state.destinationShopId || '',
+            endNodesList: location.state.endNodesList || [],
+            market: location.state?.market || '',
+            calibratedShopAngle: currentLocationDetail?.shop_angle || 0,
+          },
+        });
+      }
     } catch (error) {
       console.error("Error fetching shops:", error);
     }
+
+
+    
+
+
     setIsLoading(false);
   };
 

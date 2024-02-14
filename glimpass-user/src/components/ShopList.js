@@ -43,6 +43,15 @@ import { Bathroom, Margin, NoAccounts } from "@mui/icons-material";
 import defaultDP from "../assets/defaultDP.png";
 import Chip from "@mui/material/Chip";
 
+
+const cardStyle = {
+  // New card style to match UI design provided
+  boxShadow: "none", // Remove shadow for a flatter design
+  marginBottom: "10px", // Spacing between cards
+  borderRadius: "10px", // Rounded corners like in the UI image
+  border: "1px solid #e0e0e0", // Light border as in UI image
+  overflow: "hidden", // Ensure nothing spills out of the card border radius
+};
 const chipStyle = {
   color: "white", // Text color
   border: "1px solid #e0e0e0", // Light grey border for minimalism
@@ -335,19 +344,27 @@ data={shops}
                   p: 1,
                   "z-index": "0",
                   mx: { xs: 0, sm: 2 },
+                  boxShadow: "none", // Remove shadow for a flatter design
+  marginBottom: "10px", // Spacing between cards
+  borderRadius: "10px", // Rounded corners like in the UI image
+  border: "1px solid #e0e0e0", // Light border as in UI image
+  overflow: "hidden", // Ensure nothing spills out of the card border radius
                 }}
                 // onClick={() => handleNavigateClick(shop.nodeId)}
               >
-                <Box
-                  sx={{
-                    position: "absolute",
-                    top: 8, // Adjust top and left as per your styling needs
-                    left: 8,
-                    zIndex: "tooltip", // To ensure the badge is above other elements
-                  }}
-                >
-                  <Chip label={pricingBadge} sx={chipStyle} />
-                </Box>
+                {/* Only render Chip if pricingBadge is not empty */}
+        {pricingBadge && (
+          <Box
+            sx={{
+              position: "absolute",
+              top: 8, // Adjust top and left as per your styling needs
+              left: 8,
+              zIndex: "tooltip", // To ensure the badge is above other elements
+            }}
+          >
+            <Chip label={pricingBadge} sx={chipStyle} />
+          </Box>
+        )}
                 <CardActionArea
                   sx={{ display: "flex", flexDirection: "row", flexGrow: 1 }}
                   onClick={() => handle(shop.nodeId)}
@@ -475,10 +492,13 @@ data={shops}
               />
             </IconButton>
             <IconButton
-              onClick={() => navigate("/searchVehical", {
-                /* Handle navigation to Parking */
-                
-              })}
+              onClick={() => 
+                navigate("/searchVehicle", {
+                  state: {
+                    market: location.state?.market
+                  },
+                })
+              }
             >
               <img
                 src={parking}

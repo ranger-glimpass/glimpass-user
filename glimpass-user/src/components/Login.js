@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button, TextField, Typography, Container, Box, Paper } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,useLocation } from 'react-router-dom';
 import glimpassLogo from "../assets/glimpassLogo.png"
 import logoGif from "../assets/logoGif.gif"
 import LoadingSpinner from './LoadingSpinner'; // Assuming your Loading component is in the same directory
@@ -21,6 +21,16 @@ const Login = () => {
   const [googleEmail, setGoogleEmail] = useState(null);
   const [googleName, setGoogleName] = useState(null);
 
+  
+  const handleOrientation = (event) => {
+    // Implement your logic for orientation changes
+    console.log(event.alpha, event.beta, event.gamma);
+  };
+
+  const handleMotion = (event) => {
+    // Implement your logic for motion changes
+    console.log(event.accelerationIncludingGravity.x, event.accelerationIncludingGravity.y, event.accelerationIncludingGravity.z);
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -29,6 +39,46 @@ const Login = () => {
 
     return () => clearTimeout(timer);
   }, []);
+
+  const location = useLocation();
+  useEffect(() => {
+    // Parse query parameters
+    const queryParams = new URLSearchParams(location.search);
+    const nodeId = queryParams.get('nodeId');
+
+    if (nodeId) {
+      sessionStorage.setItem('currentLocation', `nodes/${nodeId}`);
+      
+      const requestSensorPermissions = async () => {
+        if (typeof DeviceOrientationEvent !== "undefined" && typeof DeviceOrientationEvent.requestPermission === "function") {
+          try {
+            const permission = await DeviceOrientationEvent.requestPermission();
+            if (permission === "granted") {
+              window.addEventListener("deviceorientation", handleOrientation);
+              window.addEventListener("devicemotion", handleMotion);
+            }
+          } catch (error) {
+            console.error("Sensor permission request error:", error);
+          }
+        } else {
+          // Automatically add listeners if permissions are not required (non-iOS 13+ browsers)
+          window.addEventListener("deviceorientation", handleOrientation);
+          window.addEventListener("devicemotion", handleMotion);
+        }
+      };
+
+      // Call the function to request permissions and setup event listeners
+      requestSensorPermissions();
+    }
+
+    // Cleanup function to remove event listeners when the component unmounts or nodeId changes
+    return () => {
+      window.removeEventListener("deviceorientation", handleOrientation);
+      window.removeEventListener("devicemotion", handleMotion);
+    };
+  }, [location.search]); // Depend on location.search so this effect runs anytime the query parameters change
+
+
 
   useEffect(() => {
     // Check if session storage exists

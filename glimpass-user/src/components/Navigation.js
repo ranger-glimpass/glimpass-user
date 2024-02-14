@@ -61,6 +61,7 @@ const Navigation = () => {
   const [turnAngle, setTurnAngle] = useState(false);
   const [showFloorChangePopup, setShowFloorChangePopup] = useState(false);
   const [nextFloor, setNextFloor] = useState(null);
+  const [previousNodeName, setPreviousNodeName] = useState(null);
   const [selectedShopCoords, setSelectedShopCoords] = useState(null);
   const [nodeSelected, setNodeSelected] = useState(false);
 
@@ -565,6 +566,7 @@ const Navigation = () => {
     if (previousNode && nextNode && previousNode.floor !== nextNode.floor) {
       setShowFloorChangePopup(true);
       setNextFloor(nextNode?.floor);
+      setPreviousNodeName(previousNode?.name);
     } else {
       setShowFloorChangePopup(false);
     }
@@ -1144,7 +1146,7 @@ const Navigation = () => {
                       lineHeight: "1.5",
                     }}
                   >
-                    Step 1: Go to the lift/elevator.
+                    Step 1: Go to the lift/elevator near {previousNodeName}.
                   </DialogContentText>
                 </>
               ) : (
