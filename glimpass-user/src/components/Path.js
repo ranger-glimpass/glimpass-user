@@ -123,7 +123,7 @@ const Path = forwardRef(({ route, setViewBox, stepsWalked, totalSteps, adjustedA
                 const [x, y] = point.trim().split(' ');
                 const shopOrCheckpoint = nodesOnPath[index];
                 let name = '';
-                if (shopOrCheckpoint.nodeType === "shop" || shopOrCheckpoint.nodeType === "camera") {
+                if (shopOrCheckpoint.nodeType === "shop" || shopOrCheckpoint.nodeType === "camera" ||  shopOrCheckpoint.nodeType === "qrCode") {
                     name = shopOrCheckpoint?.name;
                 }
                 if (shopOrCheckpoint.nodeType === "floor_change") {

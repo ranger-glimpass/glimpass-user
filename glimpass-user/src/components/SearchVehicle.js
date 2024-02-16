@@ -7,6 +7,7 @@ const SearchVehicle = () => {
   const [query, setQuery] = useState('');
   const [carSelected, setCarSelected] = useState('');
   const [cars, setCars] = useState([]);
+  const [qrPlaced, setQrPlaced] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [openCalibrationModal, setOpenCalibrationModal] = useState(false); // State for calibration modal visibility
 
@@ -24,7 +25,8 @@ const SearchVehicle = () => {
             body: JSON.stringify({ market }),
           });
           const data = await response.json();
-          setCars(data);
+          setCars(data.camera);
+          setQrPlaced(data.qrCode);
         } catch (error) {
           console.error('Failed to fetch cars:', error);
         }
@@ -82,13 +84,14 @@ const SearchVehicle = () => {
   const navigateToNavigation = (carSelected) => {
     requestPermission().then(() => {
     const endNodesList = [carSelected.nodeId];
+    const calibratedShopAngle = qrPlaced.find(qrCode => qrCode._id === sessionStorage.getItem('currentLocation')).shop_angle;
     navigate("/navigation", {
       state: {
         currentLocation: sessionStorage.getItem('currentLocation'),
         destinationShopId: carSelected.nodeId,
         endNodesList: endNodesList,
         market: location.state?.market,
-        calibratedShopAngle: 0, // Placeholder, adjust as necessary
+        calibratedShopAngle: calibratedShopAngle, // Placeholder, adjust as necessary
       },
     });
     
