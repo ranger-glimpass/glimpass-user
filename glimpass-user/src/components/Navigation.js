@@ -124,7 +124,7 @@ const Navigation = () => {
 
           // Find the first shop and set it as the active shop
           const firstShop = data.find(
-            item => item.shopOrCheckpoint?.type === "shop"
+            item => item.shopOrCheckpoint?.type === "shop" || item.shopOrCheckpoint?.type==="camera"
           );
           if (firstShop) {
             setCurrentRoute([firstShop]);
@@ -415,6 +415,7 @@ const Navigation = () => {
         conn[i].nodeType === "shop" ||
         conn[i].nodeType === "washroom" ||
         conn[i].nodeType === "checkpoint" ||
+        conn[i].nodeType === "camera" ||
         conn[i].nodeType === "floor_change" ||
         conn[i].nodeType === "floor_change_lift" 
       ) {
