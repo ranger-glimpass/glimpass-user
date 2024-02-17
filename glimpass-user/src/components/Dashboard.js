@@ -132,6 +132,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (fetchWashroom && currentLocation) {
+     setIsButtonActive(false);
       fetchNearestWashroom()
     }
   }, [fetchWashroom, currentLocation]);
