@@ -53,6 +53,7 @@ const Navigation = () => {
   const calibratedShopAngle = location.state?.calibratedShopAngle || 0;
   const destinationShopId = location.state.destinationShopId;
   const endNodesList = location.state.endNodesList;
+  const isWashroom = location.state.isWashroom;
   const [conn, setConn] = useState([]);
   const [route, setRoute] = useState([]);
   const [currentRoute, setCurrentRoute] = useState(route);
@@ -139,7 +140,29 @@ const Navigation = () => {
         }
       };
 
-      fetchShortestPath();
+      if(!isWashroom || isWashroom?.status == 409){
+        fetchShortestPath();
+      }
+      else{
+        console.log(isWashroom,'wwwwwwwwwwwww')
+        setConn(isWashroom); // Assuming the API returns the data in the desirrerouteeled format
+          console.log(isWashroom, "shortest path");
+
+          const lastShop = conn[conn.length - 1]?.name;
+          setDestinationName(lastShop);
+
+          // Find the first shop and set it as the active shop
+          const firstShop = isWashroom.find(
+            item => item.shopOrCheckpoint?.type === "shop" || item.shopOrCheckpoint?.type==="camera" || item.shopOrCheckpoint?.type==="qrCode"
+          );
+          if (firstShop) {
+            setCurrentRoute([firstShop]);
+          }
+
+          setIsRefreshed(true);
+
+          setIsLoading(false); // Set loading to false here
+      }
     }
   }, [currentLocation, destinationShopId]);
 
