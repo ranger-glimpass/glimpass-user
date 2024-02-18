@@ -5,7 +5,7 @@ const CountdownButton = ({ handlePrevious, buttonText }) => {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
-    setCount(0);
+    setCount(5);
   }, [buttonText]);
 
   useEffect(() => {
