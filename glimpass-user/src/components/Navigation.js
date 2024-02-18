@@ -54,6 +54,7 @@ const Navigation = () => {
   const calibratedShopAngle = location.state?.calibratedShopAngle || 0;
   const destinationShopId = location.state.destinationShopId;
   const endNodesList = location.state.endNodesList;
+  const isWashroom = location.state.isWashroom;
   const [conn, setConn] = useState([]);
   const [route, setRoute] = useState([]);
   const [currentRoute, setCurrentRoute] = useState(route);
@@ -62,6 +63,7 @@ const Navigation = () => {
   const [turnAngle, setTurnAngle] = useState(false);
   const [showFloorChangePopup, setShowFloorChangePopup] = useState(false);
   const [nextFloor, setNextFloor] = useState(null);
+  const [previousNodeName, setPreviousNodeName] = useState(null);
   const [selectedShopCoords, setSelectedShopCoords] = useState(null);
   const [nodeSelected, setNodeSelected] = useState(false);
 
@@ -124,7 +126,7 @@ const Navigation = () => {
 
           // Find the first shop and set it as the active shop
           const firstShop = data.find(
-            (item) => item.shopOrCheckpoint?.type === "shop"
+            item => item.shopOrCheckpoint?.type === "shop" || item.shopOrCheckpoint?.type==="camera" || item.shopOrCheckpoint?.type==="qrCode"
           );
           if (firstShop) {
             setCurrentRoute([firstShop]);
@@ -139,7 +141,29 @@ const Navigation = () => {
         }
       };
 
-      fetchShortestPath();
+      if(!isWashroom || isWashroom?.status == 409){
+        fetchShortestPath();
+      }
+      else{
+        console.log(isWashroom,'wwwwwwwwwwwww')
+        setConn(isWashroom); // Assuming the API returns the data in the desirrerouteeled format
+          console.log(isWashroom, "shortest path");
+
+          const lastShop = conn[conn.length - 1]?.name;
+          setDestinationName(lastShop);
+
+          // Find the first shop and set it as the active shop
+          const firstShop = isWashroom.find(
+            item => item.shopOrCheckpoint?.type === "shop" || item.shopOrCheckpoint?.type==="camera" || item.shopOrCheckpoint?.type==="qrCode"
+          );
+          if (firstShop) {
+            setCurrentRoute([firstShop]);
+          }
+
+          setIsRefreshed(true);
+
+          setIsLoading(false); // Set loading to false here
+      }
     }
   }, [currentLocation, destinationShopId]);
 
@@ -415,6 +439,8 @@ const Navigation = () => {
         conn[i].nodeType === "shop" ||
         conn[i].nodeType === "washroom" ||
         conn[i].nodeType === "checkpoint" ||
+        conn[i].nodeType === "camera" ||
+        conn[i].nodeType === "qrCode" ||
         conn[i].nodeType === "floor_change" ||
         conn[i].nodeType === "floor_change_lift"
       ) {
@@ -570,6 +596,7 @@ const Navigation = () => {
     if (previousNode && nextNode && previousNode.floor !== nextNode.floor) {
       setShowFloorChangePopup(true);
       setNextFloor(nextNode?.floor);
+      setPreviousNodeName(previousNode?.name);
     } else {
       setShowFloorChangePopup(false);
     }
@@ -1148,7 +1175,7 @@ const Navigation = () => {
                       lineHeight: "1.5",
                     }}
                   >
-                    Step 1: Go to the lift/elevator.
+                    Step 1: Go to the lift/elevator near {previousNodeName}.
                   </DialogContentText>
                 </>
               ) : (

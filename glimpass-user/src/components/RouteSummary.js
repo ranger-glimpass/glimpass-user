@@ -61,8 +61,13 @@ const RouteSummary = ({ shops, selectedShopIndex }) => {
 
       if (turnDirection) {
         // If a turn is detected based on angle
-        pathShops.push(point.name);
-        summary += `Go through ${pathShops.join(", ")} and turn ${turnDirection}. \n`;
+        if(point.nodeType !== "checkpoint"){
+          pathShops.push("Go through " +point.name);
+        }
+        else{
+          pathShops.push("Go straight")
+        }
+        summary += `${pathShops.join(", ")} and turn ${turnDirection}. \n`;
         foundTurn = true;
         break;
       } else {

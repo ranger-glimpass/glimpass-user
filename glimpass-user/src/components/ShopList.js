@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import logo from "../assets/glimpassLogo.png";
 import atm from "../assets/atm.png";
+import parking from "../assets/parking.jpg";
 import gate from "../assets/gate.png";
 import bathroom from "../assets/bathroom.png";
 import close from "../assets/close.png";
@@ -42,6 +43,15 @@ import { Bathroom, Margin, NoAccounts } from "@mui/icons-material";
 import defaultDP from "../assets/defaultDP.png";
 import Chip from "@mui/material/Chip";
 
+
+const cardStyle = {
+  // New card style to match UI design provided
+  boxShadow: "none", // Remove shadow for a flatter design
+  marginBottom: "10px", // Spacing between cards
+  borderRadius: "10px", // Rounded corners like in the UI image
+  border: "1px solid #e0e0e0", // Light border as in UI image
+  overflow: "hidden", // Ensure nothing spills out of the card border radius
+};
 const chipStyle = {
   color: "white", // Text color
   border: "1px solid #e0e0e0", // Light grey border for minimalism
@@ -143,7 +153,19 @@ const ShopList = (props) => {
     getAllNodes();
   }, []);
 
+  
+  useEffect(() => {
+    // Check if session storage exists
+    const marketValue = location.state?.market;
+    if (marketValue == null) {
+      // If it does, redirect to the shops page
+      navigate('/markets');
+    }
+  }, [navigate]);
+
+
   const [viewMode, setViewMode] = useState("shop");
+
 
   if (isLoading) {
     return (
@@ -322,19 +344,27 @@ data={shops}
                   p: 1,
                   "z-index": "0",
                   mx: { xs: 0, sm: 2 },
+                  boxShadow: "none", // Remove shadow for a flatter design
+  marginBottom: "10px", // Spacing between cards
+  borderRadius: "10px", // Rounded corners like in the UI image
+  border: "1px solid #e0e0e0", // Light border as in UI image
+  overflow: "hidden", // Ensure nothing spills out of the card border radius
                 }}
                 // onClick={() => handleNavigateClick(shop.nodeId)}
               >
-                <Box
-                  sx={{
-                    position: "absolute",
-                    top: 8, // Adjust top and left as per your styling needs
-                    left: 8,
-                    zIndex: "tooltip", // To ensure the badge is above other elements
-                  }}
-                >
-                  <Chip label={pricingBadge} sx={chipStyle} />
-                </Box>
+                {/* Only render Chip if pricingBadge is not empty */}
+        {pricingBadge && (
+          <Box
+            sx={{
+              position: "absolute",
+              top: 8, // Adjust top and left as per your styling needs
+              left: 8,
+              zIndex: "tooltip", // To ensure the badge is above other elements
+            }}
+          >
+            <Chip label={pricingBadge} sx={chipStyle} />
+          </Box>
+        )}
                 <CardActionArea
                   sx={{ display: "flex", flexDirection: "row", flexGrow: 1 }}
                   onClick={() => handle(shop.nodeId)}
@@ -342,7 +372,7 @@ data={shops}
                   {shop && (
                     <CardMedia
                       component="img"
-                      image={logo}
+                      image={shop?.imageUrl ? shop?.imageUrl : logo}
                       alt={shop.name}
                       sx={{
                         width: 80,
@@ -461,6 +491,25 @@ data={shops}
                 }}
               />
             </IconButton>
+            <IconButton
+              onClick={() => 
+                navigate("/searchVehicle", {
+                  state: {
+                    market: location.state?.market
+                  },
+                })
+              }
+            >
+              <img
+                src={parking}
+                alt="PARKING"
+                style={{
+                  width: "60px",
+                  height: "60px",
+                  borderRadius: "0%",
+                }}
+              />
+            </IconButton>
             {/* Add more buttons as needed */}
           </>
         )}
@@ -492,7 +541,7 @@ data={shops}
           <Box display="flex" flexDirection="column" alignItems="center">
             <CardMedia
               component="img"
-              image={logo} // Replace with selectedShopDetails?.image or similar
+              image={selectedShopDetails?.imageUrl ? selectedShopDetails?.imageUrl : logo} // Replace with selectedShopDetails?.image or similar
               alt={selectedShopDetails?.name}
               sx={{
                 width: "80%",

@@ -40,8 +40,11 @@ const Dashboard = () => {
   const [currentLocation, setCurrentLocation] = useState(null);
   const [isButtonActive, setIsButtonActive] = useState(true);
   const [updatedDestinationShopId, setUpdatedDestinationShopId] = useState(destinationShopId);
+  const [isWashroom, setIsWashroom] = useState(null);
 
-
+  
+  // New state variable to control fetch
+  const [fetchWashroom, setFetchWashroom] = useState(false);
 
   const navigate = useNavigate();
   console.log(endNodesList, "endNodesList");
@@ -58,6 +61,17 @@ const Dashboard = () => {
   //     navigate('/shops');
   //   }
   // },[destinationShopId])
+
+  // useEffect(() => {
+  //   // Check if session storage exists
+  //   const destinationValue = destinationShopId ;
+  //   if (destinationValue == null) {
+  //     // If it does, redirect to the shops page
+  //     navigate('/shops');
+  //   }
+  // }, [navigate,location.state]);
+
+
   const handleNext = () => {
     if (currentSlide === 0) {
       setCurrentSlide(1);
@@ -80,6 +94,21 @@ const Dashboard = () => {
       });
       const data = await response.json();
       setShops(Object.values(data).filter(shop => shop?.entryType !== "multientry"));
+      if(sessionStorage.getItem('currentLocation')){
+        const currentLocationDetailList = Object.values(data).filter(shop => shop?.nodeId === sessionStorage.getItem('currentLocation'))
+        const currentLocationDetail = currentLocationDetailList[0];
+        console.log(currentLocationDetail,'xxxxxxx')
+        navigate('/navigation', {
+          state: {
+            currentLocation: currentLocationDetail.nodeId,
+            // Include any other parameters required by the navigation component
+            destinationShopId: location.state.destinationShopId || '',
+            endNodesList: location.state.endNodesList || [],
+            market: location.state?.market || '',
+            calibratedShopAngle: currentLocationDetail?.shop_angle || 0,
+          },
+        });
+      }
     } catch (error) {
       console.error("Error fetching shops:", error);
     }
@@ -94,16 +123,23 @@ const Dashboard = () => {
     };
   }, [market]);
 
+  // useEffect(() => {
+  //   if (destinationShopId === "nearestWashroom" && location.state.clickedItem) {
+  //     setIsButtonActive(false);
+  //     fetchNearestWashroom();
+  //   }
+  // }, [destinationShopId, currentLocation]);
+
   useEffect(() => {
-    if (destinationShopId === "nearestWashroom" && location.state.clickedItem) {
-      setIsButtonActive(false);
-      fetchNearestWashroom();
+    if (fetchWashroom && currentLocation) {
+     setIsButtonActive(false);
+      fetchNearestWashroom()
     }
-  }, [destinationShopId, currentLocation]);
+  }, [fetchWashroom, currentLocation]);
 
   const fetchNearestWashroom = async () => {
     try {
-      const payload = { nodeId: currentLocation?.nodeId };
+      const payload = { nodeId: currentLocation?.nodeId, market: market };
       if (location?.state?.clickedItem) {
         payload.nodeType = location.state.clickedItem;
       }
@@ -113,7 +149,7 @@ const Dashboard = () => {
         body: JSON.stringify(payload),
       });
       const data = await response.json();
-      setUpdatedDestinationShopId(data._id);
+      setIsWashroom(data);
     } catch (error) {
       console.error("Error fetching nearest washroom:", error);
     }
@@ -146,16 +182,20 @@ const Dashboard = () => {
     if (currentLocation?.nearby) {
       currentLocationId = currentLocation?.nearby;
     }
-    navigate("/navigation", {
-      state: {
-        currentLocation: currentLocationId,
-        destinationShopId: updatedDestinationShopId,
-        endNodesList: endNodesList,
-        calibratedShopAngle: currentLocation?.shop_angle || 0,
-        market: market,
-      },
-    });
+      navigate("/navigation", {
+        state: {
+          currentLocation: currentLocationId,
+          destinationShopId: updatedDestinationShopId,
+          endNodesList: endNodesList,
+          calibratedShopAngle: currentLocation?.shop_angle || 0,
+          market: market,
+          isWashroom: isWashroom
+        },
+      });
   };
+
+
+
   console.log(currentLocation, "currentLocation");
   if (isLoading) {
     return (
@@ -181,6 +221,18 @@ const Dashboard = () => {
       setOpen(true);
     }
   };
+
+  
+
+  // Adjust the onChange handler for the SearchBox component
+  // to set the flag when a location is selected
+  const handleLocationSelect = (location) => {
+    setCurrentLocation(location);
+    if(destinationShopId === 'nearestWashroom'){
+      setFetchWashroom(true); // Set flag to true to trigger fetch
+    }
+  };
+
 
   return (
     <>
@@ -226,9 +278,9 @@ const Dashboard = () => {
           <SearchBox
             data={shops}
             value={currentLocation}
-            onChange={setCurrentLocation}
-            onShopSelected={setCurrentLocation}
-            sx={{ width: "100%", mt: 2 }}
+            onChange={handleLocationSelect} // Adjusted to use the new handler
+        onShopSelected={handleLocationSelect} // Ensure it triggers the correct handler
+        sx={{ width: "100%", mt: 2 }}
           />
 
 <Button

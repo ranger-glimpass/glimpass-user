@@ -7,6 +7,8 @@ import ShopList from "./components/ShopList";
 import Navigation from "./components/Navigation";
 import ThanksComponent from "./components/Thanks";
 import MarketSelection from "./components/MarketSelection";
+//import ShopAdya from "./components/ShopAdya";
+import SearchVehicle from "./components/SearchVehicle";
 import { useState, useEffect } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 
@@ -94,8 +96,10 @@ function App() {
               <Route path="/markets" element={<MarketSelection />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/shops" element={<ShopList />} />
+              {/* <Route path="/shopadya" element={<ShopAdya />} /> */}
               <Route path="/navigation" element={<Navigation />} />
               <Route path="/thanks" element={<ThanksComponent />} />
+              <Route path="/searchVehicle" element={<SearchVehicle />} />
             </Routes>
           </div>
         </Router>

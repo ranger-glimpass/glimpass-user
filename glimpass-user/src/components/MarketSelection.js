@@ -37,6 +37,15 @@ const MarketSelection = () => {
   });
 };
 
+useEffect(() => {
+  // Check if session storage exists
+  const userId = sessionStorage.getItem('_id');
+  if (!userId) {
+    // If it does, redirect to the shops page
+    navigate('/login');
+  }
+}, [navigate]);
+
 return (
   <Container style={{ padding: '20px' }}>
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '10px' }}>
