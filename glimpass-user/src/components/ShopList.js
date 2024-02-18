@@ -42,7 +42,7 @@ import DiscountIcon from "@mui/icons-material/LocalOffer";
 import { Bathroom, Margin, NoAccounts } from "@mui/icons-material";
 import defaultDP from "../assets/defaultDP.png";
 import Chip from "@mui/material/Chip";
-
+import { alphaMap } from "../util.js";
 
 const cardStyle = {
   // New card style to match UI design provided
@@ -153,19 +153,16 @@ const ShopList = (props) => {
     getAllNodes();
   }, []);
 
-  
   useEffect(() => {
     // Check if session storage exists
     const marketValue = location.state?.market;
     if (marketValue == null) {
       // If it does, redirect to the shops page
-      navigate('/markets');
+      navigate("/markets");
     }
   }, [navigate]);
 
-
   const [viewMode, setViewMode] = useState("shop");
-
 
   if (isLoading) {
     return (
@@ -345,26 +342,26 @@ data={shops}
                   "z-index": "0",
                   mx: { xs: 0, sm: 2 },
                   boxShadow: "none", // Remove shadow for a flatter design
-  marginBottom: "10px", // Spacing between cards
-  borderRadius: "10px", // Rounded corners like in the UI image
-  border: "1px solid #e0e0e0", // Light border as in UI image
-  overflow: "hidden", // Ensure nothing spills out of the card border radius
+                  marginBottom: "10px", // Spacing between cards
+                  borderRadius: "10px", // Rounded corners like in the UI image
+                  border: "1px solid #e0e0e0", // Light border as in UI image
+                  overflow: "hidden", // Ensure nothing spills out of the card border radius
                 }}
                 // onClick={() => handleNavigateClick(shop.nodeId)}
               >
                 {/* Only render Chip if pricingBadge is not empty */}
-        {pricingBadge && (
-          <Box
-            sx={{
-              position: "absolute",
-              top: 8, // Adjust top and left as per your styling needs
-              left: 8,
-              zIndex: "tooltip", // To ensure the badge is above other elements
-            }}
-          >
-            <Chip label={pricingBadge} sx={chipStyle} />
-          </Box>
-        )}
+                {pricingBadge && (
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      top: 8, // Adjust top and left as per your styling needs
+                      left: 8,
+                      zIndex: "tooltip", // To ensure the badge is above other elements
+                    }}
+                  >
+                    <Chip label={pricingBadge} sx={chipStyle} />
+                  </Box>
+                )}
                 <CardActionArea
                   sx={{ display: "flex", flexDirection: "row", flexGrow: 1 }}
                   onClick={() => handle(shop.nodeId)}
@@ -492,10 +489,10 @@ data={shops}
               />
             </IconButton>
             <IconButton
-              onClick={() => 
+              onClick={() =>
                 navigate("/searchVehicle", {
                   state: {
-                    market: location.state?.market
+                    market: location.state?.market,
                   },
                 })
               }
@@ -541,7 +538,11 @@ data={shops}
           <Box display="flex" flexDirection="column" alignItems="center">
             <CardMedia
               component="img"
-              image={selectedShopDetails?.imageUrl ? selectedShopDetails?.imageUrl : logo} // Replace with selectedShopDetails?.image or similar
+              image={
+                selectedShopDetails?.imageUrl
+                  ? selectedShopDetails?.imageUrl
+                  : logo
+              } // Replace with selectedShopDetails?.image or similar
               alt={selectedShopDetails?.name}
               sx={{
                 width: "80%",
@@ -551,7 +552,7 @@ data={shops}
               }}
             />
             <Typography variant="subtitle1" color="textSecondary" gutterBottom>
-              Floor: {selectedShopDetails?.floor}
+              Floor: {alphaMap[selectedShopDetails?.floor]}
             </Typography>
             <Typography variant="subtitle1" color="textSecondary" gutterBottom>
               Category: {selectedShopDetails?.category}
