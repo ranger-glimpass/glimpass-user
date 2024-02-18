@@ -1100,7 +1100,7 @@ const Navigation = () => {
               </div>
             )}
           </div>
-          <MapComponent />
+          {/* <MapComponent /> */}
           {/* <Typography variant="body1" style={{ fontWeight: "bold", marginBottom: '10px' }}>
         Steps: {dy}
       </Typography>
