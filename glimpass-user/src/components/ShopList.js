@@ -62,7 +62,7 @@ const chipStyle = {
   backgroundColor: "#7e97f2", // White background to blend with the card
 };
 
-const ShopList = (props) => {
+const ShopList = props => {
   const navigate = useNavigate();
   const [shops, setShops] = useState([]);
   const [isLoading, setIsLoading] = useState(true); // State to track loading status
@@ -78,8 +78,12 @@ const ShopList = (props) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [showSearch, setShowSearch] = React.useState(false);
   const location = useLocation();
+  const startIdx = 0;
 
-  const handleNavigateClick = async (shopId) => {
+  const loadShopsNumber = 50;
+  // const hasMoreShops = 50 * startIdx + loadShopsNumber <= shops.length;
+
+  const handleNavigateClick = async shopId => {
     setActiveCard(shopId);
     const email = sessionStorage.getItem("email");
     const name = sessionStorage.getItem("name");
@@ -116,14 +120,14 @@ const ShopList = (props) => {
     const data = await response.json();
     const shopsArray = Object.values(data);
 
-    const amb = Object.values(ambienceShops);
-    console.log(amb, "ambeinceshop");
+    // const amb = Object.values(ambienceShops);
+    // console.log(amb, "ambeinceshop");
     //setShops(shopsArray);
     console.log(shops, "shops fetched!");
     console.log(shops.length, "total shops");
 
     const shopFrequency = {};
-    shopsArray.forEach((shop) => {
+    shopsArray.forEach(shop => {
       if (shopFrequency[shop.name]) {
         shopFrequency[shop.name][1] += 1; // Increment if already exists
         shopFrequency[shop.name][2].push(shop.nodeId);
@@ -144,8 +148,8 @@ const ShopList = (props) => {
     setIsLoading(false); // Set loading to false once data is fetched
   };
 
-  const handle = (shopId) => {
-    const selectedShop = shops.find((shop) => shop.nodeId === shopId);
+  const handle = shopId => {
+    const selectedShop = shops.find(shop => shop.nodeId === shopId);
     setSelectedShopDetails(selectedShop);
     setOpenModal(true);
   };
@@ -192,14 +196,14 @@ const ShopList = (props) => {
   };
 
   const filteredShops = selectedShop
-    ? shops.filter((shop) => shop.nodeId === selectedShop.nodeId)
+    ? shops.filter(shop => shop.nodeId === selectedShop.nodeId)
     : shops;
 
   const handleExpandClick = () => {
-    setIsExpanded((prev) => !prev);
+    setIsExpanded(prev => !prev);
   };
 
-  const handleMenu = (event) => {
+  const handleMenu = event => {
     setAnchorEl(event.currentTarget);
   };
 
@@ -244,7 +248,7 @@ const ShopList = (props) => {
           </IconButton> */}
           <SearchBox
             data={shops}
-            onShopSelected={(selectedShop) => {
+            onShopSelected={selectedShop => {
               handle(selectedShop); // set the details for the selected shop
             }}
           />
@@ -303,7 +307,8 @@ data={shops}
         px={{ xs: 2, sm: 4 }}
       >
         {filteredShops
-          .filter((shop) => shop.nodeType === "shop")
+          .slice(startIdx, loadShopsNumber)
+          .filter(shop => shop.nodeType === "shop")
           .map((shop, index) => {
             if (viewMode === "deals" && !shop.discount) {
               return null;
@@ -577,7 +582,7 @@ data={shops}
                 destinationNodeId = selectedShopDetails?.nearby;
               }
               const selectedShop = shops.find(
-                (shop) => shop.nodeId === destinationNodeId
+                shop => shop.nodeId === destinationNodeId
               );
               const endNodesList = frequencyMap[selectedShop.name][2];
               navigate("/dashboard", {
