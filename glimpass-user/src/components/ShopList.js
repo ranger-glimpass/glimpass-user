@@ -557,7 +557,10 @@ data={shops}
               }}
             />
             <Typography variant="subtitle1" color="textSecondary" gutterBottom>
-              Floor: {alphaMap[selectedShopDetails?.floor]}
+              {selectedShopDetails?.floor <= 8 ? "Floor" : "Block"}:
+              {selectedShopDetails?.floor <= 8
+                ? selectedShopDetails?.floor
+                : alphaMap[selectedShopDetails?.floor]}
             </Typography>
             <Typography variant="subtitle1" color="textSecondary" gutterBottom>
               Category: {selectedShopDetails?.category}
