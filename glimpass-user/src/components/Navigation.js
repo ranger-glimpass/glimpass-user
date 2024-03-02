@@ -31,7 +31,6 @@ import ReRouting from "./ReRouting";
 import RouteSummary from "./RouteSummary";
 import MapComponent from "./MapComponent";
 
-window.currentStep = 0;
 window.modifyDy = 1;
 
 //steps calculation
@@ -558,6 +557,8 @@ const Navigation = () => {
         reachRef.current = averageAngle;
         whereRef.current = "walking somewhere else";
       }
+      globalArray.shift();
+      globalTimeArray.shift();
     }
   }, [stepsV2.current]);
   // manish
@@ -877,16 +878,16 @@ const Navigation = () => {
         });
       },
     },
-    {
-      type: reCalibrate,
-      action: () => {
-        configureDeviceSensors(false);
-        setTimeout(() => {
-          window.alert("we are re configured");
-          configureDeviceSensors(true);
-        }, 3000);
-      },
-    },
+    // {
+    //   type: reCalibrate,
+    //   action: () => {
+    //     configureDeviceSensors(false);
+    //     setTimeout(() => {
+    //       window.alert("we are re configured");
+    //       configureDeviceSensors(true);
+    //     }, 3000);
+    //   },
+    // },
     // Add more icons as needed
   ];
 
@@ -919,6 +920,9 @@ const Navigation = () => {
       stepsWalked={dy}
       totalSteps={totalSteps}
     /> */}
+      <p>{window.modifyDy}</p>
+      <p>{reachRef.current}</p>
+      <p>{whereRef.current}</p>
       <ReRouting icons={reRouteEle} />
       <div
         style={{
