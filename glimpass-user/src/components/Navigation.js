@@ -995,14 +995,15 @@ const Navigation = () => {
             Add steps mannualy
           </Button>
         </div>
+        <RouteSummary shops={shopsData} selectedShopIndex={selectedShopIndex} />
 
-        <CustomProgressBar
+        {/* <CustomProgressBar
           shops={shopsData}
           stepsWalked={dy}
           totalSteps={totalSteps}
           adjustedAng={adjustedAng}
           selectedShopIndex={selectedShopIndex}
-        />
+        /> */}
 
         <div>
           <NavigationButtons
@@ -1050,11 +1051,6 @@ const Navigation = () => {
             <p>user actual steps{stepsV2.current}</p>
             <p>is walking : {window.modifyDy}</p>
           </div> */}
-
-          <RouteSummary
-            shops={shopsData}
-            selectedShopIndex={selectedShopIndex}
-          />
 
           <button onClick={toggleShowMap}>{showMapButton}</button>
           <div
