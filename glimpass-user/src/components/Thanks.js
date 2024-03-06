@@ -10,6 +10,9 @@ import {
   Divider,
 } from "@mui/material";
 import glimpassLogo from "../assets/glimpassLogo.png";
+import * as apiService from '../apiService'; // Adjust the import path as necessary
+
+
 const ThanksComponent = ({ route, stepsWalked, totalSteps }) => {
   const navigate = useNavigate();
   const [feedback, setFeedback] = useState(""); // State to hold feedback
@@ -26,18 +29,19 @@ const ThanksComponent = ({ route, stepsWalked, totalSteps }) => {
     console.log("userId", userId);
     try {
       if (userId) {
-        const response = await fetch("https://app.glimpass.com/user/feedback", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userId,
-            feedback,
-          }),
-        });
+        // const response = await fetch("https://app.glimpass.com/user/feedback", {
+        //   method: "POST",
+        //   headers: {
+        //     "Content-Type": "application/json",
+        //   },
+        //   body: JSON.stringify({
+        //     userId,
+        //     feedback,
+        //   }),
+        // });
+        const response = await apiService.submitFeedback(userId,feedback);
 
-        if (response.ok) {
+        if (response.data) {
           window.alert("Feedback received. Thank you!");
           window.location.href = "/markets";
         } else {

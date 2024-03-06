@@ -30,6 +30,7 @@ import ReRouting from "./ReRouting";
 
 import RouteSummary from "./RouteSummary";
 import MapComponent from "./MapComponent";
+import * as apiService from '../apiService'; // Adjust the import path as necessary
 
 window.modifyDy = 1;
 
@@ -86,17 +87,18 @@ const Navigation = () => {
       });
       console.log(currDest, "currDest");
       const fetchShortestPath = async () => {
-        const requestOptions = {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: currDest,
-        };
+        // const requestOptions = {
+        //   method: "POST",
+        //   headers: { "Content-Type": "application/json" },
+        //   body: currDest,
+        // };
         try {
-          const response = await fetch(
-            "https://app.glimpass.com/graph/get-shortest-path",
-            requestOptions
-          );
-          const data = await response.json();
+          // const response = await fetch(
+          //   "https://app.glimpass.com/graph/get-shortest-path",
+          //   requestOptions
+          // );
+          const response = await apiService.getShortestPath(currDest);
+          const data = await response.data;
 
           // Check if the data is empty or not in the desired format
           if (!data || data.length === 0) {
