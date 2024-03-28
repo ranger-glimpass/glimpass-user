@@ -14,6 +14,7 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 
 // 1. Import the logo image
 import logo from "./assets/glimpassLogo.png"; // Replace 'path-to-your-logo.png' with the actual path to your logo image
+import LandingPage from "./components/LandingPage";
 
 function App() {
   if ("serviceWorker" in navigator) {
@@ -100,6 +101,7 @@ function App() {
               <Route path="/navigation" element={<Navigation />} />
               <Route path="/thanks" element={<ThanksComponent />} />
               <Route path="/searchVehicle" element={<SearchVehicle />} />
+              <Route path="/landingPage/:id" element={<LandingPage />} />
             </Routes>
           </div>
         </Router>

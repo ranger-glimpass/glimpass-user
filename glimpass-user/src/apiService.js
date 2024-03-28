@@ -25,3 +25,4 @@ export const registerUser = ({ email, name }) => apiClient.post("/user/register"
 export const getAllNodesByMarket = (market) => apiClient.post("/graph/get-all-nodes-by-market", { market });
 
 export const submitFeedback = ({ userId, feedback }) => apiClient.post("/user/feedback", { userId, feedback });
+
