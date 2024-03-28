@@ -30,6 +30,7 @@ import ReRouting from "./ReRouting";
 
 import RouteSummary from "./RouteSummary";
 import MapComponent from "./MapComponent";
+import * as apiService from "../apiService"; // Adjust the import path as necessary
 
 window.modifyDy = 1;
 
@@ -41,7 +42,7 @@ const globalTimeArray = [];
 const Navigation = () => {
   const navigate = useNavigate();
 
-  const navigateToShops = event => {
+  const navigateToShops = (event) => {
     window.location.href = "/markets";
   };
 
@@ -71,7 +72,7 @@ const Navigation = () => {
   const [selectedShopIndex, setSelectedShopIndex] = useState(0);
 
   const [showMap, setShowMap] = useState(false);
-  const changeSlectedIndexDynamic = index => {
+  const changeSlectedIndexDynamic = (index) => {
     console.log(index, "manish");
     setSelectedShopIndex(index);
   };
@@ -86,17 +87,18 @@ const Navigation = () => {
       });
       console.log(currDest, "currDest");
       const fetchShortestPath = async () => {
-        const requestOptions = {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: currDest,
-        };
+        // const requestOptions = {
+        //   method: "POST",
+        //   headers: { "Content-Type": "application/json" },
+        //   body: currDest,
+        // };
         try {
-          const response = await fetch(
-            "https://app.glimpass.com/graph/get-shortest-path",
-            requestOptions
-          );
-          const data = await response.json();
+          // const response = await fetch(
+          //   "https://app.glimpass.com/graph/get-shortest-path",
+          //   requestOptions
+          // );
+          const response = await apiService.getShortestPath(currDest);
+          const data = await response.data;
 
           // Check if the data is empty or not in the desired format
           if (!data || data.length === 0) {
@@ -113,7 +115,7 @@ const Navigation = () => {
 
           // Find the first shop and set it as the active shop
           const firstShop = data.find(
-            item =>
+            (item) =>
               item.shopOrCheckpoint?.type === "shop" ||
               item.shopOrCheckpoint?.type === "camera" ||
               item.shopOrCheckpoint?.type === "qrCode"
@@ -143,7 +145,7 @@ const Navigation = () => {
 
         // Find the first shop and set it as the active shop
         const firstShop = isWashroom.find(
-          item =>
+          (item) =>
             item.shopOrCheckpoint?.type === "shop" ||
             item.shopOrCheckpoint?.type === "camera" ||
             item.shopOrCheckpoint?.type === "qrCode"
@@ -217,7 +219,7 @@ const Navigation = () => {
   const reachRef = useRef(0);
   const whereRef = useRef("nowhere");
 
-  const handleMotion = event => {
+  const handleMotion = (event) => {
     accRef.current = event.acceleration;
     totalAccX.current += parseInt(event.acceleration.x);
     totalAccY.current += parseInt(event.acceleration.y);
@@ -388,7 +390,7 @@ const Navigation = () => {
     setDyV2(parseFloat(steps.current));
   };
 
-  const handleOrientation = event => {
+  const handleOrientation = (event) => {
     dirRef.current = event;
     setAa(event.alpha);
     if (!window.firstTime) {
@@ -402,7 +404,7 @@ const Navigation = () => {
     setAlpha(calibratedAlpha);
   };
 
-  const configureDeviceSensors = flag => {
+  const configureDeviceSensors = (flag) => {
     if (flag) {
       // console.log("hello");
       window.addEventListener("deviceorientation", handleOrientation);
@@ -529,7 +531,8 @@ const Navigation = () => {
 
       const timeDiffInterval =
         (60 + globalTimeArray[len - 3] - globalTimeArray[len - 1]) % 60;
-      const percentageError = 20;
+      const percentageError = 40;
+      const pathPercentageError=10;
 
       let angleDiff = Math.abs(currentWalkAngle - nextNodeAngle);
       let angleDiff2 = Math.abs(360 - angleDiff);
@@ -537,15 +540,15 @@ const Navigation = () => {
       straightPath.current = angleDiff <= percentageError;
 
       if (
-        averageAngle >= currentWalkAngle - percentageError &&
-        averageAngle <= currentWalkAngle + percentageError
+        averageAngle >= currentWalkAngle - pathPercentageError &&
+        averageAngle <= currentWalkAngle + pathPercentageError
       ) {
         // true walking in right direction;
         reachRef.current = averageAngle;
         whereRef.current = "staright walk path";
       } else if (
-        averageAngle >= nextNodeAngle - percentageError &&
-        averageAngle <= nextNodeAngle + percentageError &&
+        averageAngle >= nextNodeAngle - pathPercentageError &&
+        averageAngle <= nextNodeAngle + pathPercentageError &&
         timeDiffInterval >= 1
       ) {
         // turns or not
@@ -565,7 +568,7 @@ const Navigation = () => {
 
   const floorPopupfn = () => {
     const currentIndex = currentRoute.findIndex(
-      item =>
+      (item) =>
         item.shopOrCheckpoint.nodeType === "floor_change" ||
         item.shopOrCheckpoint.nodeType === "floor_change_lift"
     );
@@ -604,12 +607,12 @@ const Navigation = () => {
       // If it's the last shop in the route
       window.modifyDy = 1;
       setTurnAngle(false);
-      setCurrentRoute(prevRoute => prevRoute.slice(1));
+      setCurrentRoute((prevRoute) => prevRoute.slice(1));
       lastRecordedStep.current = dy; // Reset the step count
     } else if (dy - lastRecordedStep.current >= stepsToNextShop) {
       floorPopupfn();
       if (currentRoute.length === 2) {
-        setCurrentRoute(prevRoute => prevRoute.slice(1));
+        setCurrentRoute((prevRoute) => prevRoute.slice(1));
       } else if (currentRoute.length == 1) {
         setShowReachedPopup(true);
       }
@@ -628,10 +631,10 @@ const Navigation = () => {
     // setCurrentShop(currentRoute[0].shopOrCheckpoint?.name);
   }, [dy, currentRoute, turnAngle]);
 
-  const handleDropdownChange = selectedShopName => {
+  const handleDropdownChange = (selectedShopName) => {
     console.log(selectedShopName, "test");
     const selectedIndex = route.findIndex(
-      item => item.shopOrCheckpoint.nodeId === selectedShopName
+      (item) => item.shopOrCheckpoint.nodeId === selectedShopName
     );
     setCurrentRoute(route.slice(selectedIndex));
     console.log(currentRoute, "test t");
@@ -677,7 +680,7 @@ const Navigation = () => {
     // Reset stepsWalked and set the selected shop index
     setStepsWalked(0);
     const index = route.findIndex(
-      item => item.shopOrCheckpoint.nodeId === selectedShopName
+      (item) => item.shopOrCheckpoint.nodeId === selectedShopName
     );
     console.log(index, "test t");
     setSelectedShopIndex(index);
@@ -711,7 +714,7 @@ const Navigation = () => {
     const stepsTaken = dy - dyPrevious.current;
 
     // Update the remaining steps
-    setRemainingSteps(prevSteps => Math.max(0, prevSteps - stepsTaken));
+    setRemainingSteps((prevSteps) => Math.max(0, prevSteps - stepsTaken));
 
     // Update the previous dy value for the next calculation
     dyPrevious.current = dy;
@@ -770,7 +773,7 @@ const Navigation = () => {
       anglesIn: anglesIn,
     };
   });
-  const resetSteps = index => {
+  const resetSteps = (index) => {
     if (index === 0) {
       steps.current = 0;
       stepsV2.current = 0;
@@ -807,7 +810,7 @@ const Navigation = () => {
   }, [selectedShopIndex, route]);
 
   let flattenedRoute = [];
-  route.forEach(item => {
+  route.forEach((item) => {
     flattenedRoute.push(item.shopOrCheckpoint);
     if (item.connection) {
       flattenedRoute.push(item.connection);
@@ -921,6 +924,8 @@ const Navigation = () => {
       totalSteps={totalSteps}
     /> */}
       <p>{window.modifyDy}</p>
+      <p>{currentWalkAngle}</p>
+      <p>{nextNodeAngle}</p>
       <p>{reachRef.current}</p>
       <p>{whereRef.current}</p>
       <ReRouting icons={reRouteEle} />

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardActionArea, CardMedia, CardContent, Typography, Grid, Container } from '@mui/material';
 import glimpassLogo from "../assets/glimpassLogo.png"
+import * as apiService from '../apiService'; // Adjust the import path as necessary
+
 // const malls = [
 //   { id: 1, name: 'Ambience Mall, Gurugram', imageUrl: 'https://imgstaticcontent.lbb.in/lbbnew/wp-content/uploads/sites/1/2016/05/Exterior_of_Ambi_Mall.jpg?w=1200&h=628&fill=blur&fit=fill' },
 //   { id: 2, name: 'New friends colony', imageUrl: 'https://i.ytimg.com/vi/VV-r81_uVs0/maxresdefault.jpg' },
@@ -18,8 +20,9 @@ const MarketSelection = () => {
   useEffect(() => {
   const fetchMarkets = async () => {
     try {
-      const response = await fetch('https://app.glimpass.com/graph/get-all-market');
-      const data = await response.json();
+      // const response = await fetch('https://app.glimpass.com/graph/get-all-market');
+      const response = await apiService.fetchMarkets();
+      const data = await response.data;
       setMalls(data);
     } catch (error) {
       console.error('Error fetching market data:', error);

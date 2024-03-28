@@ -3,6 +3,9 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, TextField, Typography, Container, Box, List, ListItem, Paper, Modal } from '@mui/material';
 import '../styles/SearchVehicle.css';
 import goToQR from '../assets/goToQR.gif'
+import * as apiService from '../apiService'; // Adjust the import path as necessary
+
+
 const SearchVehicle = () => {
   const [query, setQuery] = useState('');
   const [carSelected, setCarSelected] = useState('');
@@ -19,12 +22,13 @@ const SearchVehicle = () => {
       const market = location.state?.market;
       if (market) {
         try {
-          const response = await fetch('https://app.glimpass.com/graph/get-car-by-number', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ market }),
-          });
-          const data = await response.json();
+          // const response = await fetch('https://app.glimpass.com/graph/get-car-by-number', {
+          //   method: 'POST',
+          //   headers: { 'Content-Type': 'application/json' },
+          //   body: JSON.stringify({ market }),
+          // });
+          const response = await apiService.getCarByNumber(market);
+          const data = await response.data;
           setCars(data.camera);
           setQrPlaced(data.qrCode);
         } catch (error) {

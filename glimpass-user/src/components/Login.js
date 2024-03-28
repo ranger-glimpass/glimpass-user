@@ -4,6 +4,7 @@ import { useNavigate,useLocation } from 'react-router-dom';
 import glimpassLogo from "../assets/glimpassLogo.png"
 import logoGif from "../assets/logoGif.gif"
 import LoadingSpinner from './LoadingSpinner'; // Assuming your Loading component is in the same directory
+import * as apiService from '../apiService'; // Adjust the import path as necessary
 
 
 import { GoogleLogin } from 'react-google-login';
@@ -101,13 +102,15 @@ const Login = () => {
     setIsLoading(true);
     setLoadingText('Checking if you\'re registered...');
 
-    const response = await fetch('https://app.glimpass.com/user/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: emailToCheck }),
-    });
+    // const response = await fetch('https://app.glimpass.com/user/login', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify({ email: emailToCheck }),
+    // });
 
-    const data = await response.json();
+    
+    const response = await apiService.login(emailToCheck);
+    const data = await response.data;
     setIsLoading(false);
 
     if (data && data._id) { // If user exists
@@ -138,13 +141,15 @@ const Login = () => {
     setIsLoading(true);
     setLoadingText('Registering...');
 
-    const response = await fetch('https://app.glimpass.com/user/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: emailToRegister, name: nameToRegister }),
-    });
+    // const response = await fetch('https://app.glimpass.com/user/register', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify({ email: emailToRegister, name: nameToRegister }),
+    // });
 
-    const data = await response.json();
+
+const response = await apiService.registerUser(emailToRegister, nameToRegister);
+    const data = await response.data;
     setIsLoading(false);
 
     if (data && data[0] && data[0].user) {

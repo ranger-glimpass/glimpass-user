@@ -21,6 +21,7 @@ import CountdownButton from "./CountdownButton";
 import SearchBox from "./SearchBox";
 import LoadingSpinner from "./LoadingSpinner";
 import glimpassLogo from "../assets/glimpassLogo.png";
+import * as apiService from '../apiService'; // Adjust the import path as necessary
 
 const themeStyles = {
   primary: "#1976d2", // Primary color
@@ -87,12 +88,13 @@ const Dashboard = () => {
   const fetchShops = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch("https://app.glimpass.com/graph/get-all-nodes-by-market", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ market }),
-      });
-      const data = await response.json();
+      // const response = await fetch("https://app.glimpass.com/graph/get-all-nodes-by-market", {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify({ market }),
+      // });
+      const response = await apiService.getAllNodesByMarket(market);
+      const data = await response.data;
       setShops(Object.values(data).filter(shop => shop?.entryType !== "multientry"));
       if(sessionStorage.getItem('currentLocation')){
         const currentLocationDetailList = Object.values(data).filter(shop => shop?.nodeId === sessionStorage.getItem('currentLocation'))
@@ -143,12 +145,13 @@ const Dashboard = () => {
       if (location?.state?.clickedItem) {
         payload.nodeType = location.state.clickedItem;
       }
-      const response = await fetch("https://app.glimpass.com/user/get-nearest-washroom", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const data = await response.json();
+      // const response = await fetch("https://app.glimpass.com/user/get-nearest-washroom", {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify(payload),
+      // });
+      const response = await apiService.getNearestWashroom(payload);
+      const data = await response.data;
       setIsWashroom(data);
     } catch (error) {
       console.error("Error fetching nearest washroom:", error);

@@ -43,6 +43,9 @@ import { Bathroom, Margin, NoAccounts } from "@mui/icons-material";
 import defaultDP from "../assets/defaultDP.png";
 import Chip from "@mui/material/Chip";
 import { alphaMap } from "../util.js";
+import * as apiService from '../apiService'; // Adjust the import path as necessary
+
+import CryptoJS from 'crypto-js';
 
 const cardStyle = {
   // New card style to match UI design provided
@@ -87,12 +90,13 @@ const ShopList = props => {
     setActiveCard(shopId);
     const email = sessionStorage.getItem("email");
     const name = sessionStorage.getItem("name");
-    const response = await fetch("https://app.glimpass.com/user/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, name }),
-    });
-    const data = await response.json();
+    // const response = await fetch("https://app.glimpass.com/user/register", {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify({ email, name }),
+    // });
+    const response = await apiService.registerUser(email,name);
+    const data = await response.data;
     sessionStorage.setItem("_id", data[0].user._id);
     console.log(data, "register");
     const endNodeName = null;
@@ -103,21 +107,63 @@ const ShopList = props => {
     }, 300); // Delay for the fade-out effect
   };
 
+
+
+// Function to decrypt data
+const decryptData = (encryptedData, secretKey) => {
+  try {
+    const bytes = CryptoJS.AES.decrypt(encryptedData, secretKey);
+    const originalText = bytes.toString(CryptoJS.enc.Utf8);
+    if (!originalText) throw new Error('Failed to decrypt or empty result.');
+    return originalText;
+  } catch (e) {
+    console.error('Decryption error:', e);
+    throw e; // Re-throw the error or handle it as needed
+  }
+};
+
+
   const getAllNodes = async () => {
-    const response = await fetch(
-      "https://app.glimpass.com/graph/get-all-nodes-by-market",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          market: location.state?.market,
-        }),
-        // Add any necessary body data for the POST request
-      }
-    );
-    const data = await response.json();
+    // const response = await fetch(
+    //   "https://app.glimpass.com/graph/get-all-nodes-by-market",
+    //   {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify({
+    //       market: location.state?.market,
+    //     }),
+    //     // Add any necessary body data for the POST request
+    //   }
+    // );
+    // const response1 = await fetch(
+    //   "https://application.glimpass.com/graph/get-all-nodes",
+    //   {
+    //     method: "GET",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     }
+    //     // Add any necessary body data for the POST request
+    //   }
+    // );
+    // if (response1.ok) {
+    //   const encrypted_data = await response1.text();
+    //   console.log(encrypted_data, "response1 - encrypted");
+    //   const secret = await process.env.REACT_APP_SECRET_KEY; // Make sure the environment variable is correctly prefixed
+    //   console.log(secret, "secretttt");
+    //   const decryptedData = decryptData(encrypted_data, secret);
+    //   if (decryptedData) {
+    //     console.log(JSON.parse(decryptedData), "response1 - decrypted");
+    //   } else {
+    //     console.error('Decryption failed');
+    //   }
+    // } else {
+    //   console.error('Failed to fetch data');
+    // }
+  
+    const response = await apiService.getAllNodesByMarket(location.state?.market);
+    const data = await response.data;
     const shopsArray = Object.values(data);
 
     // const amb = Object.values(ambienceShops);
